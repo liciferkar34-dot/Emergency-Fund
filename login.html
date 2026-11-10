@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লগইন - Emergency Fund</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-96 border-t-4 border-green-600">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800" id="form-title">লগ ইন করুন</h2>
+            <button id="lang-btn" class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">EN/BN</button>
+        </div>
+        <form id="login-form" class="space-y-4">
+            <input type="email" id="email" placeholder="ইমেইল আইডি (Email)" required class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500">
+            <input type="password" id="password" placeholder="পাসওয়ার্ড (Password)" required class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500">
+            <button type="submit" id="submit-btn" class="w-full bg-green-600 text-white p-2 rounded font-bold hover:bg-green-700 transition">প্রবেশ করুন</button>
+        </form>
+        <p class="text-center mt-4 text-sm text-gray-600" id="switch-text">অ্যাকাউন্ট না থাকলে <a href="register.html" class="text-green-700 font-bold hover:underline">রেজিস্টার করুন</a></p>
+        <p class="text-center mt-2 text-xs text-gray-500"><a href="index.html" class="hover:underline">← হোমপেজে ফিরে যান</a></p>
+        <p id="msg" class="text-center mt-3 text-red-600 font-bold hidden"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyChlT0buxHzHEhBjSlbQNEaRezv7oTrZ-I",
+            authDomain: "peerfund-69940.firebaseapp.com",
+            projectId: "peerfund-69940",
+            storageBucket: "peerfund-69940.firebasestorage.app",
+            messagingSenderId: "114511100406",
+            appId: "1:114511100406:web:9a4d1bc77019a6dafa6fd7",
+            measurementId: "G-9NLBGHKMYY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msgBox = document.getElementById('msg');
+            msgBox.classList.add('hidden');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = "dashboard.html"; 
+            } catch (error) {
+                msgBox.classList.remove('hidden');
+                msgBox.innerText = "ভুল ইমেইল বা পাসওয়ার্ড। আবার চেষ্টা করুন।";
+            }
+        });
+
+        let lang = 'bn';
+        document.getElementById('lang-btn').addEventListener('click', () => {
+            lang = lang === 'bn' ? 'en' : 'bn';
+            document.getElementById('form-title').innerText = lang === 'bn' ? 'লগ ইন করুন' : 'Member Login';
+            document.getElementById('submit-btn').innerText = lang === 'bn' ? 'প্রবেশ করুন' : 'Login';
+            document.getElementById('switch-text').innerHTML = lang === 'bn' 
+                ? 'অ্যাকাউন্ট না থাকলে <a href="register.html" class="text-green-700 font-bold hover:underline">রেজিস্টার করুন</a>'
+                : 'New user? <a href="register.html" class="text-green-700 font-bold hover:underline">Register here</a>';
+        });
+    </script>
+</body>
+</html>

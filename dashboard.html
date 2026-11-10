@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ড্যাশবোর্ড - Emergency Fund</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans hidden" id="body-content">
+    
+    <nav class="bg-blue-800 text-white p-4 shadow-md flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold tracking-wider">Peer Fund Dashboard</h1>
+            <span id="role-badge" class="text-xs bg-blue-600 px-2 py-0.5 rounded">Member</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="user-name" class="font-semibold text-sm md:text-base">লোড হচ্ছে...</span>
+            <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded text-sm font-bold hover:bg-red-600 transition">লগ আউট</button>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto mt-8 p-4">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                <h3 class="text-gray-500 font-bold mb-1">মোট জমা (Total Collected)</h3>
+                <p class="text-3xl font-bold text-gray-800" id="total-collected">₹0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                <h3 class="text-gray-500 font-bold mb-1">প্রদত্ত লোন (Disbursed)</h3>
+                <p class="text-3xl font-bold text-gray-800" id="total-disbursed">₹0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                <h3 class="text-gray-500 font-bold mb-1">বর্তমান ব্যালেন্স (Available)</h3>
+                <p class="text-3xl font-bold text-blue-700" id="available-balance">₹0</p>
+            </div>
+        </div>
+
+        <!-- Members & Ledger -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">সদস্যদের হিসাব (Member Ledger)</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-700">
+                            <th class="p-3 border-b">নাম (Name)</th>
+                            <th class="p-3 border-b">ইমেইল (Email)</th>
+                            <th class="p-3 border-b">মোট জমা (Total Paid)</th>
+                            <th class="p-3 border-b admin-only hidden">অ্যাডমিন অ্যাকশন (Admin)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="member-list">
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-gray-500">ডেটাবেস থেকে তথ্য লোড হচ্ছে...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Emergency Loan Request Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">ইমার্জেন্সি ফান্ডের আবেদন (Apply for Fund)</h2>
+                <form id="loan-form" class="space-y-4">
+                    <input type="number" id="loan-amount" placeholder="টাকার পরিমাণ (Max ₹35,000)" max="35000" required class="w-full p-2 border border-gray-300 rounded">
+                    <textarea id="loan-reason" placeholder="ইমার্জেন্সির কারণ বিস্তারিত লিখুন..." required class="w-full p-2 border border-gray-300 rounded"></textarea>
+                    <button type="submit" class="w-full bg-blue-700 text-white p-2 rounded font-bold hover:bg-blue-800">আবেদন জমা দিন</button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">আবেদনের তালিকা (Loan Requests)</h2>
+                <div id="loan-list" class="space-y-3 max-h-64 overflow-y-auto">
+                    <p class="text-gray-500 text-sm">কোনো আবেদন নেই।</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, onSnapshot, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyChlT0buxHzHEhBjSlbQNEaRezv7oTrZ-I",
+            authDomain: "peerfund-69940.firebaseapp.com",
+            projectId: "peerfund-69940",
+            storageBucket: "peerfund-69940.firebasestorage.app",
+            messagingSenderId: "114511100406",
+            appId: "1:114511100406:web:9a4d1bc77019a6dafa6fd7",
+            measurementId: "G-9NLBGHKMYY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserData = null;
+        let isAdmin = false;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('body-content').classList.remove('hidden');
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    currentUserData = userDoc.data();
+                    isAdmin = currentUserData.role === 'admin' || user.email === 'dhananjoyk7@gmail.com';
+                    document.getElementById('user-name').innerText = currentUserData.name;
+                    document.getElementById('role-badge').innerText = isAdmin ? "Admin (Accountant)" : "Member";
+                    if (isAdmin) {
+                        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                    }
+                }
+                loadDashboardData();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        function loadDashboardData() {
+            let totalCollected = 0;
+            let totalDisbursed = 0;
+
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                totalCollected = 0;
+                const tbody = document.getElementById('member-list');
+                tbody.innerHTML = '';
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const paid = Number(data.totalPaid || 0);
+                    totalCollected += paid;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b hover:bg-gray-50";
+                    tr.innerHTML = `
+                        <td class="p-3 font-medium">${data.name}</td>
+                        <td class="p-3 text-sm text-gray-600">${data.email}</td>
+                        <td class="p-3 font-bold text-green-700">₹${paid}</td>
+                        ${isAdmin ? `<td class="p-3"><button data-id="${docSnap.id}" data-paid="${paid}" class="add-payment-btn bg-green-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-700">+ ₹1000 জমা দিন</button></td>` : ''}
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.querySelectorAll('.add-payment-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const uid = e.target.getAttribute('data-id');
+                        const currentPaid = Number(e.target.getAttribute('data-paid'));
+                        await updateDoc(doc(db, "users", uid), { totalPaid: currentPaid + 1000 });
+                    });
+                });
+
+                updateSummary(totalCollected, totalDisbursed);
+            });
+
+            onSnapshot(collection(db, "loans"), (snapshot) => {
+                totalDisbursed = 0;
+                const loanList = document.getElementById('loan-list');
+                loanList.innerHTML = '';
+                if (snapshot.empty) {
+                    loanList.innerHTML = '<p class="text-gray-500 text-sm">কোনো আবেদন নেই।</p>';
+                }
+                snapshot.forEach((docSnap) => {
+                    const l = docSnap.data();
+                    if (l.status === 'Approved') {
+                        totalDisbursed += Number(l.amount);
+                    }
+                    const div = document.createElement('div');
+                    div.className = "p-3 border rounded bg-gray-50 flex justify-between items-center";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-sm">${l.name} - <span class="text-blue-700">₹${l.amount}</span></p>
+                            <p class="text-xs text-gray-600">${l.reason}</p>
+                            <span class="text-xs font-bold ${l.status === 'Approved' ? 'text-green-600' : l.status === 'Rejected' ? 'text-red-600' : 'text-yellow-600'}">${l.status}</span>
+                        </div>
+                        ${isAdmin && l.status === 'Pending' ? `
+                        <div class="flex gap-1">
+                            <button data-id="${docSnap.id}" class="approve-btn bg-green-600 text-white px-2 py-1 rounded text-xs">Approve</button>
+                            <button data-id="${docSnap.id}" class="reject-btn bg-red-600 text-white px-2 py-1 rounded text-xs">Reject</button>
+                        </div>` : ''}
+                    `;
+                    loanList.appendChild(div);
+                });
+
+                document.querySelectorAll('.approve-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        await updateDoc(doc(db, "loans", e.target.getAttribute('data-id')), { status: 'Approved' });
+                    });
+                });
+                document.querySelectorAll('.reject-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        await updateDoc(doc(db, "loans", e.target.getAttribute('data-id')), { status: 'Rejected' });
+                    });
+                });
+
+                updateSummary(totalCollected, totalDisbursed);
+            });
+        }
+
+        function updateSummary(collected, disbursed) {
+            document.getElementById('total-collected').innerText = `₹${collected}`;
+            document.getElementById('total-disbursed').innerText = `₹${disbursed}`;
+            document.getElementById('available-balance').innerText = `₹${collected - disbursed}`;
+        }
+
+        document.getElementById('loan-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = document.getElementById('loan-amount').value;
+            const reason = document.getElementById('loan-reason').value;
+            await addDoc(collection(db, "loans"), {
+                name: currentUserData ? currentUserData.name : "Member",
+                amount: Number(amount),
+                reason: reason,
+                status: "Pending",
+                createdAt: new Date().toISOString()
+            });
+            document.getElementById('loan-form').reset();
+            alert("আপনার আবেদন জমা হয়েছে!");
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "index.html"; 
+            });
+        });
+    </script>
+</body>
+</html>
