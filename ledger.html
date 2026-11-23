@@ -15,50 +15,52 @@
     <div class="max-w-5xl mx-auto flex justify-between items-center gap-2">
       <div class="min-w-0 flex-1">
         <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="memberLedger">সদস্যদের হিসাব (Ledger)</h1>
-        <p class="text-[11px] text-[#5CDDAB] truncate">মাসের ৫ তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়</p>
+        <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="ledgerSub">নির্ধারিত তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়</p>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
         <button id="download-statement-btn" class="px-2.5 py-1.5 rounded-xl mint-btn text-xs whitespace-nowrap" data-i18n="monthlyStatement">
           মাসিক স্টেটমেন্ট PDF
         </button>
         <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
-          <span class="lang-indicator">EN</span>
+          <span class="lang-indicator">English</span>
         </button>
       </div>
     </div>
   </header>
 
   <main class="max-w-5xl mx-auto px-4 mt-5 space-y-5">
-    <div id="admin-settings-card" class="hidden fintech-card p-4 border-l-4 border-[#0A3C2A]">
-      <h3 class="font-extrabold text-xs text-[#0A3C2A] uppercase mb-2.5">⚙️ Admin Fund Settings (UPI ID & Late Fine)</h3>
-      <form id="settings-form" class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-        <input type="text" id="set-upi" placeholder="Fund UPI ID (e.g. 9832420007@ybl)" class="px-3 py-2 rounded-xl border text-xs" />
-        <input type="number" id="set-fine" placeholder="Late Fine Amount (₹100)" class="px-3 py-2 rounded-xl border text-xs" />
-        <button type="submit" class="mint-btn py-2 px-4 rounded-xl text-xs">সেটিংস সেভ করুন / Save</button>
-      </form>
-    </div>
-
+    <!-- Pending UTR Verification Queue (Staff) -->
     <div id="utr-verify-section" class="hidden fintech-card p-5 border-l-4 border-amber-500">
       <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3" data-i18n="pendingUtrQueue">ভেরিফিকেশনের অপেক্ষায় থাকা UPI পেমেন্ট</h3>
       <div id="pending-utr-list" class="space-y-3"></div>
     </div>
 
+    <!-- Search & Status Filters -->
     <div class="fintech-card p-4 space-y-3">
-      <input type="text" id="member-search" data-i18n-placeholder="searchMember" placeholder="নাম বা ফোন নম্বর দিয়ে খুঁজুন..."
+      <input type="text" id="member-search" data-i18n-placeholder="searchMember"
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A]" />
       <div class="flex flex-wrap gap-2">
         <button data-filter="all" class="filter-chip px-3 py-1.5 rounded-xl bg-[#0A3C2A] text-white text-xs font-bold" data-i18n="filterAll">সবাই</button>
         <button data-filter="paid" class="filter-chip px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold" data-i18n="filterActive">জমা হয়েছে</button>
-        <button data-filter="pending" class="filter-chip px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold" data-i18n="filterPending">বাকি (Pending)</button>
-        <button data-filter="overdue" class="filter-chip px-3 py-1.5 rounded-xl bg-red-100 text-red-800 text-xs font-bold" data-i18n="filterOverdue">মেয়াদোত্তীর্ণ (Overdue)</button>
+        <button data-filter="pending" class="filter-chip px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold" data-i18n="filterPending">বাকি</button>
+        <button data-filter="overdue" class="filter-chip px-3 py-1.5 rounded-xl bg-red-100 text-red-800 text-xs font-bold" data-i18n="filterOverdue">মেয়াদোত্তীর্ণ</button>
+        <button id="chip-unapproved" data-filter="unapproved" class="hidden filter-chip px-3 py-1.5 rounded-xl bg-slate-200 text-slate-800 text-xs font-bold" data-i18n="filterUnapproved">অননুমোদিত</button>
       </div>
     </div>
 
+    <!-- Member Cards Grid -->
     <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <p class="text-xs text-gray-500 text-center py-6 col-span-2">লোড হচ্ছে...</p>
+      <p class="text-xs text-gray-500 text-center py-6 col-span-2">...</p>
+    </div>
+
+    <!-- Staff Recent Transactions Revert / Undo List -->
+    <div id="staff-tx-history" class="hidden fintech-card p-5">
+      <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3" data-i18n="recentTxStaffTitle">সাম্প্রতিক লেনদেন (Undo / রিভার্ট করার সুবিধা)</h3>
+      <div id="staff-tx-list" class="space-y-2.5"></div>
     </div>
   </main>
 
+  <!-- Member Profile Detail Modal -->
   <div id="member-profile-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-md p-6 relative">
       <button id="close-profile-modal" class="absolute right-4 top-4 text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
@@ -73,33 +75,34 @@
 
       <div class="space-y-2.5 text-xs bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100">
         <div class="flex justify-between">
-          <span class="text-gray-500">মোট জমা (Total Paid):</span>
+          <span class="text-gray-500" data-i18n="totalPaidLabel">মোট জমা:</span>
           <span id="mp-paid" class="font-extrabold text-emerald-800">₹0</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-500">মোবাইল নম্বর (Mobile):</span>
+          <span class="text-gray-500" data-i18n="mobileCol">মোবাইল নম্বর:</span>
           <a id="mp-phone-link" href="#" class="font-bold text-[#0A3C2A] underline">📞 <span id="mp-phone">-</span></a>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-500">ব্লাড গ্রুপ (Blood Group):</span>
+          <span class="text-gray-500" data-i18n="bloodCol">ব্লাড গ্রুপ:</span>
           <span id="mp-blood" class="font-extrabold text-red-600">-</span>
         </div>
         <div class="flex justify-between items-center">
-          <span class="text-gray-500">ফ্যামিলি SOS নম্বর:</span>
+          <span class="text-gray-500" data-i18n="sosCol">ফ্যামিলি SOS নম্বর:</span>
           <a id="mp-sos-link" href="#" class="font-bold text-red-700 underline">🚑 <span id="mp-sos">-</span></a>
         </div>
         <div class="flex justify-between">
-          <span class="text-gray-500">UPI ID:</span>
+          <span class="text-gray-500" data-i18n="upiCol">UPI ID:</span>
           <span id="mp-upi" class="font-semibold text-gray-800">-</span>
         </div>
         <div id="mp-bank-row" class="hidden pt-2 border-t border-emerald-200 flex justify-between">
-          <span class="text-gray-500">ব্যাঙ্ক অ্যাকাউন্ট (Private):</span>
+          <span class="text-gray-500" data-i18n="bankCol">ব্যাঙ্ক অ্যাকাউন্ট (গোপন):</span>
           <span id="mp-bank" class="font-bold text-gray-900">-</span>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Screenshot Inspection Modal -->
   <div id="screenshot-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-md p-4">
       <div class="flex justify-between items-center mb-2">
@@ -110,32 +113,52 @@
     </div>
   </div>
 
-  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
-  <nav id="bottom-nav" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
-    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
-      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+  <!-- Floating Undo / Redo Bar -->
+  <div id="undo-redo-bar" class="hidden fixed bottom-20 left-3 right-3 max-w-md mx-auto bg-slate-900/95 text-white rounded-2xl px-3.5 py-2 shadow-xl border border-white/15 z-40 flex items-center justify-between gap-2">
+    <span id="undo-redo-label" class="text-[11px] text-emerald-200 truncate flex-1">Action recorded</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="global-undo-btn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↩️ <span data-i18n="undoBtn">Undo</span>
+      </button>
+      <button id="global-redo-btn" class="px-2.5 py-1 rounded-lg bg-emerald-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↪️ <span data-i18n="redoBtn">Redo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 5-Tab High-Contrast SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-3 left-2.5 right-2.5 max-w-lg mx-auto bottom-nav-pill text-white rounded-2xl px-1.5 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-5 gap-0.5 text-center text-[10px] sm:text-[11px] leading-none">
+      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="ledger.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+      <a href="settings.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navSettings">সেটিংস</span>
       </a>
     </div>
   </nav>
@@ -145,10 +168,12 @@
     import {
       collection,
       doc,
-      setDoc,
       addDoc,
       updateDoc,
+      deleteDoc,
       onSnapshot,
+      query,
+      orderBy,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import {
@@ -156,11 +181,13 @@
       setupCommonUI,
       formatINR,
       getCurrentMonthKey,
-      isAfterFifthOfMonth,
+      isAfterDueDay,
       logAudit,
-      generateMonthlyStatementPDF
+      generateMonthlyStatementPDF,
+      pushUndoAction,
+      askForRemarks
     } from "./js/utils.js";
-    import { getLang } from "./js/i18n.js";
+    import { getLang, t } from "./js/i18n.js";
 
     setupCommonUI();
 
@@ -168,120 +195,218 @@
       const isStaff = me.role === "admin" || me.role === "co_admin";
       const isAdmin = me.role === "admin";
       let lateFineRate = 100;
-      let allMembers = [];
+      let monthlyUnit = 1000;
+      let dueDay = 5;
+      let allUsers = [];
       let allLoans = [];
       let activeFilter = "all";
 
-      if (isAdmin) {
-        document.getElementById("admin-settings-card").classList.remove("hidden");
+      if (isStaff) {
+        document.getElementById("chip-unapproved").classList.remove("hidden");
+        document.getElementById("staff-tx-history").classList.remove("hidden");
       }
 
       onSnapshot(doc(db, "settings", "general"), (snap) => {
         if (snap.exists()) {
           const d = snap.data();
           lateFineRate = Number(d.lateFine ?? 100);
-          if (isAdmin) {
-            document.getElementById("set-upi").value = d.fundUpi || "";
-            document.getElementById("set-fine").value = lateFineRate;
-          }
+          monthlyUnit = Number(d.monthlyAmount ?? 1000);
+          dueDay = Number(d.dueDay ?? 5);
           renderMembers();
         }
       });
 
-      if (isAdmin) {
-        document.getElementById("settings-form").addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const fundUpi = document.getElementById("set-upi").value.trim();
-          const lateFine = Number(document.getElementById("set-fine").value || 100);
-          await setDoc(doc(db, "settings", "general"), { fundUpi, lateFine }, { merge: true });
-          await logAudit({
-            actionType: "SETTINGS_UPDATED",
-            messageBn: `Admin ${me.name} ফান্ড সেটিংস আপডেট করেছেন (UPI: ${fundUpi}, লেট-ফাইন: ₹${lateFine})।`,
-            messageEn: `Admin ${me.name} updated fund settings (UPI: ${fundUpi}, Late Fine: ₹${lateFine}).`,
-            actorUid: me.uid,
-            actorName: me.name,
-            actorRole: me.role
-          });
-          alert("সেটিংস সেভ হয়েছে / Settings saved!");
-        });
-      }
-
+      // Listen to Transactions (Pending Queue + Staff Undo/Revert History)
       if (isStaff) {
-        onSnapshot(collection(db, "transactions"), (snap) => {
+        onSnapshot(query(collection(db, "transactions"), orderBy("createdAt", "desc")), (snap) => {
           const pending = [];
+          const processed = [];
           snap.forEach((d) => {
             const item = { id: d.id, ...d.data() };
             if (item.status === "pending") pending.push(item);
+            else processed.push(item);
           });
 
           const sec = document.getElementById("utr-verify-section");
           const list = document.getElementById("pending-utr-list");
           if (pending.length === 0) {
             sec.classList.add("hidden");
-            return;
+          } else {
+            sec.classList.remove("hidden");
+            list.innerHTML = pending.map((tx) => `
+              <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex flex-wrap justify-between items-center gap-3">
+                <div>
+                  <p class="font-bold text-sm text-gray-900">${tx.userName} • <span class="text-emerald-700">${formatINR(tx.amount)}</span> (${tx.month})</p>
+                  <p class="text-xs text-gray-600">UTR: <strong>${tx.utr}</strong></p>
+                </div>
+                <div class="flex items-center gap-2">
+                  ${tx.screenshotBase64 ? `<button data-ss="${tx.screenshotBase64}" class="view-ss-btn px-2.5 py-1.5 rounded-lg bg-white border text-xs font-bold">🖼️ Proof</button>` : ""}
+                  <button data-id="${tx.id}" class="verify-utr-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">✓ Verify</button>
+                  <button data-id="${tx.id}" class="reject-utr-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">✕ Reject</button>
+                </div>
+              </div>
+            `).join("");
+
+            list.querySelectorAll(".view-ss-btn").forEach((btn) => {
+              btn.addEventListener("click", () => {
+                document.getElementById("ss-preview-img").src = btn.dataset.ss;
+                document.getElementById("screenshot-modal").classList.remove("hidden");
+              });
+            });
+
+            list.querySelectorAll(".verify-utr-btn").forEach((btn) => {
+              btn.addEventListener("click", async () => {
+                const tx = pending.find((x) => x.id === btn.dataset.id);
+                if (!tx) return;
+                const amt = Number(tx.amount || monthlyUnit);
+                const targetMember = allUsers.find((m) => m.uid === tx.uid);
+                const prevPaid = Number(targetMember?.totalPaid || 0);
+                const prevMonth = targetMember?.lastPaidMonth || "";
+
+                const doVerify = async () => {
+                  await updateDoc(doc(db, "transactions", tx.id), {
+                    status: "verified",
+                    verifiedBy: me.name,
+                    verifiedAt: new Date().toISOString()
+                  });
+                  if (targetMember) {
+                    await updateDoc(doc(db, "users", tx.uid), {
+                      totalPaid: prevPaid + amt,
+                      lastPaidMonth: tx.month
+                    });
+                  }
+                  await logAudit({
+                    actionType: "UPI_VERIFIED",
+                    messageBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(amt)} UPI পেমেন্ট (UTR: ${tx.utr}) ভেরিফাই করেছেন।`,
+                    messageEn: `${me.name} verified ${formatINR(amt)} UPI payment (UTR: ${tx.utr}) for ${tx.userName}.`,
+                    actorUid: me.uid,
+                    actorName: me.name,
+                    actorRole: me.role
+                  });
+                };
+
+                const doUndo = async () => {
+                  await updateDoc(doc(db, "transactions", tx.id), {
+                    status: "pending",
+                    verifiedBy: "",
+                    verifiedAt: ""
+                  });
+                  if (targetMember) {
+                    await updateDoc(doc(db, "users", tx.uid), {
+                      totalPaid: prevPaid,
+                      lastPaidMonth: prevMonth
+                    });
+                  }
+                  await logAudit({
+                    actionType: "UNDO_UPI_VERIFY",
+                    messageBn: `${me.name} সদস্য ${tx.userName}-এর UTR (${tx.utr}) ভেরিফিকেশন Undo করেছেন।`,
+                    messageEn: `${me.name} undid UPI verification (UTR: ${tx.utr}) for ${tx.userName}.`,
+                    actorUid: me.uid,
+                    actorName: me.name,
+                    actorRole: me.role
+                  });
+                };
+
+                await doVerify();
+                pushUndoAction({
+                  labelBn: `Verify UTR: ${tx.userName}`,
+                  labelEn: `Verified UTR: ${tx.userName}`,
+                  undoFn: doUndo,
+                  redoFn: doVerify
+                });
+              });
+            });
+
+            list.querySelectorAll(".reject-utr-btn").forEach((btn) => {
+              btn.addEventListener("click", async () => {
+                const tx = pending.find((x) => x.id === btn.dataset.id);
+                if (!tx) return;
+                const remark = await askForRemarks({
+                  titleBn: `${tx.userName}-এর পেমেন্ট বাতিলের কারণ`,
+                  titleEn: `Reason for rejecting ${tx.userName}'s payment`
+                });
+                if (!remark) return;
+
+                const doReject = async () => {
+                  await updateDoc(doc(db, "transactions", tx.id), {
+                    status: "rejected",
+                    rejectReason: remark,
+                    verifiedBy: me.name,
+                    verifiedAt: new Date().toISOString()
+                  });
+                  await logAudit({
+                    actionType: "UPI_REJECTED",
+                    messageBn: `${me.name} সদস্য ${tx.userName}-এর UPI UTR (${tx.utr}) বাতিল করেছেন। কারণ: ${remark}`,
+                    messageEn: `${me.name} rejected UPI UTR (${tx.utr}) for ${tx.userName}. Reason: ${remark}`,
+                    remark,
+                    actorUid: me.uid,
+                    actorName: me.name,
+                    actorRole: me.role
+                  });
+                };
+
+                const doUndo = async () => {
+                  await updateDoc(doc(db, "transactions", tx.id), {
+                    status: "pending",
+                    rejectReason: "",
+                    verifiedBy: "",
+                    verifiedAt: ""
+                  });
+                  await logAudit({
+                    actionType: "UNDO_UPI_REJECT",
+                    messageBn: `${me.name} সদস্য ${tx.userName}-এর UTR (${tx.utr}) বাতিল সিদ্ধান্ত Undo করেছেন।`,
+                    messageEn: `${me.name} undid rejection of UTR (${tx.utr}) for ${tx.userName}.`,
+                    actorUid: me.uid,
+                    actorName: me.name,
+                    actorRole: me.role
+                  });
+                };
+
+                await doReject();
+                pushUndoAction({
+                  labelBn: `Reject UTR: ${tx.userName}`,
+                  labelEn: `Rejected UTR: ${tx.userName}`,
+                  undoFn: doUndo,
+                  redoFn: doReject
+                });
+              });
+            });
           }
-          sec.classList.remove("hidden");
-          list.innerHTML = pending.map((tx) => `
-            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex flex-wrap justify-between items-center gap-3">
+
+          // Render Staff Recent Transactions with Revert/Undo button
+          const staffList = document.getElementById("staff-tx-list");
+          staffList.innerHTML = processed.slice(0, 8).map((tx) => `
+            <div class="p-3 rounded-xl bg-gray-50 border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs">
               <div>
-                <p class="font-bold text-sm text-gray-900">${tx.userName} • <span class="text-emerald-700">${formatINR(tx.amount)}</span> (${tx.month})</p>
-                <p class="text-xs text-gray-600">UTR: <strong>${tx.utr}</strong></p>
+                <p class="font-bold text-gray-900">${tx.userName} • ${formatINR(tx.amount)} (${tx.month})
+                  <span class="ml-1 px-2 py-0.5 rounded text-[10px] font-extrabold ${tx.status === "verified" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-700"}">${tx.status.toUpperCase()}</span>
+                </p>
+                ${tx.rejectReason ? `<p class="text-[11px] text-red-600 mt-0.5">Remark: ${tx.rejectReason}</p>` : ""}
               </div>
-              <div class="flex items-center gap-2">
-                ${tx.screenshotBase64 ? `<button data-ss="${tx.screenshotBase64}" class="view-ss-btn px-2.5 py-1.5 rounded-lg bg-white border text-xs font-bold">🖼️ Proof</button>` : ""}
-                <button data-id="${tx.id}" data-uid="${tx.uid}" data-name="${tx.userName}" data-month="${tx.month}" data-utr="${tx.utr}"
-                  class="verify-utr-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">✓ Verify</button>
-                <button data-id="${tx.id}" data-name="${tx.userName}" data-utr="${tx.utr}"
-                  class="reject-utr-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">✕ Reject</button>
-              </div>
+              <button data-id="${tx.id}" class="revert-tx-btn px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold text-[11px]">
+                ↩️ ${t("undoBtn")}
+              </button>
             </div>
           `).join("");
 
-          list.querySelectorAll(".view-ss-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-              document.getElementById("ss-preview-img").src = btn.dataset.ss;
-              document.getElementById("screenshot-modal").classList.remove("hidden");
-            });
-          });
-
-          list.querySelectorAll(".verify-utr-btn").forEach((btn) => {
+          staffList.querySelectorAll(".revert-tx-btn").forEach((btn) => {
             btn.addEventListener("click", async () => {
-              const { id, uid, name, month, utr } = btn.dataset;
-              const targetMember = allMembers.find((m) => m.uid === uid);
-              const newPaid = Number(targetMember?.totalPaid || 0) + 1000;
-
-              await updateDoc(doc(db, "transactions", id), {
-                status: "verified",
-                verifiedBy: me.name,
-                verifiedAt: new Date().toISOString()
-              });
-              await updateDoc(doc(db, "users", uid), {
-                totalPaid: newPaid,
-                lastPaidMonth: month
+              const tx = processed.find((x) => x.id === btn.dataset.id);
+              if (!tx) return;
+              const targetMember = allUsers.find((m) => m.uid === tx.uid);
+              if (tx.status === "verified" && targetMember) {
+                const newPaid = Number(targetMember.totalPaid || 0) - Number(tx.amount || 0);
+                await updateDoc(doc(db, "users", tx.uid), { totalPaid: newPaid });
+              }
+              await updateDoc(doc(db, "transactions", tx.id), {
+                status: "pending",
+                rejectReason: "",
+                verifiedBy: ""
               });
               await logAudit({
-                actionType: "UPI_VERIFIED",
-                messageBn: `${me.name} সদস্য ${name}-এর ₹১,০০০ UPI পেমেন্ট (UTR: ${utr}, মাস: ${month}) ভেরিফাই করেছেন।`,
-                messageEn: `${me.name} verified ₹1,000 UPI payment (UTR: ${utr}, Month: ${month}) for ${name}.`,
-                actorUid: me.uid,
-                actorName: me.name,
-                actorRole: me.role
-              });
-            });
-          });
-
-          list.querySelectorAll(".reject-utr-btn").forEach((btn) => {
-            btn.addEventListener("click", async () => {
-              const { id, name, utr } = btn.dataset;
-              await updateDoc(doc(db, "transactions", id), {
-                status: "rejected",
-                verifiedBy: me.name,
-                verifiedAt: new Date().toISOString()
-              });
-              await logAudit({
-                actionType: "UPI_REJECTED",
-                messageBn: `${me.name} সদস্য ${name}-এর UPI UTR (${utr}) বাতিল (Reject) করেছেন।`,
-                messageEn: `${me.name} rejected UPI UTR (${utr}) submitted by ${name}.`,
+                actionType: "TX_REVERTED",
+                messageBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(tx.amount)} লেনদেন রিভার্ট (Undo) করে Pending-এ ফিরিয়ে নিয়েছেন।`,
+                messageEn: `${me.name} reverted ${tx.userName}'s ${formatINR(tx.amount)} transaction back to Pending.`,
                 actorUid: me.uid,
                 actorName: me.name,
                 actorRole: me.role
@@ -296,13 +421,8 @@
       });
 
       onSnapshot(collection(db, "users"), (snap) => {
-        allMembers = [];
-        snap.forEach((d) => {
-          const u = { uid: d.id, ...d.data() };
-          if (u.approvalStatus === "approved") {
-            allMembers.push(u);
-          }
-        });
+        allUsers = [];
+        snap.forEach((d) => allUsers.push({ uid: d.id, ...d.data() }));
         renderMembers();
       });
 
@@ -312,9 +432,10 @@
       });
 
       function getMemberStatus(m) {
+        if (m.approvalStatus !== "approved") return "unapproved";
         const curMonth = getCurrentMonthKey();
         if (m.lastPaidMonth === curMonth) return "paid";
-        return isAfterFifthOfMonth() ? "overdue" : "pending";
+        return isAfterDueDay(dueDay) ? "overdue" : "pending";
       }
 
       function renderMembers() {
@@ -322,9 +443,14 @@
         const queryStr = document.getElementById("member-search").value.trim().toLowerCase();
         const lang = getLang();
 
-        const filtered = allMembers.filter((m) => {
+        const visiblePool = isStaff
+          ? allUsers
+          : allUsers.filter((u) => u.approvalStatus === "approved");
+
+        const filtered = visiblePool.filter((m) => {
           const status = getMemberStatus(m);
-          const matchesFilter = activeFilter === "all" || status === activeFilter;
+          const matchesFilter =
+            activeFilter === "all" ? m.approvalStatus === "approved" : status === activeFilter;
           const matchesQuery =
             (m.name || "").toLowerCase().includes(queryStr) ||
             (m.phone || "").includes(queryStr) ||
@@ -333,19 +459,23 @@
         });
 
         if (filtered.length === 0) {
-          grid.innerHTML = `<p class="text-xs text-gray-500 text-center py-6 col-span-2">কোনো সদস্য পাওয়া যায়নি / No members found.</p>`;
+          grid.innerHTML = `<p class="text-xs text-gray-500 text-center py-6 col-span-2">${lang === "bn" ? "কোনো সদস্য পাওয়া যায়নি।" : "No members found."}</p>`;
           return;
         }
+
+        const sixMonthGoal = monthlyUnit * 6;
 
         grid.innerHTML = filtered.map((m) => {
           const status = getMemberStatus(m);
           const autoFine = status === "overdue" ? lateFineRate : 0;
           const effectiveFine = Math.max(Number(m.pendingFine || 0), autoFine);
           const paid = Number(m.totalPaid || 0);
-          const pct = Math.min(100, Math.round((paid / 6000) * 100));
+          const pct = sixMonthGoal > 0 ? Math.min(100, Math.max(0, Math.round((paid / sixMonthGoal) * 100))) : 0;
 
           const badgeHtml =
-            status === "paid"
+            status === "unapproved"
+              ? `<span class="px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-bold shrink-0">🚫 ${m.approvalStatus.toUpperCase()}</span>`
+              : status === "paid"
               ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0">✓ Paid</span>`
               : status === "overdue"
               ? `<span class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[11px] font-bold shrink-0">⚠️ Overdue (+₹${effectiveFine})</span>`
@@ -353,8 +483,8 @@
 
           const waText =
             lang === "bn"
-              ? `ভাই ${m.name}, এই মাসের ₹১,০০০ ফান্ডের চাঁদা বাকি আছে, অ্যাপ থেকে UPI করে দিও।`
-              : `Hi ${m.name}, your ₹1,000 Peer Fund contribution for this month is pending. Please pay via UPI from the app.`;
+              ? `ভাই ${m.name}, এই মাসের ${formatINR(monthlyUnit)} ফান্ডের চাঁদা বাকি আছে, অ্যাপ থেকে UPI করে দিও।`
+              : `Hi ${m.name}, your ${formatINR(monthlyUnit)} Peer Fund contribution for this month is pending. Please pay via UPI from the app.`;
           const waUrl = `https://wa.me/91${m.phone}?text=${encodeURIComponent(waText)}`;
 
           return `
@@ -374,10 +504,12 @@
                   ${badgeHtml}
                 </div>
 
+                ${m.rejectReason ? `<p class="text-[11px] text-red-600 bg-red-50 px-2.5 py-1 rounded-lg mt-2">Remark: ${m.rejectReason}</p>` : ""}
+
                 <div class="mt-3.5">
                   <div class="flex justify-between text-xs mb-1">
-                    <span class="text-gray-500">মোট জমা / Paid:</span>
-                    <span class="font-extrabold text-[#0A3C2A]">${formatINR(paid)} / ₹6,000</span>
+                    <span class="text-gray-500">${t("totalPaidLabel")}</span>
+                    <span class="font-extrabold text-[#0A3C2A]">${formatINR(paid)} / ${formatINR(sixMonthGoal)}</span>
                   </div>
                   <div class="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
                     <div class="h-full bg-[#39D59E] rounded-full" style="width: ${pct}%"></div>
@@ -385,45 +517,70 @@
                 </div>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2 items-center justify-between">
-                <button data-uid="${m.uid}" class="view-member-trigger text-xs font-bold text-[#0A3C2A] hover:underline">
-                  প্রোফাইল দেখুন →
-                </button>
+              <!-- Action Controls -->
+              <div class="mt-4 pt-3 border-t border-gray-100 space-y-2">
+                <div class="flex flex-wrap gap-1.5 items-center justify-between">
+                  <button data-uid="${m.uid}" class="view-member-trigger text-xs font-bold text-[#0A3C2A] hover:underline">
+                    ${t("viewProfileBtn")}
+                  </button>
 
-                <div class="flex flex-wrap gap-1.5">
-                  ${isStaff && status !== "paid" ? `
-                    <a href="${waUrl}" target="_blank" rel="noopener"
-                      class="px-2.5 py-1.5 rounded-xl bg-[#25D366] text-white text-[11px] font-bold shadow-sm hover:opacity-90">
-                      💬 WhatsApp
-                    </a>
-                  ` : ""}
-
-                  ${isStaff ? `
-                    <button data-uid="${m.uid}" class="cash-deposit-btn px-2.5 py-1.5 rounded-xl mint-btn text-[11px]">
-                      + ₹1,000 Cash
-                    </button>
-                  ` : ""}
-
-                  ${isStaff && effectiveFine > 0 ? `
-                    <button data-uid="${m.uid}" class="waive-fine-btn px-2.5 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-[11px] font-bold">
-                      Waive Fine
-                    </button>
-                  ` : ""}
-
-                  ${isAdmin && m.uid !== me.uid ? `
-                    <button data-uid="${m.uid}" data-role="${m.role}" class="toggle-coadmin-btn px-2.5 py-1.5 rounded-xl bg-slate-800 text-white text-[11px] font-bold">
-                      ${m.role === "co_admin" ? "Remove Co-Admin" : "Make Co-Admin"}
-                    </button>
+                  ${isStaff && m.approvalStatus === "approved" ? `
+                    <div class="flex flex-wrap gap-1.5">
+                      ${status !== "paid" ? `
+                        <a href="${waUrl}" target="_blank" rel="noopener"
+                          class="px-2.5 py-1 rounded-lg bg-[#25D366] text-white text-[11px] font-bold">
+                          💬 ${t("whatsappNudge")}
+                        </a>
+                      ` : ""}
+                      <button data-uid="${m.uid}" data-delta="${monthlyUnit}" class="adjust-bal-btn px-2.5 py-1 rounded-lg mint-btn text-[11px]">
+                        + ${formatINR(monthlyUnit)}
+                      </button>
+                      <button data-uid="${m.uid}" data-delta="${-monthlyUnit}" class="adjust-bal-btn px-2.5 py-1 rounded-lg bg-red-100 text-red-800 text-[11px] font-bold">
+                        − ${formatINR(monthlyUnit)}
+                      </button>
+                      <button data-uid="${m.uid}" class="custom-adjust-btn px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-bold">
+                        ${t("customAdjustBtn")}
+                      </button>
+                    </div>
                   ` : ""}
                 </div>
+
+                ${isStaff ? `
+                  <div class="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                    ${isStaff && effectiveFine > 0 && m.approvalStatus === "approved" ? `
+                      <button data-uid="${m.uid}" class="waive-fine-btn px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-bold">
+                        ${t("waiveFineBtn")}
+                      </button>
+                    ` : ""}
+
+                    ${m.uid !== me.uid ? `
+                      <button data-uid="${m.uid}" class="toggle-approve-btn px-2.5 py-1 rounded-lg ${m.approvalStatus === "approved" ? "bg-amber-500 text-slate-950" : "bg-emerald-700 text-white"} text-[11px] font-bold">
+                        ${m.approvalStatus === "approved" ? t("unapproveBtn") : t("reapproveBtn")}
+                      </button>
+                    ` : ""}
+
+                    ${isAdmin && m.uid !== me.uid && m.approvalStatus === "approved" ? `
+                      <button data-uid="${m.uid}" class="toggle-coadmin-btn px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[11px] font-bold">
+                        ${m.role === "co_admin" ? t("removeCoAdminBtn") : t("makeCoAdminBtn")}
+                      </button>
+                    ` : ""}
+
+                    ${isAdmin && m.uid !== me.uid ? `
+                      <button data-uid="${m.uid}" class="delete-member-btn px-2.5 py-1 rounded-lg bg-red-600 text-white text-[11px] font-bold">
+                        🗑️ ${t("deleteMemberBtn")}
+                      </button>
+                    ` : ""}
+                  </div>
+                ` : ""}
               </div>
             </div>
           `;
         }).join("");
 
+        // View Member Profile Modal
         grid.querySelectorAll(".view-member-trigger").forEach((el) => {
           el.addEventListener("click", () => {
-            const target = allMembers.find((x) => x.uid === el.dataset.uid);
+            const target = allUsers.find((x) => x.uid === el.dataset.uid);
             if (!target) return;
             document.getElementById("mp-avatar").src = target.photoBase64 || "./icon.svg";
             document.getElementById("mp-role").textContent = (target.role || "member").toUpperCase();
@@ -432,17 +589,17 @@
             document.getElementById("mp-paid").textContent = formatINR(target.totalPaid || 0);
             document.getElementById("mp-phone").textContent = target.phone;
             document.getElementById("mp-phone-link").href = `tel:+91${target.phone}`;
-            document.getElementById("mp-blood").textContent = target.bloodGroup || "Not set";
-            document.getElementById("mp-sos").textContent = target.sosContact || "Not set";
+            document.getElementById("mp-blood").textContent = target.bloodGroup || "-";
+            document.getElementById("mp-sos").textContent = target.sosContact || "-";
             document.getElementById("mp-sos-link").href = target.sosContact ? `tel:${target.sosContact}` : "#";
-            document.getElementById("mp-upi").textContent = target.upiId || "Not set";
+            document.getElementById("mp-upi").textContent = target.upiId || "-";
 
             const bankRow = document.getElementById("mp-bank-row");
             if (isAdmin || target.uid === me.uid) {
               bankRow.classList.remove("hidden");
               document.getElementById("mp-bank").textContent = target.bankAccount
                 ? `${target.bankAccount} (${target.ifsc || ""})`
-                : "Not set";
+                : "-";
             } else {
               bankRow.classList.add("hidden");
             }
@@ -450,70 +607,248 @@
           });
         });
 
-        grid.querySelectorAll(".cash-deposit-btn").forEach((btn) => {
-          btn.addEventListener("click", async () => {
-            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
-            if (!target) return;
-            const curMonth = getCurrentMonthKey();
-            const newPaid = Number(target.totalPaid || 0) + 1000;
+        // Helper for + / - Balance Adjustment with Undo/Redo & Audit Log
+        async function applyBalanceDelta(target, delta, remark = "") {
+          const curMonth = getCurrentMonthKey();
+          const prevPaid = Number(target.totalPaid || 0);
+          const prevMonth = target.lastPaidMonth || "";
+          const nextPaid = prevPaid + delta;
 
+          const doAdjust = async () => {
             await updateDoc(doc(db, "users", target.uid), {
-              totalPaid: newPaid,
-              lastPaidMonth: curMonth
+              totalPaid: nextPaid,
+              lastPaidMonth: delta > 0 ? curMonth : prevMonth
             });
             await addDoc(collection(db, "transactions"), {
               uid: target.uid,
               userName: target.name,
               memberId: target.memberId || "-",
-              amount: 1000,
+              amount: delta,
               month: curMonth,
-              utr: "CASH-ENTRY",
-              mode: "CASH",
+              utr: delta > 0 ? "CASH-CREDIT" : "CORRECTION-DEBIT",
+              mode: delta > 0 ? "CASH" : "ADJUSTMENT",
+              remark,
               status: "verified",
               verifiedBy: me.name,
               verifiedAt: new Date().toISOString(),
               createdAt: serverTimestamp()
             });
             await logAudit({
-              actionType: "CASH_DEPOSIT",
-              messageBn: `${me.name} সদস্য ${target.name}-এর ₹১,০০০ নগদ চাঁদা (${curMonth}) এন্ট্রি করেছেন।`,
-              messageEn: `${me.name} recorded ₹1,000 cash deposit (${curMonth}) for ${target.name}.`,
+              actionType: delta > 0 ? "BALANCE_ADDED" : "BALANCE_DEDUCTED",
+              messageBn: `${me.name} সদস্য ${target.name}-এর হিসাবে ${formatINR(delta)} ${delta > 0 ? "যোগ" : "বিয়োগ"} করেছেন।${remark ? " কারণ: " + remark : ""}`,
+              messageEn: `${me.name} ${delta > 0 ? "added" : "deducted"} ${formatINR(Math.abs(delta))} for ${target.name}.${remark ? " Remark: " + remark : ""}`,
+              remark,
               actorUid: me.uid,
               actorName: me.name,
               actorRole: me.role
             });
+          };
+
+          const doUndo = async () => {
+            await updateDoc(doc(db, "users", target.uid), {
+              totalPaid: prevPaid,
+              lastPaidMonth: prevMonth
+            });
+            await logAudit({
+              actionType: "UNDO_BALANCE_ADJUST",
+              messageBn: `${me.name} সদস্য ${target.name}-এর ${formatINR(delta)} পরিবর্তন Undo করেছেন।`,
+              messageEn: `${me.name} undid ${formatINR(delta)} adjustment for ${target.name}.`,
+              actorUid: me.uid,
+              actorName: me.name,
+              actorRole: me.role
+            });
+          };
+
+          await doAdjust();
+          pushUndoAction({
+            labelBn: `${delta > 0 ? "+" : ""}${formatINR(delta)}: ${target.name}`,
+            labelEn: `${delta > 0 ? "+" : ""}${formatINR(delta)}: ${target.name}`,
+            undoFn: doUndo,
+            redoFn: doAdjust
+          });
+        }
+
+        // +1000 / -1000 Quick Buttons
+        grid.querySelectorAll(".adjust-bal-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const delta = Number(btn.dataset.delta);
+            let remark = "";
+            if (delta < 0) {
+              remark = await askForRemarks({
+                titleBn: `${target.name}-এর টাকা বিয়োগের কারণ`,
+                titleEn: `Reason for deducting from ${target.name}`
+              });
+              if (!remark) return;
+            }
+            await applyBalanceDelta(target, delta, remark);
           });
         });
 
+        // Custom +/- Amount Button
+        grid.querySelectorAll(".custom-adjust-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const raw = prompt(
+              getLang() === "bn"
+                ? `${target.name}-এর জন্য কত টাকা যোগ বা বিয়োগ করবেন? (যেমন: 500 বা -500)`
+                : `Enter amount to add or subtract for ${target.name} (e.g., 500 or -500):`
+            );
+            const delta = Number(raw);
+            if (!delta || isNaN(delta)) return;
+            const remark = await askForRemarks({
+              titleBn: `${formatINR(delta)} এডিট করার কারণ`,
+              titleEn: `Reason for ${formatINR(delta)} adjustment`,
+              required: false
+            });
+            if (remark === null) return;
+            await applyBalanceDelta(target, delta, remark);
+          });
+        });
+
+        // Waive Fine
         grid.querySelectorAll(".waive-fine-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
             if (!target) return;
-            await updateDoc(doc(db, "users", target.uid), {
-              pendingFine: 0,
-              lastPaidMonth: getCurrentMonthKey()
-            });
-            await logAudit({
-              actionType: "FINE_WAIVED",
-              messageBn: `${me.name} সদস্য ${target.name}-এর লেট-ফাইন মওকুফ (Waive) করেছেন।`,
-              messageEn: `${me.name} waived late fine for ${target.name}.`,
-              actorUid: me.uid,
-              actorName: me.name,
-              actorRole: me.role
+            const prevMonth = target.lastPaidMonth || "";
+            const prevFine = Number(target.pendingFine || 0);
+            const doWaive = async () => {
+              await updateDoc(doc(db, "users", target.uid), {
+                pendingFine: 0,
+                lastPaidMonth: getCurrentMonthKey()
+              });
+              await logAudit({
+                actionType: "FINE_WAIVED",
+                messageBn: `${me.name} সদস্য ${target.name}-এর লেট-ফাইন মওকুফ করেছেন।`,
+                messageEn: `${me.name} waived late fine for ${target.name}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+            const doUndo = async () => {
+              await updateDoc(doc(db, "users", target.uid), {
+                pendingFine: prevFine,
+                lastPaidMonth: prevMonth
+              });
+            };
+            await doWaive();
+            pushUndoAction({
+              labelBn: `Waive Fine: ${target.name}`,
+              labelEn: `Waived Fine: ${target.name}`,
+              undoFn: doUndo,
+              redoFn: doWaive
             });
           });
         });
 
+        // Toggle Approve / Unapprove Member (with Undo/Redo & Remarks)
+        grid.querySelectorAll(".toggle-approve-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const wasApproved = target.approvalStatus === "approved";
+            let remark = "";
+            if (wasApproved) {
+              remark = await askForRemarks({
+                titleBn: `${target.name}-কে Unapprove করার কারণ`,
+                titleEn: `Reason for unapproving ${target.name}`
+              });
+              if (!remark) return;
+            }
+
+            const nextStatus = wasApproved ? "pending" : "approved";
+            const doToggle = async () => {
+              await updateDoc(doc(db, "users", target.uid), {
+                approvalStatus: nextStatus,
+                rejectReason: remark
+              });
+              await logAudit({
+                actionType: wasApproved ? "MEMBER_UNAPPROVED" : "MEMBER_APPROVED",
+                messageBn: wasApproved
+                  ? `${me.name} সদস্য ${target.name}-কে Unapprove করেছেন। কারণ: ${remark}`
+                  : `${me.name} সদস্য ${target.name}-কে পুনরায় Approve করেছেন।`,
+                messageEn: wasApproved
+                  ? `${me.name} unapproved member ${target.name}. Reason: ${remark}`
+                  : `${me.name} re-approved member ${target.name}.`,
+                remark,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+            const doUndo = async () => {
+              await updateDoc(doc(db, "users", target.uid), {
+                approvalStatus: wasApproved ? "approved" : "pending",
+                rejectReason: ""
+              });
+            };
+
+            await doToggle();
+            pushUndoAction({
+              labelBn: `${wasApproved ? "Unapprove" : "Approve"}: ${target.name}`,
+              labelEn: `${wasApproved ? "Unapproved" : "Approved"}: ${target.name}`,
+              undoFn: doUndo,
+              redoFn: doToggle
+            });
+          });
+        });
+
+        // Toggle Co-Admin (Multiple Co-Admins supported)
         grid.querySelectorAll(".toggle-coadmin-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
             if (!target) return;
-            const nextRole = target.role === "co_admin" ? "member" : "co_admin";
-            await updateDoc(doc(db, "users", target.uid), { role: nextRole });
+            const prevRole = target.role;
+            const nextRole = prevRole === "co_admin" ? "member" : "co_admin";
+
+            const doRole = async () => {
+              await updateDoc(doc(db, "users", target.uid), { role: nextRole });
+              await logAudit({
+                actionType: "ROLE_CHANGED",
+                messageBn: `Admin ${me.name} সদস্য ${target.name}-এর রোল পরিবর্তন করে ${nextRole.toUpperCase()} করেছেন।`,
+                messageEn: `Admin ${me.name} changed ${target.name}'s role to ${nextRole.toUpperCase()}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+            const doUndo = async () => {
+              await updateDoc(doc(db, "users", target.uid), { role: prevRole });
+            };
+            await doRole();
+            pushUndoAction({
+              labelBn: `Role ${nextRole}: ${target.name}`,
+              labelEn: `Role ${nextRole}: ${target.name}`,
+              undoFn: doUndo,
+              redoFn: doRole
+            });
+          });
+        });
+
+        // Admin Delete Member (with Remarks + Phone Lookup Release)
+        grid.querySelectorAll(".delete-member-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allUsers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const remark = await askForRemarks({
+              titleBn: `সদস্য ${target.name}-কে ডিলিট করার কারণ`,
+              titleEn: `Reason for deleting member ${target.name}`
+            });
+            if (!remark) return;
+
+            await deleteDoc(doc(db, "users", target.uid));
+            if (target.phone) {
+              await deleteDoc(doc(db, "phone_lookup", target.phone)).catch(() => {});
+            }
             await logAudit({
-              actionType: "ROLE_CHANGED",
-              messageBn: `Admin ${me.name} সদস্য ${target.name}-এর রোল পরিবর্তন করে ${nextRole.toUpperCase()} করেছেন।`,
-              messageEn: `Admin ${me.name} changed ${target.name}'s role to ${nextRole.toUpperCase()}.`,
+              actionType: "MEMBER_DELETED",
+              messageBn: `Admin ${me.name} সদস্য ${target.name} (${target.phone})-কে গ্রুপ থেকে ডিলিট করেছেন। কারণ: ${remark}`,
+              messageEn: `Admin ${me.name} deleted member ${target.name} (${target.phone}). Reason: ${remark}`,
+              remark,
               actorUid: me.uid,
               actorName: me.name,
               actorRole: me.role
@@ -539,13 +874,14 @@
       });
 
       document.getElementById("download-statement-btn").addEventListener("click", () => {
-        const totalCollected = allMembers.reduce((s, m) => s + Number(m.totalPaid || 0), 0);
+        const approvedMembers = allUsers.filter((u) => u.approvalStatus === "approved");
+        const totalCollected = approvedMembers.reduce((s, m) => s + Number(m.totalPaid || 0), 0);
         const totalDisbursed = allLoans
           .filter((l) => l.status === "approved")
           .reduce((s, l) => s + Math.max(0, Number(l.amount || 0) - Number(l.repaidAmount || 0)), 0);
-        const targetAmount = allMembers.length * 1000 * 6;
+        const targetAmount = approvedMembers.length * monthlyUnit * 6;
         generateMonthlyStatementPDF({
-          members: allMembers,
+          members: approvedMembers,
           totalCollected,
           totalDisbursed,
           availableBalance: totalCollected - totalDisbursed,

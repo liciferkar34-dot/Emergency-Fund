@@ -12,62 +12,63 @@
 <body class="min-h-screen flex items-center justify-center p-4 fintech-gradient">
   <div class="fintech-card w-full max-w-md p-7">
     <div class="flex justify-between items-center mb-5">
-      <a href="index.html" class="text-xs font-bold text-[#0A3C2A] hover:underline">← হোম / Home</a>
+      <a href="index.html" class="text-xs font-bold text-[#0A3C2A] hover:underline" data-i18n="backHome">← হোম</a>
       <button class="lang-toggle-btn px-3 py-1 rounded-lg bg-emerald-100 text-[#0A3C2A] text-xs font-bold">
-        <span class="lang-indicator">EN</span>
+        <span class="lang-indicator">English</span>
       </button>
     </div>
 
     <div class="text-center mb-6">
       <div class="w-12 h-12 rounded-2xl fintech-gradient text-[#5CDDAB] flex items-center justify-center font-extrabold text-2xl mx-auto mb-2 shadow">₹</div>
       <h1 class="text-2xl font-extrabold text-[#0A3C2A]" data-i18n="login">লগ ইন</h1>
-      <p class="text-xs text-gray-500 mt-1">ইমেইল আইডি অথবা ১০ সংখ্যার মোবাইল নম্বর দিয়ে প্রবেশ করুন</p>
+      <p class="text-xs text-gray-500 mt-1" data-i18n="loginSubtitle">ইমেইল আইডি অথবা ১০ সংখ্যার মোবাইল নম্বর দিয়ে প্রবেশ করুন</p>
     </div>
 
     <form id="login-form" class="space-y-4">
       <div>
-        <label class="block text-xs font-bold text-gray-700 mb-1">ইমেইল বা মোবাইল নম্বর / Email or Mobile *</label>
-        <input type="text" id="login-id" required placeholder="example@gmail.com বা 9832420007"
+        <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="emailOrMobileLabel">ইমেইল বা মোবাইল নম্বর *</label>
+        <input type="text" id="login-id" required data-i18n-placeholder="emailOrMobilePh"
           class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
       </div>
 
       <div>
         <div class="flex justify-between items-center mb-1">
-          <label class="text-xs font-bold text-gray-700">পাসওয়ার্ড / Password *</label>
-          <button type="button" id="forgot-open-btn" class="text-xs font-bold text-[#0A3C2A] hover:underline">
-            পাসওয়ার্ড ভুলে গেছেন? / Forgot?
+          <label class="text-xs font-bold text-gray-700" data-i18n="passwordLabel">পাসওয়ার্ড *</label>
+          <button type="button" id="forgot-open-btn" class="text-xs font-bold text-[#0A3C2A] hover:underline" data-i18n="forgotPassLink">
+            পাসওয়ার্ড ভুলে গেছেন?
           </button>
         </div>
         <div class="relative">
           <input type="password" id="login-pass" required placeholder="••••••••"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm pr-12" />
-          <button type="button" id="toggle-pass" class="absolute right-3 top-2.5 text-xs font-bold text-gray-500">Show</button>
+            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm pr-14" />
+          <button type="button" id="toggle-pass" class="absolute right-3 top-2.5 text-xs font-bold text-gray-500" data-i18n="showPass">দেখুন</button>
         </div>
       </div>
 
       <div id="login-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold"></div>
 
-      <button type="submit" id="login-submit" class="w-full mint-btn py-3 rounded-xl text-sm" data-i18n="login">
+      <button type="submit" id="login-submit" class="w-full mint-btn py-3 rounded-xl text-sm" data-i18n="loginSubmitBtn">
         লগ ইন করুন
       </button>
     </form>
 
     <p class="text-center text-xs text-gray-600 mt-5">
-      নতুন সদস্য? <a href="register.html" class="text-[#0A3C2A] font-bold underline" data-i18n="register">রেজিস্ট্রেশন করুন</a>
+      <span data-i18n="newMemberPrompt">নতুন সদস্য?</span>
+      <a href="register.html" class="text-[#0A3C2A] font-bold underline" data-i18n="registerHere">রেজিস্ট্রেশন করুন</a>
     </p>
   </div>
 
   <!-- Forgot Password Modal -->
   <div id="forgot-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-sm p-6">
-      <h3 class="text-lg font-extrabold text-[#0A3C2A] mb-1">পাসওয়ার্ড রিসেট / Reset Password</h3>
-      <p class="text-xs text-gray-500 mb-4">আপনার রেজিস্টার্ড ইমেইল অথবা ১০ সংখ্যার মোবাইল নম্বর দিন, ইমেইলে রিসেট লিংক চলে যাবে।</p>
-      <input type="text" id="reset-identifier" placeholder="Email বা 10-digit Mobile"
+      <h3 class="text-lg font-extrabold text-[#0A3C2A] mb-1" data-i18n="resetPassTitle">পাসওয়ার্ড রিসেট</h3>
+      <p class="text-xs text-gray-500 mb-4" data-i18n="resetPassDesc">আপনার রেজিস্টার্ড ইমেইল অথবা ১০ সংখ্যার মোবাইল নম্বর দিন, ইমেইলে রিসেট লিংক চলে যাবে।</p>
+      <input type="text" id="reset-identifier" data-i18n-placeholder="resetIdPh"
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm mb-3 focus:outline-none focus:border-[#0A3C2A]" />
       <div id="reset-msg" class="hidden p-2.5 rounded-xl text-xs font-semibold mb-3"></div>
       <div class="flex gap-2">
-        <button type="button" id="forgot-close-btn" class="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold text-xs">বাতিল / Cancel</button>
-        <button type="button" id="forgot-send-btn" class="flex-1 py-2.5 rounded-xl mint-btn text-xs">লিংক পাঠান / Send Link</button>
+        <button type="button" id="forgot-close-btn" class="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-bold text-xs" data-i18n="cancelBtn">বাতিল</button>
+        <button type="button" id="forgot-send-btn" class="flex-1 py-2.5 rounded-xl mint-btn text-xs" data-i18n="sendLinkBtn">লিংক পাঠান</button>
       </div>
     </div>
   </div>
@@ -76,21 +77,22 @@
     import { auth, db } from "./js/firebase-config.js";
     import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import "./js/i18n.js";
+    import { getLang, t } from "./js/i18n.js";
 
     const passInput = document.getElementById("login-pass");
     document.getElementById("toggle-pass").addEventListener("click", (e) => {
       const isPass = passInput.type === "password";
       passInput.type = isPass ? "text" : "password";
-      e.target.textContent = isPass ? "Hide" : "Show";
+      e.target.textContent = isPass ? t("hidePass") : t("showPass");
     });
 
     async function resolveEmail(identifier) {
+      const lang = getLang();
       const clean = identifier.trim();
       if (/^[0-9]{10}$/.test(clean)) {
         const snap = await getDoc(doc(db, "phone_lookup", clean));
         if (!snap.exists()) {
-          throw new Error("এই মোবাইল নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি / Mobile number not registered.");
+          throw new Error(lang === "bn" ? "এই মোবাইল নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি।" : "Mobile number is not registered.");
         }
         return snap.data().email;
       }
@@ -99,11 +101,12 @@
 
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const lang = getLang();
       const errBox = document.getElementById("login-error");
       const btn = document.getElementById("login-submit");
       errBox.classList.add("hidden");
       btn.disabled = true;
-      btn.textContent = "লগ ইন হচ্ছে...";
+      btn.textContent = lang === "bn" ? "লগ ইন হচ্ছে..." : "Signing in...";
 
       try {
         const email = await resolveEmail(document.getElementById("login-id").value);
@@ -112,20 +115,20 @@
         window.location.href = "dashboard.html";
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = "লগ ইন করুন / Login";
-        errBox.textContent = err.message.includes("not registered")
+        btn.textContent = t("loginSubmitBtn");
+        errBox.textContent = err.message.includes("not registered") || err.message.includes("পাওয়া যায়নি")
           ? err.message
-          : "ভুল ইমেইল/মোবাইল বা পাসওয়ার্ড / Invalid credentials.";
+          : (lang === "bn" ? "ভুল ইমেইল/মোবাইল বা পাসওয়ার্ড।" : "Invalid email/mobile or password.");
         errBox.classList.remove("hidden");
       }
     });
 
-    // Forgot Password Flow
     const forgotModal = document.getElementById("forgot-modal");
     document.getElementById("forgot-open-btn").addEventListener("click", () => forgotModal.classList.remove("hidden"));
     document.getElementById("forgot-close-btn").addEventListener("click", () => forgotModal.classList.add("hidden"));
 
     document.getElementById("forgot-send-btn").addEventListener("click", async () => {
+      const lang = getLang();
       const msgEl = document.getElementById("reset-msg");
       const val = document.getElementById("reset-identifier").value;
       if (!val.trim()) return;
@@ -133,7 +136,9 @@
         const email = await resolveEmail(val);
         await sendPasswordResetEmail(auth, email);
         msgEl.className = "p-2.5 rounded-xl text-xs font-semibold mb-3 bg-emerald-50 text-emerald-800 border border-emerald-200";
-        msgEl.textContent = `পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে (${email})। ইনবক্স বা Spam ফোল্ডার চেক করুন।`;
+        msgEl.textContent = lang === "bn"
+          ? `পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে (${email})। ইনবক্স বা Spam ফোল্ডার চেক করুন।`
+          : `Password reset link sent to ${email}. Please check your Inbox or Spam folder.`;
         msgEl.classList.remove("hidden");
       } catch (err) {
         msgEl.className = "p-2.5 rounded-xl text-xs font-semibold mb-3 bg-red-50 text-red-700 border border-red-200";

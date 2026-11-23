@@ -1,4 +1,4 @@
-const CACHE_NAME = 'peer-fund-v1';
+const CACHE_NAME = 'peer-fund-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './ledger.html',
   './loans.html',
   './profile.html',
+  './settings.html',
   './audit.html',
   './manifest.json',
   './icon.svg',

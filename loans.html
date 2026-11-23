@@ -14,10 +14,10 @@
     <div class="max-w-5xl mx-auto flex justify-between items-center gap-2">
       <div class="min-w-0 flex-1">
         <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="emergencyLoans">ইমার্জেন্সি লোন ও পিয়ার ভোটিং</h1>
-        <p class="text-[11px] text-[#5CDDAB] truncate">০% সুদ • ₹০ প্রসেসিং ফি • সর্বোচ্চ ₹৩৫,০০০</p>
+        <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="loansSub">০% সুদ • ₹০ প্রসেসিং ফি • প্রমাণসহ আবেদন</p>
       </div>
       <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
-        <span class="lang-indicator">EN</span>
+        <span class="lang-indicator">English</span>
       </button>
     </div>
   </header>
@@ -30,28 +30,28 @@
         <div class="grid grid-cols-3 gap-2 mb-4 text-center">
           <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-100">
             <p class="text-[10px] text-gray-500">Interest</p>
-            <p class="font-extrabold text-xs text-emerald-800">0% সুদ</p>
+            <p class="font-extrabold text-xs text-emerald-800" data-i18n="interestBadge">০% সুদ</p>
           </div>
           <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-100">
             <p class="text-[10px] text-gray-500">Fee</p>
-            <p class="font-extrabold text-xs text-emerald-800">₹0 ফি</p>
+            <p class="font-extrabold text-xs text-emerald-800" data-i18n="feeBadge">₹০ ফি</p>
           </div>
           <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-100">
-            <p class="text-[10px] text-gray-500">Max Limit</p>
-            <p class="font-extrabold text-xs text-emerald-800">₹35,000</p>
+            <p class="text-[10px] text-gray-500" data-i18n="maxLimitBadge">সর্বোচ্চ সীমা</p>
+            <p class="font-extrabold text-xs text-emerald-800" id="max-loan-badge">₹35,000</p>
           </div>
         </div>
 
         <form id="loan-apply-form" class="space-y-3.5">
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="loanAmountLabel">টাকার পরিমাণ (সর্বোচ্চ ₹৩৫,০০০) *</label>
-            <input type="number" id="loan-amount" required min="1000" max="35000" placeholder="যেমন: 25000"
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="loanAmountLabel">টাকার পরিমাণ *</label>
+            <input type="number" id="loan-amount" required min="500" max="35000" placeholder="25000"
               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A]" />
           </div>
 
           <div>
             <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="loanReasonLabel">ইমার্জেন্সির বিস্তারিত কারণ *</label>
-            <textarea id="loan-reason" required rows="3" placeholder="হাসপাতাল বা জরুরি বিপদের বিবরণ লিখুন..."
+            <textarea id="loan-reason" required rows="3" data-i18n-placeholder="loanReasonPh"
               class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A]"></textarea>
           </div>
 
@@ -63,8 +63,8 @@
               class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-[#0A3C2A] file:font-bold" />
           </div>
 
-          <p class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200" data-i18n="dualApprovalNote">
-            ₹২০,০০০-এর বেশি লোনে Admin ও Co-Admin উভয়ের অনুমোদন বাধ্যতামূলক
+          <p class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+            <span data-i18n="dualApprovalNote"></span> (<strong id="dual-limit-badge">₹20,000</strong>)
           </p>
 
           <button type="submit" id="loan-submit-btn" class="w-full mint-btn py-3 rounded-xl text-sm" data-i18n="submitLoanBtn">
@@ -75,7 +75,7 @@
     </div>
 
     <div class="lg:col-span-7 space-y-4" id="loans-feed">
-      <p class="text-xs text-gray-500 text-center py-8">লোনের তালিকা লোড হচ্ছে...</p>
+      <p class="text-xs text-gray-500 text-center py-8">...</p>
     </div>
   </main>
 
@@ -89,32 +89,52 @@
     </div>
   </div>
 
-  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
-  <nav id="bottom-nav" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
-    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
-      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+  <!-- Floating Undo / Redo Bar -->
+  <div id="undo-redo-bar" class="hidden fixed bottom-20 left-3 right-3 max-w-md mx-auto bg-slate-900/95 text-white rounded-2xl px-3.5 py-2 shadow-xl border border-white/15 z-40 flex items-center justify-between gap-2">
+    <span id="undo-redo-label" class="text-[11px] text-emerald-200 truncate flex-1">Action recorded</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="global-undo-btn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↩️ <span data-i18n="undoBtn">Undo</span>
+      </button>
+      <button id="global-redo-btn" class="px-2.5 py-1 rounded-lg bg-emerald-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↪️ <span data-i18n="redoBtn">Redo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 5-Tab High-Contrast SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-3 left-2.5 right-2.5 max-w-lg mx-auto bottom-nav-pill text-white rounded-2xl px-1.5 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-5 gap-0.5 text-center text-[10px] sm:text-[11px] leading-none">
+      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="loans.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+      <a href="settings.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navSettings">সেটিংস</span>
       </a>
     </div>
   </nav>
@@ -136,9 +156,11 @@
       setupCommonUI,
       formatINR,
       compressImageToBase64,
-      logAudit
+      logAudit,
+      pushUndoAction,
+      askForRemarks
     } from "./js/utils.js";
-    import "./js/i18n.js";
+    import { getLang, t } from "./js/i18n.js";
 
     setupCommonUI();
 
@@ -146,27 +168,46 @@
       const isAdmin = me.role === "admin";
       const isCoAdmin = me.role === "co_admin";
       const isStaff = isAdmin || isCoAdmin;
+      let maxLoanLimit = 35000;
+      let dualThreshold = 20000;
+      let loansEnabled = true;
+
+      onSnapshot(doc(db, "settings", "general"), (snap) => {
+        const d = snap.exists() ? snap.data() : {};
+        maxLoanLimit = Number(d.maxLoanLimit || 35000);
+        dualThreshold = Number(d.dualThreshold || 20000);
+        loansEnabled = d.loansEnabled !== false;
+
+        document.getElementById("max-loan-badge").textContent = formatINR(maxLoanLimit);
+        document.getElementById("dual-limit-badge").textContent = formatINR(dualThreshold);
+        document.getElementById("loan-amount").max = maxLoanLimit;
+
+        const btn = document.getElementById("loan-submit-btn");
+        btn.disabled = !loansEnabled;
+        btn.classList.toggle("opacity-50", !loansEnabled);
+      });
 
       document.getElementById("loan-apply-form").addEventListener("submit", async (e) => {
         e.preventDefault();
+        if (!loansEnabled) return;
+        const lang = getLang();
         const btn = document.getElementById("loan-submit-btn");
         btn.disabled = true;
-        btn.textContent = "জমা হচ্ছে...";
 
         try {
           const amount = Number(document.getElementById("loan-amount").value);
           const reason = document.getElementById("loan-reason").value.trim();
           const file = document.getElementById("loan-proof-file").files[0];
 
-          if (amount > 35000 || amount <= 0) {
-            throw new Error("সর্বোচ্চ ₹৩৫,০০০ পর্যন্ত লোন নেওয়া যাবে / Max limit is ₹35,000.");
+          if (amount > maxLoanLimit || amount <= 0) {
+            throw new Error(lang === "bn" ? `সর্বোচ্চ ${formatINR(maxLoanLimit)} পর্যন্ত লোন নেওয়া যাবে।` : `Max loan limit is ${formatINR(maxLoanLimit)}.`);
           }
           if (!file) {
-            throw new Error("জরুরি প্রমাণ আপলোড করা বাধ্যতামূলক / Proof attachment is mandatory.");
+            throw new Error(lang === "bn" ? "জরুরি প্রমাণ আপলোড করা বাধ্যতামূলক।" : "Proof attachment is mandatory.");
           }
 
           const proofBase64 = await compressImageToBase64(file, 700, 0.72);
-          const requiresDual = amount > 20000;
+          const requiresDual = amount > dualThreshold;
 
           await addDoc(collection(db, "loans"), {
             uid: me.uid,
@@ -180,40 +221,45 @@
             adminApproved: false,
             coAdminApproved: false,
             status: "pending",
+            rejectReason: "",
             votes: {},
             createdAt: serverTimestamp()
           });
 
           await logAudit({
             actionType: "LOAN_APPLIED",
-            messageBn: `${me.name} ${formatINR(amount)} ইমার্জেন্সি লোনের আবেদন করেছেন (প্রমাণ সংযুক্ত)।`,
-            messageEn: `${me.name} applied for ${formatINR(amount)} emergency loan with proof attached.`,
+            messageBn: `${me.name} ${formatINR(amount)} ইমার্জেন্সি লোনের আবেদন করেছেন।`,
+            messageEn: `${me.name} applied for ${formatINR(amount)} emergency loan.`,
             actorUid: me.uid,
             actorName: me.name,
             actorRole: me.role
           });
 
           document.getElementById("loan-apply-form").reset();
-          alert("লোনের আবেদন সফলভাবে জমা হয়েছে! বাকি সদস্যরা ভোট দিতে পারবেন।");
+          alert(lang === "bn" ? "লোনের আবেদন জমা হয়েছে!" : "Loan application submitted!");
         } catch (err) {
           alert(err.message);
         } finally {
           btn.disabled = false;
-          btn.textContent = "আবেদন জমা দিন / Submit";
         }
       });
 
+      let loanItems = [];
       onSnapshot(query(collection(db, "loans"), orderBy("createdAt", "desc")), (snap) => {
-        const feed = document.getElementById("loans-feed");
-        const items = [];
-        snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+        loanItems = [];
+        snap.forEach((d) => loanItems.push({ id: d.id, ...d.data() }));
+        renderLoans();
+      });
 
-        if (items.length === 0) {
-          feed.innerHTML = `<div class="fintech-card p-8 text-center text-xs text-gray-500">এখনো কোনো লোনের আবেদন নেই / No loan applications yet.</div>`;
+      function renderLoans() {
+        const feed = document.getElementById("loans-feed");
+        const lang = getLang();
+        if (loanItems.length === 0) {
+          feed.innerHTML = `<div class="fintech-card p-8 text-center text-xs text-gray-500">${lang === "bn" ? "এখনো কোনো লোনের আবেদন নেই।" : "No loan applications yet."}</div>`;
           return;
         }
 
-        feed.innerHTML = items.map((l) => {
+        feed.innerHTML = loanItems.map((l) => {
           const votes = l.votes || {};
           const agreeCount = Object.values(votes).filter((v) => v === "agree").length;
           const disagreeCount = Object.values(votes).filter((v) => v === "disagree").length;
@@ -241,27 +287,28 @@
               </div>
 
               <p class="text-xs text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100">${l.reason}</p>
+              ${l.rejectReason ? `<p class="text-xs text-red-700 bg-red-50 p-2.5 rounded-xl border border-red-200 font-semibold">Remark: ${l.rejectReason}</p>` : ""}
 
               <div class="flex justify-between items-center flex-wrap gap-2">
                 <button data-proof="${l.proofBase64}" class="view-proof-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold hover:bg-emerald-200">
-                  📎 প্রমাণ দেখুন / View Proof
+                  📎 ${t("viewProofBtn")}
                 </button>
-                ${l.requiresDualApproval ? `<span class="text-[11px] font-bold text-amber-700">🔐 Maker-Checker (>₹20k)</span>` : ""}
+                ${l.requiresDualApproval ? `<span class="text-[11px] font-bold text-amber-700">🔐 Maker-Checker</span>` : ""}
               </div>
 
               <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-wrap justify-between items-center gap-2">
                 <div class="text-xs font-bold text-gray-700">
-                  পিয়ার ভোট (Peer Vote): <span class="text-emerald-700">👍 ${agreeCount}</span> | <span class="text-red-600">👎 ${disagreeCount}</span>
+                  ${t("peerVoteLabel")} <span class="text-emerald-700">👍 ${agreeCount}</span> | <span class="text-red-600">👎 ${disagreeCount}</span>
                 </div>
                 ${l.status === "pending" && l.uid !== me.uid ? `
                   <div class="flex gap-2">
                     <button data-id="${l.id}" data-vote="agree"
                       class="vote-btn px-3 py-1.5 rounded-xl text-xs font-bold ${myVote === "agree" ? "bg-emerald-700 text-white" : "bg-white border text-emerald-800"}">
-                      👍 Agree (সহমত)
+                      👍 ${t("agreeBtn")}
                     </button>
                     <button data-id="${l.id}" data-vote="disagree"
                       class="vote-btn px-3 py-1.5 rounded-xl text-xs font-bold ${myVote === "disagree" ? "bg-red-600 text-white" : "bg-white border text-red-700"}">
-                      👎 Disagree (অসম্মত)
+                      👎 ${t("disagreeBtn")}
                     </button>
                   </div>
                 ` : ""}
@@ -272,29 +319,36 @@
                   <div class="text-[11px] text-gray-600">
                     ${l.requiresDualApproval
                       ? `Admin: <strong>${l.adminApproved ? "✓" : "⏳"}</strong> | Co-Admin: <strong>${l.coAdminApproved ? "✓" : "⏳"}</strong>`
-                      : "Single Admin/Co-Admin Sign-off"}
+                      : "Single Sign-off"}
                   </div>
                   ${isStaff ? `
                     <div class="flex gap-2">
                       <button data-id="${l.id}" class="approve-loan-btn px-3.5 py-1.5 rounded-xl mint-btn text-xs">
-                        ✓ Approve Loan
+                        ✓ ${t("approveLoanBtn")}
                       </button>
                       <button data-id="${l.id}" class="reject-loan-btn px-3 py-1.5 rounded-xl bg-red-600 text-white text-xs font-bold">
-                        ✕ Reject
+                        ✕ ${t("rejectLoanBtn")}
                       </button>
                     </div>
                   ` : ""}
                 </div>
               ` : ""}
 
-              ${l.status === "approved" ? `
+              ${l.status !== "pending" && isStaff ? `
                 <div class="pt-2 border-t border-gray-100 flex flex-wrap justify-between items-center gap-2 text-xs">
-                  <span>বকেয়া লোন (Due): <strong class="text-red-700">${formatINR(outstanding)}</strong> (Paid: ${formatINR(l.repaidAmount || 0)})</span>
-                  ${isStaff && outstanding > 0 ? `
-                    <button data-id="${l.id}" class="repay-loan-btn px-3 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] font-bold">
-                      + কিস্তি জমা (Record Repayment)
+                  ${l.status === "approved" ? `
+                    <span>${t("loanDueLabel")} <strong class="text-red-700">${formatINR(outstanding)}</strong></span>
+                  ` : `<span></span>`}
+                  <div class="flex gap-2">
+                    ${l.status === "approved" && outstanding > 0 ? `
+                      <button data-id="${l.id}" class="repay-loan-btn px-3 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] font-bold">
+                        ${t("recordRepayBtn")}
+                      </button>
+                    ` : ""}
+                    <button data-id="${l.id}" class="undo-loan-btn px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 font-bold">
+                      ↩️ ${t("undoDecisionBtn")}
                     </button>
-                  ` : ""}
+                  </div>
                 </div>
               ` : ""}
             </div>
@@ -316,7 +370,7 @@
 
         feed.querySelectorAll(".vote-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const loan = items.find((x) => x.id === btn.dataset.id);
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
             if (!loan) return;
             const updatedVotes = { ...(loan.votes || {}), [me.uid]: btn.dataset.vote };
             await updateDoc(doc(db, "loans", loan.id), { votes: updatedVotes });
@@ -333,11 +387,16 @@
 
         feed.querySelectorAll(".approve-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const loan = items.find((x) => x.id === btn.dataset.id);
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
             if (!loan) return;
+            const prevState = {
+              adminApproved: Boolean(loan.adminApproved),
+              coAdminApproved: Boolean(loan.coAdminApproved),
+              status: loan.status
+            };
 
-            let adminApproved = Boolean(loan.adminApproved);
-            let coAdminApproved = Boolean(loan.coAdminApproved);
+            let adminApproved = prevState.adminApproved;
+            let coAdminApproved = prevState.coAdminApproved;
             if (isAdmin) adminApproved = true;
             if (isCoAdmin) coAdminApproved = true;
 
@@ -345,36 +404,98 @@
               ? (adminApproved && coAdminApproved)
               : (adminApproved || coAdminApproved);
 
-            await updateDoc(doc(db, "loans", loan.id), {
-              adminApproved,
-              coAdminApproved,
-              status: finalApproved ? "approved" : "pending"
-            });
+            const doApprove = async () => {
+              await updateDoc(doc(db, "loans", loan.id), {
+                adminApproved,
+                coAdminApproved,
+                status: finalApproved ? "approved" : "pending"
+              });
+              await logAudit({
+                actionType: finalApproved ? "LOAN_APPROVED" : "LOAN_PARTIAL_APPROVED",
+                messageBn: finalApproved
+                  ? `${me.name} সদস্য ${loan.applicantName}-এর ${formatINR(loan.amount)} লোন অনুমোদন দিয়েছেন।`
+                  : `${me.name} সদস্য ${loan.applicantName}-এর লোন আংশিক অনুমোদন দিয়েছেন।`,
+                messageEn: finalApproved
+                  ? `${me.name} approved ${loan.applicantName}'s ${formatINR(loan.amount)} loan.`
+                  : `${me.name} signed off on ${loan.applicantName}'s loan.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
 
-            await logAudit({
-              actionType: finalApproved ? "LOAN_APPROVED" : "LOAN_PARTIAL_APPROVED",
-              messageBn: finalApproved
-                ? `${me.name} সদস্য ${loan.applicantName}-এর ${formatINR(loan.amount)} লোন চূড়ান্ত অনুমোদন দিয়েছেন।`
-                : `${me.name} সদস্য ${loan.applicantName}-এর লোন আংশিক অনুমোদন দিয়েছেন (দ্বিতীয় অনুমোদন বাকি)।`,
-              messageEn: finalApproved
-                ? `${me.name} gave final approval for ${loan.applicantName}'s ${formatINR(loan.amount)} loan.`
-                : `${me.name} signed off on ${loan.applicantName}'s loan (awaiting second Maker-Checker approval).`,
-              actorUid: me.uid,
-              actorName: me.name,
-              actorRole: me.role
+            const doUndo = async () => {
+              await updateDoc(doc(db, "loans", loan.id), prevState);
+              await logAudit({
+                actionType: "UNDO_LOAN_DECISION",
+                messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের সিদ্ধান্ত Undo করেছেন।`,
+                messageEn: `${me.name} undid loan decision for ${loan.applicantName}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+
+            await doApprove();
+            pushUndoAction({
+              labelBn: `Approve Loan: ${loan.applicantName}`,
+              labelEn: `Approved Loan: ${loan.applicantName}`,
+              undoFn: doUndo,
+              redoFn: doApprove
             });
           });
         });
 
         feed.querySelectorAll(".reject-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const loan = items.find((x) => x.id === btn.dataset.id);
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
             if (!loan) return;
-            await updateDoc(doc(db, "loans", loan.id), { status: "rejected" });
+            const remark = await askForRemarks({
+              titleBn: `${loan.applicantName}-এর লোন বাতিলের কারণ`,
+              titleEn: `Reason for rejecting ${loan.applicantName}'s loan`
+            });
+            if (!remark) return;
+
+            const doReject = async () => {
+              await updateDoc(doc(db, "loans", loan.id), { status: "rejected", rejectReason: remark });
+              await logAudit({
+                actionType: "LOAN_REJECTED",
+                messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোন বাতিল করেছেন। কারণ: ${remark}`,
+                messageEn: `${me.name} rejected ${loan.applicantName}'s loan. Reason: ${remark}`,
+                remark,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+            const doUndo = async () => {
+              await updateDoc(doc(db, "loans", loan.id), { status: "pending", rejectReason: "" });
+            };
+
+            await doReject();
+            pushUndoAction({
+              labelBn: `Reject Loan: ${loan.applicantName}`,
+              labelEn: `Rejected Loan: ${loan.applicantName}`,
+              undoFn: doUndo,
+              redoFn: doReject
+            });
+          });
+        });
+
+        feed.querySelectorAll(".undo-loan-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
+            if (!loan) return;
+            await updateDoc(doc(db, "loans", loan.id), {
+              status: "pending",
+              adminApproved: false,
+              coAdminApproved: false,
+              rejectReason: ""
+            });
             await logAudit({
-              actionType: "LOAN_REJECTED",
-              messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের আবেদন বাতিল করেছেন।`,
-              messageEn: `${me.name} rejected ${loan.applicantName}'s loan application.`,
+              actionType: "UNDO_LOAN_DECISION",
+              messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের পূর্বের সিদ্ধান্ত ফিরিয়ে নিয়েছেন।`,
+              messageEn: `${me.name} reset ${loan.applicantName}'s loan back to Pending.`,
               actorUid: me.uid,
               actorName: me.name,
               actorRole: me.role
@@ -384,27 +505,42 @@
 
         feed.querySelectorAll(".repay-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
-            const loan = items.find((x) => x.id === btn.dataset.id);
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
             if (!loan) return;
             const outstanding = Number(loan.amount) - Number(loan.repaidAmount || 0);
-            const input = prompt(`কত টাকা ফেরত জমা দিচ্ছেন? (বকেয়া: ₹${outstanding})`, String(Math.min(5000, outstanding)));
+            const input = prompt(`Repayment amount (Due: ₹${outstanding}):`, String(Math.min(5000, outstanding)));
             const payAmt = Number(input);
             if (!payAmt || payAmt <= 0 || payAmt > outstanding) return;
 
-            const newRepaid = Number(loan.repaidAmount || 0) + payAmt;
-            await updateDoc(doc(db, "loans", loan.id), { repaidAmount: newRepaid });
-            await logAudit({
-              actionType: "LOAN_REPAYMENT",
-              messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের ${formatINR(payAmt)} কিস্তি জমা নিয়েছেন।`,
-              messageEn: `${me.name} recorded ${formatINR(payAmt)} loan repayment for ${loan.applicantName}.`,
-              actorUid: me.uid,
-              actorName: me.name,
-              actorRole: me.role
+            const prevRepaid = Number(loan.repaidAmount || 0);
+            const newRepaid = prevRepaid + payAmt;
+            const doRepay = async () => {
+              await updateDoc(doc(db, "loans", loan.id), { repaidAmount: newRepaid });
+              await logAudit({
+                actionType: "LOAN_REPAYMENT",
+                messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের ${formatINR(payAmt)} কিস্তি জমা নিয়েছেন।`,
+                messageEn: `${me.name} recorded ${formatINR(payAmt)} loan repayment for ${loan.applicantName}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            };
+            const doUndo = async () => {
+              await updateDoc(doc(db, "loans", loan.id), { repaidAmount: prevRepaid });
+            };
+
+            await doRepay();
+            pushUndoAction({
+              labelBn: `Repay ${formatINR(payAmt)}: ${loan.applicantName}`,
+              labelEn: `Repaid ${formatINR(payAmt)}: ${loan.applicantName}`,
+              undoFn: doUndo,
+              redoFn: doRepay
             });
           });
         });
-      });
+      }
 
+      window.addEventListener("languageChanged", renderLoans);
       document.getElementById("close-proof-modal").addEventListener("click", () => {
         document.getElementById("proof-modal").classList.add("hidden");
       });

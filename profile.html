@@ -15,7 +15,7 @@
       <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="myProfile">আমার প্রোফাইল ও SOS</h1>
       <div class="flex items-center gap-2 shrink-0">
         <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
-          <span class="lang-indicator">EN</span>
+          <span class="lang-indicator">English</span>
         </button>
         <button class="logout-btn px-3 py-1.5 rounded-xl bg-red-500/85 text-xs font-bold whitespace-nowrap" data-i18n="logout">লগ আউট</button>
       </div>
@@ -41,19 +41,19 @@
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
         <div class="p-3 rounded-2xl bg-emerald-50">
-          <p class="text-[11px] text-gray-500">মোট জমা (+)</p>
+          <p class="text-[11px] text-gray-500" data-i18n="exitPaidCol">মোট জমা (+)</p>
           <p class="font-extrabold text-sm text-emerald-800" id="exit-paid">₹0</p>
         </div>
         <div class="p-3 rounded-2xl bg-red-50">
-          <p class="text-[11px] text-gray-500">বকেয়া লোন (−)</p>
+          <p class="text-[11px] text-gray-500" data-i18n="exitLoanCol">বকেয়া লোন (−)</p>
           <p class="font-extrabold text-sm text-red-700" id="exit-loan">₹0</p>
         </div>
         <div class="p-3 rounded-2xl bg-amber-50">
-          <p class="text-[11px] text-gray-500">বকেয়া ফাইন (−)</p>
+          <p class="text-[11px] text-gray-500" data-i18n="exitFineCol">বকেয়া ফাইন (−)</p>
           <p class="font-extrabold text-sm text-amber-800" id="exit-fine">₹0</p>
         </div>
         <div class="p-3 rounded-2xl fintech-gradient text-white">
-          <p class="text-[11px] text-[#5CDDAB]">নিট ফেরতযোগ্য (=)</p>
+          <p class="text-[11px] text-[#5CDDAB]" data-i18n="exitNetCol">নিট ফেরতযোগ্য (=)</p>
           <p class="font-extrabold text-base text-white" id="exit-net">₹0</p>
         </div>
       </div>
@@ -64,21 +64,21 @@
 
       <form id="profile-edit-form" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">প্রোফাইল পিকচার আপলোড / Profile Picture</label>
+          <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="profilePicLabel">প্রোফাইল পিকচার আপলোড</label>
           <input type="file" id="edit-photo" accept="image/*"
             class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-[#0A3C2A] file:font-bold" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">পূর্ণ নাম / Full Name *</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="fullNameLabel">পূর্ণ নাম *</label>
             <input type="text" id="edit-name" required class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">ব্লাড গ্রুপ / Blood Group</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="bloodGroupLabel">ব্লাড গ্রুপ</label>
             <select id="edit-blood" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white">
-              <option value="">নির্বাচন করুন / Select</option>
+              <option value="" data-i18n="selectOption">নির্বাচন করুন</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
@@ -91,64 +91,84 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">আপনার UPI ID (পেমেন্ট পাওয়ার জন্য)</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="yourUpiLabel">আপনার UPI ID</label>
             <input type="text" id="edit-upi" placeholder="yourname@okaxis" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">ফ্যামিলি ইমার্জেন্সি SOS নম্বর</label>
-            <input type="tel" id="edit-sos" placeholder="বাড়ির কারোর মোবাইল নম্বর" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="sosNumberLabel">ফ্যামিলি ইমার্জেন্সি SOS নম্বর</label>
+            <input type="tel" id="edit-sos" placeholder="9876543210" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">ব্যাঙ্ক অ্যাকাউন্ট নম্বর (সুরক্ষিত ও ব্যক্তিগত)</label>
-            <input type="text" id="edit-bank" placeholder="Account Number (Private)" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="bankAccLabel">ব্যাঙ্ক অ্যাকাউন্ট নম্বর (সুরক্ষিত ও ব্যক্তিগত)</label>
+            <input type="text" id="edit-bank" placeholder="Account Number" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-gray-700 mb-1">IFSC কোড</label>
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="ifscLabel">IFSC কোড</label>
             <input type="text" id="edit-ifsc" placeholder="SBIN0001234" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm uppercase" />
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-xs font-bold text-gray-700 mb-1">নমিনি নাম ও সম্পর্ক / Nominee Name & Relation</label>
-            <input type="text" id="edit-nominee" placeholder="যেমন: Rina Karmakar (Wife / Mother)" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
+            <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="nomineeLabel">নমিনি নাম ও সম্পর্ক</label>
+            <input type="text" id="edit-nominee" placeholder="Nominee Name (Relation)" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm" />
           </div>
         </div>
 
-        <button type="submit" id="save-profile-btn" class="w-full mint-btn py-3 rounded-xl text-sm">
-          প্রোফাইল সেভ করুন / Save Profile
+        <button type="submit" id="save-profile-btn" class="w-full mint-btn py-3 rounded-xl text-sm" data-i18n="saveProfileBtn">
+          প্রোফাইল সেভ করুন
         </button>
       </form>
     </div>
   </main>
 
-  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
-  <nav id="bottom-nav" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
-    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
-      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+  <!-- Floating Undo / Redo Bar -->
+  <div id="undo-redo-bar" class="hidden fixed bottom-20 left-3 right-3 max-w-md mx-auto bg-slate-900/95 text-white rounded-2xl px-3.5 py-2 shadow-xl border border-white/15 z-40 flex items-center justify-between gap-2">
+    <span id="undo-redo-label" class="text-[11px] text-emerald-200 truncate flex-1">Action recorded</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="global-undo-btn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↩️ <span data-i18n="undoBtn">Undo</span>
+      </button>
+      <button id="global-redo-btn" class="px-2.5 py-1 rounded-lg bg-emerald-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↪️ <span data-i18n="redoBtn">Redo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 5-Tab High-Contrast SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-3 left-2.5 right-2.5 max-w-lg mx-auto bottom-nav-pill text-white rounded-2xl px-1.5 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-5 gap-0.5 text-center text-[10px] sm:text-[11px] leading-none">
+      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="profile.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+      <a href="settings.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navSettings">সেটিংস</span>
       </a>
     </div>
   </nav>
@@ -166,11 +186,11 @@
       setupCommonUI,
       formatINR,
       getCurrentMonthKey,
-      isAfterFifthOfMonth,
+      isAfterDueDay,
       compressImageToBase64,
       logAudit
     } from "./js/utils.js";
-    import "./js/i18n.js";
+    import { getLang, t } from "./js/i18n.js";
 
     setupCommonUI();
 
@@ -200,7 +220,7 @@
         });
 
         const totalPaid = Number(me.totalPaid || 0);
-        const autoOverdueFine = (me.lastPaidMonth !== getCurrentMonthKey() && isAfterFifthOfMonth()) ? 100 : 0;
+        const autoOverdueFine = (me.lastPaidMonth !== getCurrentMonthKey() && isAfterDueDay(5)) ? 100 : 0;
         const pendingFine = Math.max(Number(me.pendingFine || 0), autoOverdueFine);
         const netRefund = totalPaid - activeLoanDue - pendingFine;
 
@@ -214,7 +234,6 @@
         e.preventDefault();
         const btn = document.getElementById("save-profile-btn");
         btn.disabled = true;
-        btn.textContent = "সেভ হচ্ছে...";
 
         try {
           const updates = {
@@ -246,12 +265,12 @@
             actorRole: me.role
           });
 
-          alert("প্রোফাইল সফলভাবে আপডেট হয়েছে / Profile updated!");
+          alert(getLang() === "bn" ? "প্রোফাইল সফলভাবে আপডেট হয়েছে!" : "Profile updated successfully!");
         } catch (err) {
           alert("Error: " + err.message);
         } finally {
           btn.disabled = false;
-          btn.textContent = "প্রোফাইল সেভ করুন / Save Profile";
+          btn.textContent = t("saveProfileBtn");
         }
       });
     });

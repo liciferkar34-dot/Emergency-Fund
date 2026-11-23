@@ -11,15 +11,13 @@
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body class="pb-32">
-  <!-- Offline Indicator -->
   <div id="offline-banner" class="hidden bg-amber-500 text-slate-950 text-center text-xs font-bold py-1.5 px-3" data-i18n="offlineBanner">
     অফলাইন মোড: সর্বশেষ সেভ করা ডেটা দেখানো হচ্ছে
   </div>
 
-  <!-- Top Header (Clean 2-Tier Mobile-First Layout - Zero Overlap) -->
+  <!-- Top Header -->
   <header class="fintech-gradient text-white pt-3.5 pb-16 px-4 rounded-b-[32px] shadow-xl">
     <div class="max-w-5xl mx-auto">
-      <!-- Row 1: App Title & Action Pills -->
       <div class="flex justify-between items-center gap-2 pb-3.5 mb-3.5 border-b border-white/10">
         <div class="flex items-center gap-2 min-w-0">
           <span class="w-7 h-7 rounded-lg bg-[#5CDDAB] text-[#013A20] flex items-center justify-center font-extrabold text-sm shrink-0">₹</span>
@@ -34,21 +32,37 @@
             <span data-i18n="navAudit">অডিট লগ</span>
           </a>
           <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold border border-white/20 whitespace-nowrap">
-            <span class="lang-indicator">EN</span>
+            <span class="lang-indicator">English</span>
           </button>
           <button class="logout-btn px-2.5 py-1.5 rounded-xl bg-red-500/85 hover:bg-red-500 text-xs font-bold whitespace-nowrap" data-i18n="logout">লগ আউট</button>
         </div>
       </div>
 
-      <!-- Row 2: User Profile & Role Badge -->
-      <div class="flex items-center gap-3 mb-5">
+      <div class="flex items-center gap-3 mb-4">
         <img id="header-avatar" src="./icon.svg" alt="Avatar" class="w-12 h-12 rounded-2xl object-cover border-2 border-[#5CDDAB] shrink-0 bg-emerald-950" />
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 mb-0.5">
-            <p class="text-xs text-[#5CDDAB] font-semibold" id="greeting-text">স্বাগতম,</p>
+            <p class="text-xs text-[#5CDDAB] font-semibold" data-i18n="welcomePrefix">স্বাগতম,</p>
             <span id="header-role-badge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#5CDDAB] text-[#013A20] uppercase tracking-wider shrink-0">MEMBER</span>
           </div>
-          <h1 class="font-extrabold text-base sm:text-lg leading-snug text-white break-words" id="header-user-name">লোড হচ্ছে...</h1>
+          <h1 class="font-extrabold text-base sm:text-lg leading-snug text-white break-words" id="header-user-name">...</h1>
+        </div>
+      </div>
+
+      <!-- Admin Pinned Urgent Notice Banner (Right at the top of Home Dashboard) -->
+      <div id="pinned-notice-box" class="hidden mb-4 p-3.5 rounded-2xl bg-amber-400/20 border border-amber-300/40 backdrop-blur-sm">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-start gap-2.5 min-w-0">
+            <span class="w-7 h-7 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 mt-0.5 font-bold">📌</span>
+            <div class="min-w-0">
+              <p class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300" data-i18n="pinnedNoticeTitle">অ্যাডমিন জরুরি ঘোষণা</p>
+              <p id="pinned-notice-text" class="text-xs sm:text-sm font-semibold text-white mt-0.5 leading-relaxed break-words"></p>
+              <p id="pinned-notice-meta" class="text-[10px] text-amber-200/75 mt-1"></p>
+            </div>
+          </div>
+          <button id="admin-quick-notice-btn" class="hidden px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-[11px] font-extrabold shrink-0" data-i18n="editNoticeBtn">
+            নোটিশ লিখুন / এডিট
+          </button>
         </div>
       </div>
 
@@ -56,7 +70,10 @@
       <div id="hero-balance-section" class="hidden bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-5 md:p-6">
         <div class="flex justify-between items-start gap-2">
           <div>
-            <p class="text-xs text-emerald-100/80 font-semibold" data-i18n="availableBalance">বর্তমান ব্যালেন্স (Available)</p>
+            <div class="flex items-center gap-2">
+              <p class="text-xs text-emerald-100/80 font-semibold" data-i18n="availableBalance">বর্তমান ব্যালেন্স (Available)</p>
+              <button id="toggle-balance-eye" class="text-xs text-[#5CDDAB] hover:underline font-bold" title="Show/Hide Balance">👁️</button>
+            </div>
             <h2 class="text-3xl md:text-4xl font-extrabold text-[#5CDDAB] mt-1" id="stat-available">₹0</h2>
           </div>
           <span class="px-2.5 py-1 rounded-full bg-emerald-400/20 text-[#5CDDAB] text-[11px] font-bold flex items-center gap-1.5 shrink-0 whitespace-nowrap">
@@ -76,10 +93,9 @@
           </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="grid grid-cols-2 gap-2.5 sm:gap-3 mt-5">
           <button id="open-upi-modal-btn" class="mint-btn py-3 px-3 rounded-2xl text-xs sm:text-sm text-center leading-tight" data-i18n="payUpiBtn">
-            ₹১,০০০ UPI পেমেন্ট করুন
+            UPI পেমেন্ট করুন
           </button>
           <a href="loans.html" class="py-3 px-3 rounded-2xl bg-white text-[#0A3C2A] font-bold text-xs sm:text-sm text-center shadow hover:bg-emerald-50 transition flex items-center justify-center leading-tight" data-i18n="requestLoanBtn">
             ইমার্জেন্সি লোন আবেদন
@@ -94,34 +110,32 @@
     <div class="fintech-card p-8 text-center border-t-4 border-amber-500">
       <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4">⏳</div>
       <h2 class="text-xl font-extrabold text-[#0A3C2A] mb-2" data-i18n="pendingApprovalTitle">অ্যাডমিন অনুমোদনের অপেক্ষায়</h2>
-      <p class="text-sm text-gray-600 leading-relaxed mb-6" data-i18n="pendingApprovalDesc">
-        আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। গ্রুপের অ্যাডমিন (Admin) আপনার অ্যাকাউন্টটি Approve করলেই আপনি ড্যাশবোর্ড ও ফান্ডের হিসাব দেখতে পাবেন।
-      </p>
+      <p class="text-sm text-gray-600 leading-relaxed mb-6" data-i18n="pendingApprovalDesc"></p>
       <div class="bg-emerald-50 rounded-xl p-3 text-xs text-left text-gray-700 mb-5 space-y-1">
-        <p><strong>Name:</strong> <span id="gate-name">-</span></p>
-        <p><strong>Email:</strong> <span id="gate-email">-</span></p>
-        <p><strong>Mobile:</strong> <span id="gate-phone">-</span></p>
+        <p><strong data-i18n="fullNameLabel">Name:</strong> <span id="gate-name">-</span></p>
+        <p><strong data-i18n="emailLabel">Email:</strong> <span id="gate-email">-</span></p>
+        <p><strong data-i18n="mobileLabel">Mobile:</strong> <span id="gate-phone">-</span></p>
       </div>
       <button class="logout-btn w-full py-3 rounded-xl bg-red-600 text-white font-bold text-sm" data-i18n="logout">লগ আউট</button>
     </div>
   </section>
 
-  <!-- Main Approved Dashboard Content -->
+  <!-- Main Approved Dashboard -->
   <main id="dashboard-main" class="hidden max-w-5xl mx-auto px-4 -mt-8 space-y-5">
-    <!-- Admin Pending Member Requests Queue -->
+    <!-- Admin Pending Member Approvals -->
     <div id="admin-approval-card" class="hidden fintech-card p-5 border-l-4 border-amber-500">
       <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3 flex items-center gap-2">
-        🔔 নতুন সদস্য অনুমোদনের অনুরোধ (Pending Member Approvals)
+        🔔 <span data-i18n="pendingRequestsHeading">নতুন সদস্য অনুমোদনের অনুরোধ</span>
       </h3>
       <div id="pending-users-list" class="space-y-2.5"></div>
     </div>
 
-    <!-- Dynamic Corpus Target & Progress Bar -->
+    <!-- Dynamic Corpus Target -->
     <div class="fintech-card p-5">
       <div class="flex justify-between items-center gap-2 mb-2.5">
         <div>
           <h3 class="text-sm font-extrabold text-[#0A3C2A]" data-i18n="corpusTarget">৬ মাসের ফান্ড টার্গেট</h3>
-          <p class="text-xs text-gray-500 mt-0.5"><span data-i18n="approvedMembers">অনুমোদিত সদস্য</span>: <strong id="stat-member-count">0</strong> × ₹1,000 × 6</p>
+          <p class="text-xs text-gray-500 mt-0.5"><span data-i18n="approvedMembers">অনুমোদিত সদস্য</span>: <strong id="stat-member-count">0</strong> × <strong id="stat-monthly-unit">₹1,000</strong> × 6</p>
         </div>
         <div class="text-right shrink-0">
           <p class="text-base font-extrabold text-[#0A3C2A]" id="stat-target">₹0</p>
@@ -133,119 +147,103 @@
       </div>
     </div>
 
-    <!-- Quick Navigation Grid (Crisp Vector Icons) -->
-    <div class="grid grid-cols-4 gap-2.5">
-      <a href="ledger.html" class="fintech-card p-3 sm:p-4 text-center hover:border-emerald-400 transition flex flex-col items-center justify-center gap-1.5">
-        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-[#0A3C2A] flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
-          </svg>
-        </div>
-        <p class="text-xs font-bold text-[#0A3C2A] leading-tight" data-i18n="navLedger">হিসাব</p>
-      </a>
-      <a href="loans.html" class="fintech-card p-3 sm:p-4 text-center hover:border-emerald-400 transition flex flex-col items-center justify-center gap-1.5">
-        <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-900 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <p class="text-xs font-bold text-[#0A3C2A] leading-tight" data-i18n="navLoans">লোন</p>
-      </a>
-      <a href="profile.html" class="fintech-card p-3 sm:p-4 text-center hover:border-emerald-400 transition flex flex-col items-center justify-center gap-1.5">
-        <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-900 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-        </div>
-        <p class="text-xs font-bold text-[#0A3C2A] leading-tight" data-i18n="navProfile">প্রোফাইল</p>
-      </a>
-      <a href="audit.html" class="fintech-card p-3 sm:p-4 text-center hover:border-emerald-400 transition flex flex-col items-center justify-center gap-1.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-          </svg>
-        </div>
-        <p class="text-xs font-bold text-[#0A3C2A] leading-tight" data-i18n="navAudit">অডিট লগ</p>
-      </a>
-    </div>
-
-    <!-- Recent Verified Transactions & Digital PDF Receipts -->
+    <!-- Recent Verified Transactions -->
     <div class="fintech-card p-5">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-extrabold text-base text-[#0A3C2A]" data-i18n="recentVerified">সাম্প্রতিক ভেরিফায়েড জমা</h3>
-        <a href="ledger.html" class="text-xs font-bold text-emerald-700 underline">সব দেখুন →</a>
+        <a href="ledger.html" class="text-xs font-bold text-emerald-700 underline" data-i18n="viewAllLink">সব দেখুন →</a>
       </div>
       <div id="recent-tx-list" class="space-y-3">
-        <p class="text-xs text-gray-500 text-center py-4">লোড হচ্ছে...</p>
+        <p class="text-xs text-gray-500 text-center py-4">...</p>
       </div>
     </div>
   </main>
 
-  <!-- UPI Payment & UTR Submission Modal -->
+  <!-- UPI Payment Modal -->
   <div id="upi-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-3">
-        <h3 class="text-lg font-extrabold text-[#0A3C2A]">₹১,০০০ মাসিক চাঁদা (UPI)</h3>
+        <h3 class="text-lg font-extrabold text-[#0A3C2A]" data-i18n="upiModalTitle">মাসিক চাঁদা পেমেন্ট (UPI)</h3>
         <button id="close-upi-modal" class="text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
       </div>
 
       <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 text-center">
-        <p class="text-xs text-gray-600 mb-1">ফান্ডের অফিসিয়াল UPI ID:</p>
+        <p class="text-xs text-gray-600 mb-1" data-i18n="officialUpiLabel">ফান্ডের অফিসিয়াল UPI ID:</p>
         <p class="font-extrabold text-base text-[#0A3C2A] select-all" id="fund-upi-display">9832420007@ybl</p>
         <a id="upi-deep-link" href="upi://pay?pa=9832420007@ybl&pn=PeerFund&am=1000&cu=INR"
           class="mt-3 inline-block w-full py-2.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] font-bold text-xs shadow">
-          📲 GPay / PhonePe / Paytm খুলুন (₹1,000)
+          📲 <span data-i18n="openUpiAppBtn">GPay / PhonePe / Paytm খুলুন</span> (<span id="upi-amt-badge">₹1,000</span>)
         </a>
       </div>
 
       <form id="utr-submit-form" class="space-y-3">
         <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">কোন মাসের চাঁদা / Month *</label>
+          <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="selectMonthLabel">কোন মাসের চাঁদা *</label>
           <input type="month" id="utr-month" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">১২ সংখ্যার UTR / Reference নম্বর *</label>
-          <input type="text" id="utr-number" required minlength="6" maxlength="24" placeholder="যেমন: 432198765432"
+          <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="utrNumberLabel">১২ সংখ্যার UTR / Reference নম্বর *</label>
+          <input type="text" id="utr-number" required minlength="6" maxlength="24" data-i18n-placeholder="utrNumberPh"
             class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 mb-1">পেমেন্ট স্ক্রিনশট আপলোড / Payment Screenshot *</label>
+          <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="screenshotLabel">পেমেন্ট স্ক্রিনশট আপলোড *</label>
           <input type="file" id="utr-screenshot" accept="image/*" required
             class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-[#0A3C2A] file:font-bold" />
         </div>
-        <button type="submit" id="utr-submit-btn" class="w-full mint-btn py-3 rounded-xl text-sm">
-          ভেরিফিকেশনের জন্য জমা দিন / Submit UTR
+        <button type="submit" id="utr-submit-btn" class="w-full mint-btn py-3 rounded-xl text-sm" data-i18n="submitUtrBtn">
+          ভেরিফিকেশনের জন্য জমা দিন
         </button>
       </form>
     </div>
   </div>
 
-  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
-  <nav id="bottom-nav" class="hidden fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
-    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
-      <a href="dashboard.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+  <!-- Floating Undo / Redo Bar -->
+  <div id="undo-redo-bar" class="hidden fixed bottom-20 left-3 right-3 max-w-md mx-auto bg-slate-900/95 text-white rounded-2xl px-3.5 py-2 shadow-xl border border-white/15 z-40 flex items-center justify-between gap-2">
+    <span id="undo-redo-label" class="text-[11px] text-emerald-200 truncate flex-1">Action recorded</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="global-undo-btn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↩️ <span data-i18n="undoBtn">Undo</span>
+      </button>
+      <button id="global-redo-btn" class="px-2.5 py-1 rounded-lg bg-emerald-400 text-slate-950 font-extrabold text-[11px] flex items-center gap-1">
+        ↪️ <span data-i18n="redoBtn">Redo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 5-Tab High-Contrast SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="hidden fixed bottom-3 left-2.5 right-2.5 max-w-lg mx-auto bottom-nav-pill text-white rounded-2xl px-1.5 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-5 gap-0.5 text-center text-[10px] sm:text-[11px] leading-none">
+      <a href="dashboard.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
         <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+      <a href="settings.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navSettings">সেটিংস</span>
       </a>
     </div>
   </nav>
@@ -256,6 +254,7 @@
       collection,
       doc,
       addDoc,
+      setDoc,
       updateDoc,
       onSnapshot,
       query,
@@ -269,18 +268,19 @@
       getCurrentMonthKey,
       compressImageToBase64,
       logAudit,
-      generatePaymentReceiptPDF
+      generatePaymentReceiptPDF,
+      pushUndoAction,
+      askForRemarks
     } from "./js/utils.js";
-    import "./js/i18n.js";
+    import { getLang, t } from "./js/i18n.js";
 
     setupCommonUI();
 
     requireApprovedUser((user, me) => {
+      const isAdmin = me.role === "admin";
       document.getElementById("header-user-name").textContent = me.name;
       document.getElementById("header-role-badge").textContent = me.role.toUpperCase();
-      if (me.photoBase64) {
-        document.getElementById("header-avatar").src = me.photoBase64;
-      }
+      if (me.photoBase64) document.getElementById("header-avatar").src = me.photoBase64;
 
       if (me.approvalStatus !== "approved") {
         document.getElementById("approval-gate").classList.remove("hidden");
@@ -298,29 +298,102 @@
       let totalCollected = 0;
       let activeLoanDisbursed = 0;
       let approvedCount = 0;
+      let monthlyContribution = 1000;
+      let upiEnabled = true;
+      let hideBalance = localStorage.getItem("peerfund_hide_bal") === "1";
+
+      document.getElementById("toggle-balance-eye").addEventListener("click", () => {
+        hideBalance = !hideBalance;
+        localStorage.setItem("peerfund_hide_bal", hideBalance ? "1" : "0");
+        refreshCorpusUI();
+      });
 
       function refreshCorpusUI() {
         const available = totalCollected - activeLoanDisbursed;
-        const target = approvedCount * 1000 * 6;
+        const target = approvedCount * monthlyContribution * 6;
         const pct = target > 0 ? Math.min(100, Math.round((totalCollected / target) * 100)) : 0;
 
-        document.getElementById("stat-collected").textContent = formatINR(totalCollected);
-        document.getElementById("stat-disbursed").textContent = formatINR(activeLoanDisbursed);
-        document.getElementById("stat-available").textContent = formatINR(available);
+        document.getElementById("stat-collected").textContent = hideBalance ? "₹•••••" : formatINR(totalCollected);
+        document.getElementById("stat-disbursed").textContent = hideBalance ? "₹•••••" : formatINR(activeLoanDisbursed);
+        document.getElementById("stat-available").textContent = hideBalance ? "₹•••••" : formatINR(available);
         document.getElementById("stat-member-count").textContent = approvedCount;
+        document.getElementById("stat-monthly-unit").textContent = formatINR(monthlyContribution);
         document.getElementById("stat-target").textContent = formatINR(target);
         document.getElementById("stat-progress-pct").textContent = `${pct}%`;
         document.getElementById("stat-progress-bar").style.width = `${pct}%`;
       }
 
+      // Listen to Settings + Pinned Admin Notice
       onSnapshot(doc(db, "settings", "general"), (snap) => {
-        if (snap.exists() && snap.data().fundUpi) {
-          const upi = snap.data().fundUpi;
-          document.getElementById("fund-upi-display").textContent = upi;
-          document.getElementById("upi-deep-link").href = `upi://pay?pa=${encodeURIComponent(upi)}&pn=PeerFund&am=1000&cu=INR`;
+        const d = snap.exists() ? snap.data() : {};
+        const upi = d.fundUpi || "9832420007@ybl";
+        const payee = d.payeeName || "PeerFund";
+        monthlyContribution = Number(d.monthlyAmount || 1000);
+        upiEnabled = d.upiEnabled !== false;
+
+        document.getElementById("fund-upi-display").textContent = upi;
+        document.getElementById("upi-amt-badge").textContent = formatINR(monthlyContribution);
+        document.getElementById("upi-deep-link").href = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payee)}&am=${monthlyContribution}&cu=INR`;
+
+        const payBtn = document.getElementById("open-upi-modal-btn");
+        if (!upiEnabled) {
+          payBtn.disabled = true;
+          payBtn.classList.add("opacity-50");
+        } else {
+          payBtn.disabled = false;
+          payBtn.classList.remove("opacity-50");
         }
+
+        // Pinned Notice Banner
+        const noticeBox = document.getElementById("pinned-notice-box");
+        const noticeText = document.getElementById("pinned-notice-text");
+        const noticeMeta = document.getElementById("pinned-notice-meta");
+        const quickBtn = document.getElementById("admin-quick-notice-btn");
+
+        if (d.pinnedNotice && d.pinnedNotice.trim()) {
+          noticeBox.classList.remove("hidden");
+          noticeText.textContent = d.pinnedNotice;
+          noticeMeta.textContent = d.noticeUpdatedAt ? `📌 ${new Date(d.noticeUpdatedAt).toLocaleString("en-IN")}` : "";
+          if (isAdmin) quickBtn.classList.remove("hidden");
+        } else if (isAdmin) {
+          noticeBox.classList.remove("hidden");
+          noticeText.textContent = t("noNoticeYet");
+          noticeMeta.textContent = "";
+          quickBtn.classList.remove("hidden");
+        } else {
+          noticeBox.classList.add("hidden");
+        }
+
+        refreshCorpusUI();
       });
 
+      // Admin-Only Quick Notice Editor
+      if (isAdmin) {
+        document.getElementById("admin-quick-notice-btn").addEventListener("click", async () => {
+          const current = document.getElementById("pinned-notice-text").textContent;
+          const nextText = prompt(
+            getLang() === "bn" ? "জরুরি নোটিশ লিখুন (ফাঁকা রাখলে মুছে যাবে):" : "Enter urgent notice (leave blank to clear):",
+            current === t("noNoticeYet") ? "" : current
+          );
+          if (nextText === null) return;
+          const trimmed = nextText.trim();
+          await setDoc(doc(db, "settings", "general"), {
+            pinnedNotice: trimmed,
+            noticeUpdatedAt: new Date().toISOString()
+          }, { merge: true });
+
+          await logAudit({
+            actionType: "NOTICE_UPDATED",
+            messageBn: trimmed ? `Admin ${me.name} নতুন নোটিশ পিন করেছেন: "${trimmed}"` : `Admin ${me.name} পিন করা নোটিশ মুছে ফেলেছেন।`,
+            messageEn: trimmed ? `Admin ${me.name} pinned notice: "${trimmed}"` : `Admin ${me.name} cleared the pinned notice.`,
+            actorUid: me.uid,
+            actorName: me.name,
+            actorRole: me.role
+          });
+        });
+      }
+
+      // Listen to Users (Collected + Pending Approvals with Undo/Redo & Remarks)
       onSnapshot(collection(db, "users"), (snap) => {
         totalCollected = 0;
         approvedCount = 0;
@@ -349,40 +422,85 @@
                 <p class="text-xs text-gray-600">${u.phone} • ${u.email}</p>
               </div>
               <div class="flex gap-2">
-                <button data-uid="${u.uid}" data-name="${u.name}" class="approve-user-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">Approve</button>
-                <button data-uid="${u.uid}" data-name="${u.name}" class="reject-user-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">Reject</button>
+                <button data-uid="${u.uid}" data-name="${u.name}" class="approve-user-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">✓ Approve</button>
+                <button data-uid="${u.uid}" data-name="${u.name}" class="reject-user-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">✕ Reject</button>
               </div>
             </div>
           `).join("");
 
           pendingList.querySelectorAll(".approve-user-btn").forEach((btn) => {
             btn.addEventListener("click", async () => {
-              const uid = btn.dataset.uid;
-              const uname = btn.dataset.name;
-              await updateDoc(doc(db, "users", uid), { approvalStatus: "approved" });
-              await logAudit({
-                actionType: "MEMBER_APPROVED",
-                messageBn: `${me.name} নতুন সদস্য ${uname}-কে অনুমোদন (Approve) দিয়েছেন।`,
-                messageEn: `${me.name} approved new member ${uname}.`,
-                actorUid: me.uid,
-                actorName: me.name,
-                actorRole: me.role
+              const { uid, name } = btn.dataset;
+              const doApprove = async () => {
+                await updateDoc(doc(db, "users", uid), { approvalStatus: "approved", rejectReason: "" });
+                await logAudit({
+                  actionType: "MEMBER_APPROVED",
+                  messageBn: `${me.name} নতুন সদস্য ${name}-কে অনুমোদন (Approve) দিয়েছেন।`,
+                  messageEn: `${me.name} approved new member ${name}.`,
+                  actorUid: me.uid,
+                  actorName: me.name,
+                  actorRole: me.role
+                });
+              };
+              const doUndo = async () => {
+                await updateDoc(doc(db, "users", uid), { approvalStatus: "pending" });
+                await logAudit({
+                  actionType: "UNDO_MEMBER_APPROVAL",
+                  messageBn: `${me.name} সদস্য ${name}-এর অনুমোদন ফিরিয়ে (Undo/Unapprove) নিয়েছেন।`,
+                  messageEn: `${me.name} undid approval (unapproved) for ${name}.`,
+                  actorUid: me.uid,
+                  actorName: me.name,
+                  actorRole: me.role
+                });
+              };
+              await doApprove();
+              pushUndoAction({
+                labelBn: `Approve: ${name}`,
+                labelEn: `Approved: ${name}`,
+                undoFn: doUndo,
+                redoFn: doApprove
               });
             });
           });
 
           pendingList.querySelectorAll(".reject-user-btn").forEach((btn) => {
             btn.addEventListener("click", async () => {
-              const uid = btn.dataset.uid;
-              const uname = btn.dataset.name;
-              await updateDoc(doc(db, "users", uid), { approvalStatus: "rejected" });
-              await logAudit({
-                actionType: "MEMBER_REJECTED",
-                messageBn: `${me.name} সদস্য ${uname}-এর আবেদন বাতিল (Reject) করেছেন।`,
-                messageEn: `${me.name} rejected signup request of ${uname}.`,
-                actorUid: me.uid,
-                actorName: me.name,
-                actorRole: me.role
+              const { uid, name } = btn.dataset;
+              const remark = await askForRemarks({
+                titleBn: `${name}-এর আবেদন বাতিলের কারণ`,
+                titleEn: `Reason for rejecting ${name}`
+              });
+              if (!remark) return;
+
+              const doReject = async () => {
+                await updateDoc(doc(db, "users", uid), { approvalStatus: "rejected", rejectReason: remark });
+                await logAudit({
+                  actionType: "MEMBER_REJECTED",
+                  messageBn: `${me.name} সদস্য ${name}-এর আবেদন বাতিল করেছেন। কারণ: ${remark}`,
+                  messageEn: `${me.name} rejected signup of ${name}. Reason: ${remark}`,
+                  remark,
+                  actorUid: me.uid,
+                  actorName: me.name,
+                  actorRole: me.role
+                });
+              };
+              const doUndo = async () => {
+                await updateDoc(doc(db, "users", uid), { approvalStatus: "pending", rejectReason: "" });
+                await logAudit({
+                  actionType: "UNDO_MEMBER_REJECT",
+                  messageBn: `${me.name} সদস্য ${name}-এর আবেদন বাতিল ফিরিয়ে (Undo) নিয়েছেন।`,
+                  messageEn: `${me.name} undid rejection for ${name}.`,
+                  actorUid: me.uid,
+                  actorName: me.name,
+                  actorRole: me.role
+                });
+              };
+              await doReject();
+              pushUndoAction({
+                labelBn: `Reject: ${name}`,
+                labelEn: `Rejected: ${name}`,
+                undoFn: doUndo,
+                redoFn: doReject
               });
             });
           });
@@ -412,7 +530,7 @@
         });
 
         if (verified.length === 0) {
-          list.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">এখনো কোনো ভেরিফায়েড জমা নেই / No verified deposits yet.</p>`;
+          list.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">${getLang() === "bn" ? "এখনো কোনো ভেরিফায়েড জমা নেই।" : "No verified deposits yet."}</p>`;
           return;
         }
 
@@ -420,10 +538,10 @@
           <div class="flex justify-between items-center gap-2 p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100">
             <div class="min-w-0">
               <p class="font-bold text-sm text-[#0A3C2A] truncate">${tx.userName} <span class="text-xs font-normal text-gray-500">(${tx.month})</span></p>
-              <p class="text-[11px] text-gray-600 truncate">UTR: ${tx.utr || "Cash"} • Verified by ${tx.verifiedBy || "Admin"}</p>
+              <p class="text-[11px] text-gray-600 truncate">UTR: ${tx.utr || "Cash"} • ${tx.verifiedBy || "Admin"}</p>
             </div>
             <div class="text-right flex items-center gap-2 shrink-0">
-              <span class="font-extrabold text-sm text-emerald-700">+${formatINR(tx.amount)}</span>
+              <span class="font-extrabold text-sm ${Number(tx.amount) < 0 ? "text-red-600" : "text-emerald-700"}">${Number(tx.amount) < 0 ? formatINR(tx.amount) : "+" + formatINR(tx.amount)}</span>
               <button data-tx='${JSON.stringify({
                 id: tx.id,
                 userName: tx.userName,
@@ -443,21 +561,22 @@
 
         list.querySelectorAll(".pdf-receipt-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
-            const txObj = JSON.parse(btn.dataset.tx);
-            generatePaymentReceiptPDF(txObj);
+            generatePaymentReceiptPDF(JSON.parse(btn.dataset.tx));
           });
         });
       });
 
       const upiModal = document.getElementById("upi-modal");
-      document.getElementById("open-upi-modal-btn").addEventListener("click", () => upiModal.classList.remove("hidden"));
+      document.getElementById("open-upi-modal-btn").addEventListener("click", () => {
+        if (!upiEnabled) return alert(t("upiPausedNotice"));
+        upiModal.classList.remove("hidden");
+      });
       document.getElementById("close-upi-modal").addEventListener("click", () => upiModal.classList.add("hidden"));
 
       document.getElementById("utr-submit-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const btn = document.getElementById("utr-submit-btn");
         btn.disabled = true;
-        btn.textContent = "আপলোড হচ্ছে...";
 
         try {
           const month = document.getElementById("utr-month").value;
@@ -469,7 +588,7 @@
             uid: me.uid,
             userName: me.name,
             memberId: me.memberId || "-",
-            amount: 1000,
+            amount: monthlyContribution,
             month,
             utr,
             mode: "UPI",
@@ -480,8 +599,8 @@
 
           await logAudit({
             actionType: "UPI_UTR_SUBMITTED",
-            messageBn: `${me.name} (${month}) মাসের ₹১,০০০ UPI পেমেন্টের UTR (${utr}) জমা দিয়েছেন।`,
-            messageEn: `${me.name} submitted ₹1,000 UPI payment UTR (${utr}) for ${month}.`,
+            messageBn: `${me.name} (${month}) মাসের ${formatINR(monthlyContribution)} UPI পেমেন্টের UTR (${utr}) জমা দিয়েছেন।`,
+            messageEn: `${me.name} submitted ${formatINR(monthlyContribution)} UPI payment UTR (${utr}) for ${month}.`,
             actorUid: me.uid,
             actorName: me.name,
             actorRole: me.role
@@ -490,12 +609,11 @@
           document.getElementById("utr-submit-form").reset();
           document.getElementById("utr-month").value = getCurrentMonthKey();
           upiModal.classList.add("hidden");
-          alert("UTR ও স্ক্রিনশট জমা হয়েছে! অ্যাডমিন ভেরিফাই করলে ব্যালেন্স যুক্ত হবে।");
+          alert(getLang() === "bn" ? "UTR ও স্ক্রিনশট জমা হয়েছে! অ্যাডমিন ভেরিফাই করলে ব্যালেন্স যুক্ত হবে।" : "UTR & screenshot submitted for verification!");
         } catch (err) {
           alert("Error: " + err.message);
         } finally {
           btn.disabled = false;
-          btn.textContent = "ভেরিফিকেশনের জন্য জমা দিন / Submit UTR";
         }
       });
     });
