@@ -7,13 +7,13 @@ import {
 
 // Your PeerFund Firebase Project Configuration
 export const firebaseConfig = {
-  apiKey: "AIzaSyChLT0buxHzHEH8jS1bQNEaRezv7oTzZ-I",
-  authDomain: "peerfund-69940.firebaseapp.com",
-  projectId: "peerfund-69940",
-  storageBucket: "peerfund-69940.firebasestorage.app",
-  messagingSenderId: "114511100406",
-  appId: "1:114511100406:web:9a4d1bc77019a6dafa6fd7",
-  measurementId: "G-9NLBGHXHYY"
+  apiKey: "AIzaSyCeHyQjY3DQB-ayE8tennAdinFmoVB0n8I",
+  authDomain: "peerfund-92066.firebaseapp.com",
+  projectId: "peerfund-92066",
+  storageBucket: "peerfund-92066.firebasestorage.app",
+  messagingSenderId: "1080499326205",
+  appId: "1:1080499326205:web:a517e9e21e8c8f044d8294",
+  measurementId: "G-K4BMW34C6Y"
 };
 
 export const ADMIN_EMAIL = "dhananjoyk049@gmail.com";
