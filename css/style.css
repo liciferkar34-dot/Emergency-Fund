@@ -1,1 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --emerald-dark: #0A3C2A;
+  --emerald-deep: #013A20;
+  --mint-primary: #5CDDAB;
+  --mint-bright: #39D59E;
+  --surface-tint: #F2FBF7;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', sans-serif;
+  background-color: var(--surface-tint);
+  color: #112A20;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fintech-gradient {
+  background: linear-gradient(135deg, #0A3C2A 0%, #013A20 100%);
+}
+
+.mint-btn {
+  background: linear-gradient(135deg, #5CDDAB 0%, #39D59E 100%);
+  color: #013A20;
+  font-weight: 700;
+  box-shadow: 0 8px 20px -4px rgba(57, 213, 158, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mint-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -4px rgba(57, 213, 158, 0.6);
+}
+
+.mint-btn:active {
+  transform: scale(0.98);
+}
+
+.fintech-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(10, 60, 42, 0.06);
+  border: 1px solid rgba(10, 60, 42, 0.06);
+}
+
+.bottom-nav-pill {
+  background: rgba(10, 60, 42, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(1, 58, 32, 0.35);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #A7D7C5;
+  border-radius: 999px;
+}
 
