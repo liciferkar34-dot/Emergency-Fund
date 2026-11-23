@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peer Fund — Immutable Audit Log</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A3C2A">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-header">
+      <div class="header-top">
+        <div class="brand-row">
+          <a href="dashboard.html" class="icon-btn">←</a>
+          <div>
+            <div class="greeting-name" data-i18n="auditLog">Immutable Audit Log</div>
+            <div class="greeting-small">Read-only • Cannot be edited or deleted</div>
+          </div>
+        </div>
+        <button class="lang-btn" id="lang-toggle">বাংলা</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="card">
+        <div id="audit-list" class="empty-state">Loading audit trail...</div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+  </div>
+
+  <script type="module">
+    import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { db, requireApprovedUser, renderBottomNav, toggleLang, getLang } from "./js/app.js";
+
+    renderBottomNav("home");
+    let logs = [];
+    document.getElementById("lang-toggle").addEventListener("click", () => { toggleLang(); renderLogs(); });
+
+    requireApprovedUser(async () => {
+      const snap = await getDocs(query(collection(db, "audit_logs"), orderBy("clientTime", "desc"), limit(100)));
+      logs = snap.docs.map(d => d.data());
+      renderLogs();
+    });
+
+    function renderLogs() {
+      const el = document.getElementById("audit-list");
+      if (!logs.length) {
+        el.innerHTML = `<div class="empty-state">No audit logs recorded yet.</div>`;
+        return;
+      }
+      const bn = getLang() === "bn";
+      el.className = "";
+      el.innerHTML = logs.map(l => `
+        <div style="padding:11px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span class="badge badge-admin">${l.action}</span>
+            <span style="font-size:11px;color:var(--muted);">${l.clientTime ? new Date(l.clientTime).toLocaleString() : ""}</span>
+          </div>
+          <div style="font-size:13px;font-weight:600;">${bn ? (l.detailsBn || l.detailsEn) : l.detailsEn}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">By: ${l.actorName} (${l.actorRole})</div>
+        </div>
+      `).join("");
+    }
+  </script>
+</body>
+</html>

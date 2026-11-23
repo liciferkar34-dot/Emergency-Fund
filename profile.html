@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peer Fund — Profile & Security</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A3C2A">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-header" style="text-align:center;">
+      <div class="header-top">
+        <div class="brand-row"><div class="brand-logo">👤</div><div class="greeting-name" data-i18n="profile">Profile</div></div>
+        <button class="lang-btn" id="lang-toggle">বাংলা</button>
+      </div>
+      <div id="profile-avatar-box" style="display:flex;justify-content:center;margin:8px 0;"></div>
+      <h2 id="prof-name" style="font-size:20px;">...</h2>
+      <div id="prof-meta" style="font-size:12px;opacity:.85;margin-top:4px;">...</div>
+    </header>
+
+    <main class="content">
+      <!-- Edit Profile Picture & Basic Details -->
+      <div class="card">
+        <div class="section-title"><span>Edit Profile & SOS Details</span></div>
+        <form id="profile-form">
+          <div class="form-group">
+            <label class="form-label">Change Profile Picture</label>
+            <input type="file" class="input" id="pf-photo" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="input" id="pf-name" required>
+          </div>
+          <div class="stats-grid">
+            <div class="form-group">
+              <label class="form-label">Blood Group</label>
+              <input type="text" class="input" id="pf-blood" placeholder="e.g. O+">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Family SOS Phone</label>
+              <input type="tel" class="input" id="pf-sos" placeholder="Emergency no.">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your UPI ID (For Loan Payout)</label>
+            <input type="text" class="input" id="pf-upi" placeholder="name@upi">
+          </div>
+          <div class="stats-grid">
+            <div class="form-group">
+              <label class="form-label">Bank Account No. (Private)</label>
+              <input type="text" class="input" id="pf-bank" placeholder="Account number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">IFSC Code</label>
+              <input type="text" class="input" id="pf-ifsc" placeholder="SBIN0001234">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nominee Name & Relation</label>
+            <input type="text" class="input" id="pf-nominee" placeholder="e.g. Father / Spouse">
+          </div>
+          <button type="submit" class="btn btn-mint btn-full" id="save-prof-btn">Save Profile Changes</button>
+        </form>
+      </div>
+
+      <!-- 4-Digit App PIN Lock -->
+      <div class="card">
+        <div class="section-title"><span>🔒 4-Digit App PIN Lock</span></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" class="input" id="new-pin" maxlength="4" pattern="[0-9]{4}" placeholder="Enter 4-digit PIN">
+          <button class="btn btn-dark btn-sm" id="set-pin-btn" style="white-space:nowrap;">Set PIN</button>
+          <button class="btn btn-danger btn-sm" id="clear-pin-btn">Off</button>
+        </div>
+      </div>
+
+      <!-- Exit Settlement Calculator -->
+      <div class="card">
+        <div class="section-title"><span>🧮 Exit Settlement Calculator</span></div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+          Exact Refundable Payout = Total Contributed − Active Loan Dues − Pending Fines
+        </p>
+        <div id="exit-calc-box" style="background:var(--mint-soft);padding:14px;border-radius:14px;font-size:13px;"></div>
+      </div>
+
+      <button class="btn btn-danger btn-full" id="logout-btn" data-i18n="logout">Logout</button>
+    </main>
+
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+  </div>
+
+  <script type="module">
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      auth, db, requireApprovedUser, renderBottomNav, toggleLang, renderAvatar,
+      compressImageToBase64, formatINR, sha256, showToast, writeAuditLog
+    } from "./js/app.js";
+
+    renderBottomNav("profile");
+    document.getElementById("lang-toggle").addEventListener("click", toggleLang);
+
+    let currentUser = null;
+
+    requireApprovedUser(async (user) => {
+      currentUser = user;
+      fillUI(user);
+      await loadExitCalculator(user);
+    });
+
+    function fillUI(u) {
+      document.getElementById("profile-avatar-box").innerHTML = renderAvatar(u, "avatar-lg");
+      document.getElementById("prof-name").textContent = u.name;
+      document.getElementById("prof-meta").textContent = `${u.role.toUpperCase()} • ${u.memberId || ""} • ${u.phone}`;
+      document.getElementById("pf-name").value = u.name || "";
+      document.getElementById("pf-blood").value = u.bloodGroup || "";
+      document.getElementById("pf-sos").value = u.emergencyContact || "";
+      document.getElementById("pf-upi").value = u.upiId || "";
+      document.getElementById("pf-bank").value = u.bankAccount || "";
+      document.getElementById("pf-ifsc").value = u.ifsc || "";
+      document.getElementById("pf-nominee").value = u.nominee || "";
+    }
+
+    async function loadExitCalculator(u) {
+      const q = query(collection(db, "loans"), where("uid", "==", u.uid));
+      const snap = await getDocs(q);
+      const loanDues = snap.docs
+        .map(d => d.data())
+        .filter(l => l.status === "disbursed")
+        .reduce((s, l) => s + Number(l.remainingBalance ?? l.amount ?? 0), 0);
+
+      const contributed = Number(u.totalPaid || 0);
+      const fines = Number(u.pendingFine || 0);
+      const refundable = contributed - loanDues - fines;
+
+      document.getElementById("exit-calc-box").innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Total Contributed:</span><strong>${formatINR(contributed)}</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Active Loan Dues:</span><strong style="color:var(--danger);">- ${formatINR(loanDues)}</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Pending Fines:</span><strong style="color:var(--danger);">- ${formatINR(fines)}</strong></div>
+        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px dashed var(--emerald);font-size:16px;">
+          <strong>Net Refundable:</strong><strong style="color:var(--emerald-dark);">${formatINR(refundable)}</strong>
+        </div>
+      `;
+    }
+
+    document.getElementById("profile-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-prof-btn");
+      btn.disabled = true;
+      try {
+        const updates = {
+          name: document.getElementById("pf-name").value.trim(),
+          bloodGroup: document.getElementById("pf-blood").value.trim(),
+          emergencyContact: document.getElementById("pf-sos").value.trim(),
+          upiId: document.getElementById("pf-upi").value.trim(),
+          bankAccount: document.getElementById("pf-bank").value.trim(),
+          ifsc: document.getElementById("pf-ifsc").value.trim(),
+          nominee: document.getElementById("pf-nominee").value.trim()
+        };
+        const file = document.getElementById("pf-photo").files[0];
+        if (file) {
+          updates.photoBase64 = await compressImageToBase64(file, 200, 0.72);
+        }
+        await updateDoc(doc(db, "users", currentUser.uid), updates);
+        currentUser = { ...currentUser, ...updates };
+        fillUI(currentUser);
+        await writeAuditLog(currentUser, "PROFILE_UPDATED", `${currentUser.name} updated profile details.`, `${currentUser.name} প্রোফাইল আপডেট করেছেন।`);
+        showToast("Profile saved successfully!");
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // PIN Lock controls
+    document.getElementById("set-pin-btn").addEventListener("click", async () => {
+      const pin = document.getElementById("new-pin").value.trim();
+      if (!/^[0-9]{4}$/.test(pin)) { showToast("Enter exactly 4 digits"); return; }
+      localStorage.setItem("pf_pin_hash", await sha256(pin));
+      sessionStorage.setItem("pf_pin_unlocked", "1");
+      document.getElementById("new-pin").value = "";
+      showToast("4-Digit PIN Lock enabled!");
+    });
+    document.getElementById("clear-pin-btn").addEventListener("click", () => {
+      localStorage.removeItem("pf_pin_hash");
+      showToast("PIN Lock disabled.");
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      sessionStorage.removeItem("pf_pin_unlocked");
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

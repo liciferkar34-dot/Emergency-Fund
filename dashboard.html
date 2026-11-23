@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peer Fund — Dashboard</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A3C2A">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-header">
+      <div class="header-top">
+        <div class="brand-row">
+          <div id="user-avatar-wrap"></div>
+          <div>
+            <div class="greeting-small" id="greeting-text">Good morning,</div>
+            <div class="greeting-name" id="user-name">...</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="role-pill" id="role-badge">Member</span>
+          <button class="lang-btn" id="lang-toggle">বাংলা</button>
+        </div>
+      </div>
+
+      <div class="balance-label">
+        <span data-i18n="totalBalance">Available Corpus Balance</span>
+        <span id="member-count-pill" style="color:var(--mint);font-weight:700;">0 Members</span>
+      </div>
+      <div class="balance-amount" id="available-balance">₹0</div>
+
+      <div class="hero-actions">
+        <button class="btn btn-mint" id="open-upi-btn" data-i18n="payUpi">Pay ₹1,000 (UPI)</button>
+        <a href="loans.html" class="btn btn-glass" data-i18n="requestFund">Request Fund</a>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Admin Pending Approvals Banner -->
+      <div class="alert-banner hidden" id="pending-banner">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <span id="pending-banner-text">Pending member requests!</span>
+          <a href="ledger.html" class="btn btn-dark btn-sm">Review</a>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label" data-i18n="collected">Total Collected</div>
+          <div class="stat-value" id="stat-collected">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-i18n="disbursed">Total Disbursed</div>
+          <div class="stat-value" id="stat-disbursed">₹0</div>
+        </div>
+      </div>
+
+      <!-- Dynamic 6-Month Corpus Progress -->
+      <div class="card">
+        <div class="section-title">
+          <span>6-Month Target Progress</span>
+          <span id="target-pct" style="color:var(--emerald);font-weight:800;">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="target-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
+          <span id="target-collected-label">Collected: ₹0</span>
+          <span id="target-goal-label">Target: ₹0</span>
+        </div>
+      </div>
+
+      <!-- 4-Tile Quick Services Grid -->
+      <div class="quick-grid">
+        <a href="ledger.html" class="quick-tile">
+          <div class="quick-icon">👥</div>
+          <div class="quick-label" data-i18n="members">Members</div>
+        </a>
+        <a href="audit.html" class="quick-tile">
+          <div class="quick-icon">🛡️</div>
+          <div class="quick-label" data-i18n="auditLog">Audit Log</div>
+        </a>
+        <button class="quick-tile" id="btn-monthly-pdf">
+          <div class="quick-icon">📄</div>
+          <div class="quick-label" data-i18n="monthlyPdf">Monthly PDF</div>
+        </button>
+        <a href="rules.html" class="quick-tile">
+          <div class="quick-icon">📜</div>
+          <div class="quick-label" data-i18n="rules">Rules</div>
+        </a>
+      </div>
+
+      <!-- Recent Verified Activity -->
+      <div class="card">
+        <div class="section-title">
+          <span data-i18n="recentActivity">Recent Verified Activity</span>
+          <a href="audit.html" style="font-size:12px;color:var(--emerald);text-decoration:none;font-weight:700;">View All →</a>
+        </div>
+        <div id="recent-list" class="empty-state">Loading activity...</div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+  </div>
+
+  <!-- Pay ₹1,000 via UPI + UTR Modal -->
+  <div class="modal-backdrop" id="upi-modal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3>Pay ₹1,000 via UPI</h3>
+        <button class="modal-close" id="close-upi">✕</button>
+      </div>
+      <div style="background:var(--mint-soft);padding:12px;border-radius:14px;margin-bottom:14px;font-size:13px;">
+        <div style="color:var(--muted);font-size:11px;font-weight:700;">FUND UPI ID</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          <strong id="fund-upi-display">Not set by Admin</strong>
+          <button type="button" class="btn btn-outline btn-sm" id="copy-upi-btn">Copy</button>
+        </div>
+      </div>
+      <a id="upi-deep-link" href="#" class="btn btn-dark btn-full" style="margin-bottom:14px;">Open GPay / PhonePe / Paytm (₹1,000)</a>
+      <form id="utr-form">
+        <div class="form-group">
+          <label class="form-label">UTR / Transaction ID (12 Digits)</label>
+          <input type="text" class="input" id="utr-number" required placeholder="e.g. 423156789012">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Screenshot (Optional)</label>
+          <input type="file" class="input" id="utr-file" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-mint btn-full" id="utr-submit">Submit for Admin Verification</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import {
+      collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy, limit
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      db, requireApprovedUser, renderBottomNav, toggleLang, getGreeting, formatINR,
+      renderAvatar, currentMonthKey, compressImageToBase64, showToast, writeAuditLog,
+      downloadReceiptPDF, downloadMonthlyStatementPDF
+    } from "./js/app.js";
+
+    renderBottomNav("home");
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      toggleLang();
+      document.getElementById("greeting-text").textContent = getGreeting();
+    });
+
+    let currentUser = null;
+    let approvedMembers = [];
+    let allTransactions = [];
+    let allLoans = [];
+    let fundUpiId = "peerfund@upi";
+
+    requireApprovedUser(async (user) => {
+      currentUser = user;
+      document.getElementById("greeting-text").textContent = getGreeting();
+      document.getElementById("user-name").textContent = user.name;
+      document.getElementById("user-avatar-wrap").innerHTML = renderAvatar(user);
+      document.getElementById("role-badge").textContent = user.role.toUpperCase();
+
+      await loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+      const [usersSnap, txSnap, loansSnap, setSnap] = await Promise.all([
+        getDocs(collection(db, "users")),
+        getDocs(query(collection(db, "transactions"), orderBy("clientTime", "desc"))),
+        getDocs(collection(db, "loans")),
+        getDoc(doc(db, "settings", "fund"))
+      ]);
+
+      if (setSnap.exists() && setSnap.data().upiId) {
+        fundUpiId = setSnap.data().upiId;
+      }
+      document.getElementById("fund-upi-display").textContent = fundUpiId;
+      document.getElementById("upi-deep-link").href =
+        `upi://pay?pa=${encodeURIComponent(fundUpiId)}&pn=Peer%20Fund&am=1000&cu=INR&tn=PeerFund_${currentMonthKey()}`;
+
+      const allUsers = usersSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      approvedMembers = allUsers.filter(u => u.approvalStatus === "approved");
+      const pendingMembers = allUsers.filter(u => u.approvalStatus === "pending");
+
+      allTransactions = txSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allLoans = loansSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Pending approvals banner for Admin / Co-Admin
+      if ((currentUser.role === "admin" || currentUser.role === "co_admin") && pendingMembers.length > 0) {
+        document.getElementById("pending-banner").classList.remove("hidden");
+        document.getElementById("pending-banner-text").textContent =
+          `${pendingMembers.length} new member signup(s) waiting for approval`;
+      }
+
+      const verifiedDeposits = allTransactions.filter(t => t.status === "verified" && t.type !== "loan_disbursement");
+      const totalCollected = verifiedDeposits.reduce((s, t) => s + Number(t.amount || 0), 0);
+      const totalDisbursed = allLoans.filter(l => l.status === "disbursed").reduce((s, l) => s + Number(l.amount || 0), 0);
+      const available = totalCollected - totalDisbursed;
+
+      // Dynamic target = Approved Members * 1000 * 6
+      const target = approvedMembers.length * 1000 * 6;
+      const pct = target > 0 ? Math.min(100, Math.round((totalCollected / target) * 100)) : 0;
+
+      document.getElementById("member-count-pill").textContent = `${approvedMembers.length} Members`;
+      document.getElementById("available-balance").textContent = formatINR(available);
+      document.getElementById("stat-collected").textContent = formatINR(totalCollected);
+      document.getElementById("stat-disbursed").textContent = formatINR(totalDisbursed);
+      document.getElementById("target-pct").textContent = pct + "%";
+      document.getElementById("target-bar").style.width = pct + "%";
+      document.getElementById("target-collected-label").textContent = `Collected: ${formatINR(totalCollected)}`;
+      document.getElementById("target-goal-label").textContent = `Target: ${formatINR(target)}`;
+
+      const recentEl = document.getElementById("recent-list");
+      const recent = verifiedDeposits.slice(0, 8);
+      if (!recent.length) {
+        recentEl.innerHTML = `<div class="empty-state">No verified deposits yet.</div>`;
+      } else {
+        recentEl.className = "";
+        recentEl.innerHTML = recent.map((tx, idx) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:14px;font-weight:700;">${tx.userName}</div>
+              <div style="font-size:11px;color:var(--muted);">${tx.type || "Deposit"} • ${tx.month || ""}</div>
+            </div>
+            <div style="text-align:right;display:flex;align-items:center;gap:8px;">
+              <strong style="color:var(--emerald);">${formatINR(tx.amount)}</strong>
+              <button class="btn btn-outline btn-sm receipt-btn" data-idx="${idx}">PDF</button>
+            </div>
+          </div>
+        `).join("");
+        recentEl.querySelectorAll(".receipt-btn").forEach(btn => {
+          btn.addEventListener("click", () => downloadReceiptPDF(recent[Number(btn.dataset.idx)]));
+        });
+      }
+    }
+
+    // Monthly PDF button
+    document.getElementById("btn-monthly-pdf").addEventListener("click", () => {
+      downloadMonthlyStatementPDF(approvedMembers, allTransactions, allLoans);
+      showToast("Monthly Statement PDF downloaded!");
+    });
+
+    // UPI Modal
+    const upiModal = document.getElementById("upi-modal");
+    document.getElementById("open-upi-btn").addEventListener("click", () => upiModal.classList.add("open"));
+    document.getElementById("close-upi").addEventListener("click", () => upiModal.classList.remove("open"));
+    document.getElementById("copy-upi-btn").addEventListener("click", () => {
+      navigator.clipboard.writeText(fundUpiId);
+      showToast("UPI ID copied!");
+    });
+
+    document.getElementById("utr-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("utr-submit");
+      btn.disabled = true;
+      try {
+        const utr = document.getElementById("utr-number").value.trim();
+        const file = document.getElementById("utr-file").files[0];
+        let screenshotBase64 = "";
+        if (file) screenshotBase64 = await compressImageToBase64(file, 480, 0.7);
+
+        await addDoc(collection(db, "transactions"), {
+          uid: currentUser.uid,
+          userName: currentUser.name,
+          amount: 1000,
+          type: "Monthly Deposit",
+          month: currentMonthKey(),
+          utr,
+          screenshotBase64,
+          status: "pending",
+          createdAt: serverTimestamp(),
+          clientTime: new Date().toISOString()
+        });
+        await writeAuditLog(currentUser, "UTR_SUBMITTED",
+          `${currentUser.name} submitted ₹1,000 UTR (${utr}) for verification.`,
+          `${currentUser.name} ₹১,০০০ জমার UTR (${utr}) জমা দিয়েছেন।`
+        );
+        upiModal.classList.remove("open");
+        document.getElementById("utr-form").reset();
+        showToast("UTR submitted! Waiting for Admin verification.");
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
