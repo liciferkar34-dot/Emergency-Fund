@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Peer Fund</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0A3C2A" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 fintech-gradient">
+  <div class="fintech-card w-full max-w-md p-7">
+    <div class="flex justify-between items-center mb-5">
+      <a href="index.html" class="text-xs font-bold text-[#0A3C2A] hover:underline">← হোম / Home</a>
+      <button class="lang-toggle-btn px-3 py-1 rounded-lg bg-emerald-100 text-[#0A3C2A] text-xs font-bold">
+        <span class="lang-indicator">EN</span>
+      </button>
+    </div>
+
+    <div class="text-center mb-6">
+      <div class="w-12 h-12 rounded-2xl fintech-gradient text-[#5CDDAB] flex items-center justify-center font-extrabold text-2xl mx-auto mb-2 shadow">₹</div>
+      <h1 class="text-2xl font-extrabold text-[#0A3C2A]" data-i18n="register">রেজিস্ট্রেশন</h1>
+      <p class="text-xs text-gray-500 mt-1">একটি ইমেইল ও একটি মোবাইল নম্বরে একবারই অ্যাকাউন্ট খোলা যাবে</p>
+    </div>
+
+    <form id="register-form" class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">পূর্ণ নাম / Full Name *</label>
+        <input type="text" id="reg-name" required placeholder="যেমন: Dhananjoy Karmakar"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">ইমেইল আইডি / Email ID *</label>
+        <input type="email" id="reg-email" required placeholder="example@gmail.com"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">১০ সংখ্যার মোবাইল নম্বর / 10-Digit Mobile *</label>
+        <input type="tel" id="reg-phone" required pattern="[0-9]{10}" maxlength="10" placeholder="9832420007"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">পাসওয়ার্ড / Password (Min 6 chars) *</label>
+        <input type="password" id="reg-pass" required minlength="6" placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">পুনরায় পাসওয়ার্ড / Retype Password *</label>
+        <input type="password" id="reg-repass" required minlength="6" placeholder="••••••••"
+          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-[#0A3C2A] text-sm" />
+      </div>
+
+      <div id="reg-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold"></div>
+      <div id="reg-success" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold"></div>
+
+      <button type="submit" id="reg-submit" class="w-full mint-btn py-3 rounded-xl text-sm mt-2" data-i18n="register">
+        রেজিস্ট্রেশন সম্পন্ন করুন
+      </button>
+    </form>
+
+    <p class="text-center text-xs text-gray-600 mt-5">
+      আগে থেকে অ্যাকাউন্ট আছে? <a href="login.html" class="text-[#0A3C2A] font-bold underline" data-i18n="login">লগ ইন করুন</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { auth, db, ADMIN_EMAIL, ADMIN_PHONE } from "./js/firebase-config.js";
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { logAudit } from "./js/utils.js";
+    import "./js/i18n.js";
+
+    const form = document.getElementById("register-form");
+    const errBox = document.getElementById("reg-error");
+    const okBox = document.getElementById("reg-success");
+    const submitBtn = document.getElementById("reg-submit");
+
+    function showError(msg) {
+      errBox.textContent = msg;
+      errBox.classList.remove("hidden");
+      okBox.classList.add("hidden");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errBox.classList.add("hidden");
+
+      const name = document.getElementById("reg-name").value.trim();
+      const email = document.getElementById("reg-email").value.trim().toLowerCase();
+      const phone = document.getElementById("reg-phone").value.trim();
+      const pass = document.getElementById("reg-pass").value;
+      const repass = document.getElementById("reg-repass").value;
+
+      if (!/^[0-9]{10}$/.test(phone)) {
+        return showError("সঠিক ১০ সংখ্যার মোবাইল নম্বর দিন / Enter a valid 10-digit mobile number.");
+      }
+      if (pass !== repass) {
+        return showError("পাসওয়ার্ড দুটি মিলছে না / Passwords do not match.");
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "যাচাই হচ্ছে / Processing...";
+
+      try {
+        // 1. Check strict one-phone-one-account uniqueness
+        const phoneRef = doc(db, "phone_lookup", phone);
+        const phoneSnap = await getDoc(phoneRef);
+        if (phoneSnap.exists()) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "রেজিস্ট্রেশন / Register";
+          return showError("এই মোবাইল নম্বর দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে / This mobile number is already registered.");
+        }
+
+        // 2. Create Firebase Auth user (enforces unique email automatically)
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        const uid = cred.user.uid;
+
+        // 3. Determine Auto-Admin vs Pending Member
+        const isAutoAdmin = (email === ADMIN_EMAIL.toLowerCase() && phone === ADMIN_PHONE);
+        const role = isAutoAdmin ? "admin" : "member";
+        const approvalStatus = isAutoAdmin ? "approved" : "pending";
+        const memberId = "PF-" + String(Math.floor(1000 + Math.random() * 9000));
+
+        // 4. Write phone_lookup document
+        await setDoc(phoneRef, {
+          email: email,
+          uid: uid,
+          createdAt: serverTimestamp()
+        });
+
+        // 5. Write user profile document
+        await setDoc(doc(db, "users", uid), {
+          name,
+          email,
+          phone,
+          memberId,
+          role,
+          approvalStatus,
+          totalPaid: 0,
+          pendingFine: 0,
+          lastPaidMonth: "",
+          bloodGroup: "",
+          upiId: "",
+          bankAccount: "",
+          ifsc: "",
+          nominee: "",
+          sosContact: "",
+          photoBase64: "",
+          joinedAt: serverTimestamp()
+        });
+
+        await logAudit({
+          actionType: "USER_REGISTERED",
+          messageBn: `${name} (${phone}) নতুন অ্যাকাউন্ট রেজিস্ট্রেশন করেছেন (${role.toUpperCase()})।`,
+          messageEn: `${name} (${phone}) registered a new account (${role.toUpperCase()}).`,
+          actorUid: uid,
+          actorName: name,
+          actorRole: role
+        });
+
+        okBox.textContent = isAutoAdmin
+          ? "স্বাগতম Admin! ড্যাশবোর্ডে নিয়ে যাওয়া হচ্ছে..."
+          : "রেজিস্ট্রেশন সফল! ড্যাশবোর্ডে নিয়ে যাওয়া হচ্ছে...";
+        okBox.classList.remove("hidden");
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 900);
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "রেজিস্ট্রেশন / Register";
+        if (err.code === "auth/email-already-in-use") {
+          showError("এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে / This email is already registered.");
+        } else {
+          showError("সমস্যা হয়েছে: " + err.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

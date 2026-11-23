@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peer Fund - Emergency Mutual Fund</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0A3C2A" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Top Header -->
+  <header class="fintech-gradient text-white sticky top-0 z-40 shadow-lg">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-[#5CDDAB] text-[#013A20] flex items-center justify-center font-extrabold text-xl shadow">₹</div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight" data-i18n="appName">পিয়ার ফান্ড</h1>
+          <p class="text-xs text-[#5CDDAB]" data-i18n="appTagline">বন্ধুদের ইমার্জেন্সি মিউচুয়াল ফান্ড</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="lang-toggle-btn px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold border border-white/20 transition">
+          <span class="lang-indicator">EN</span>
+        </button>
+        <a href="login.html" id="top-login-btn" class="px-4 py-2 rounded-xl bg-white text-[#0A3C2A] text-sm font-bold hover:bg-emerald-50 transition" data-i18n="login">লগ ইন</a>
+        <a href="register.html" id="top-reg-btn" class="px-4 py-2 rounded-xl mint-btn text-sm" data-i18n="register">রেজিস্ট্রেশন</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="fintech-gradient text-white pt-6 pb-14 px-4 rounded-b-[32px] shadow-xl">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block px-3 py-1 rounded-full bg-[#5CDDAB]/20 text-[#5CDDAB] text-xs font-bold mb-3 border border-[#5CDDAB]/30">
+        100% Transparent • 0% Interest • PWA App
+      </span>
+      <h2 class="text-2xl md:text-4xl font-extrabold mb-3" data-i18n="rulesTitle">ইমার্জেন্সি ফান্ড - কঠোর নিয়মাবলী</h2>
+      <p class="text-emerald-100/85 text-sm md:text-base max-w-2xl mx-auto mb-6" data-i18n="rulesSubtitle">
+        স্বচ্ছতা ও পারস্পরিক ভরসার ভিত্তিতে পরিচালিত ডিজিটাল ফান্ড
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="register.html" id="hero-cta-reg" class="mint-btn px-6 py-3 rounded-2xl text-sm md:text-base" data-i18n="register">রেজিস্ট্রেশন</a>
+        <a href="login.html" id="hero-cta-login" class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-sm md:text-base transition" data-i18n="login">লগ ইন</a>
+        <button id="pwa-install-btn" class="hidden px-5 py-3 rounded-2xl bg-amber-400 text-slate-900 font-bold text-sm shadow-lg" data-i18n="installApp">
+          মোবাইল অ্যাপ ইনস্টল করুন (PWA)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rules Cards -->
+  <main class="max-w-4xl mx-auto px-4 -mt-8 mb-12 flex-1 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="fintech-card p-6 border-l-4 border-[#0A3C2A]">
+        <h3 class="font-bold text-base text-[#0A3C2A] mb-2" data-i18n="rule1Title">১. ফান্ডের উদ্দেশ্য (Emergency Only)</h3>
+        <p class="text-sm text-gray-600 leading-relaxed" data-i18n="rule1Desc"></p>
+      </div>
+      <div class="fintech-card p-6 border-l-4 border-[#39D59E]">
+        <h3 class="font-bold text-base text-[#0A3C2A] mb-2" data-i18n="rule2Title">২. মাসিক চাঁদা ও সময়সীমা</h3>
+        <p class="text-sm text-gray-600 leading-relaxed" data-i18n="rule2Desc"></p>
+      </div>
+      <div class="fintech-card p-6 border-l-4 border-amber-500">
+        <h3 class="font-bold text-base text-[#0A3C2A] mb-2" data-i18n="rule3Title">৩. লেট-ফাইন নিয়ম (Auto Fine)</h3>
+        <p class="text-sm text-gray-600 leading-relaxed" data-i18n="rule3Desc"></p>
+      </div>
+      <div class="fintech-card p-6 border-l-4 border-emerald-600">
+        <h3 class="font-bold text-base text-[#0A3C2A] mb-2" data-i18n="rule4Title">৪. ০% সুদে ইমার্জেন্সি লোন ও ভোটিং</h3>
+        <p class="text-sm text-gray-600 leading-relaxed" data-i18n="rule4Desc"></p>
+      </div>
+      <div class="fintech-card p-6 border-l-4 border-teal-700 md:col-span-2">
+        <h3 class="font-bold text-base text-[#0A3C2A] mb-2" data-i18n="rule5Title">৫. অপরিবর্তনীয় অডিট লগ ও এক্সিট পলিসি</h3>
+        <p class="text-sm text-gray-600 leading-relaxed" data-i18n="rule5Desc"></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center text-xs text-gray-500 py-6 border-t border-emerald-900/10">
+    Peer Fund Digital Mutual Banking System • Secured by Firebase
+  </footer>
+
+  <script type="module">
+    import { auth } from "./js/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import "./js/i18n.js";
+
+    // If user is already logged in, show Dashboard shortcut
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const loginBtn = document.getElementById("top-login-btn");
+        loginBtn.href = "dashboard.html";
+        loginBtn.setAttribute("data-i18n", "dashboard");
+        loginBtn.textContent = "ড্যাশবোর্ড / Dashboard";
+        document.getElementById("top-reg-btn").classList.add("hidden");
+        document.getElementById("hero-cta-reg").href = "dashboard.html";
+        document.getElementById("hero-cta-reg").textContent = "ড্যাশবোর্ডে প্রবেশ করুন →";
+      }
+    });
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    const installBtn = document.getElementById("pwa-install-btn");
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.remove("hidden");
+    });
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.classList.add("hidden");
+    });
+  </script>
+</body>
+</html>

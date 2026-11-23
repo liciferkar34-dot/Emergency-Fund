@@ -1,0 +1,19 @@
+{
+  "name": "Peer Fund - Emergency Mutual Fund",
+  "short_name": "Peer Fund",
+  "description": "12-Member Emergency Mutual Fund & Banking Portal",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0A3C2A",
+  "theme_color": "#0A3C2A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Peer Fund</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0A3C2A" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="pb-24">
+  <!-- Offline Indicator -->
+  <div id="offline-banner" class="hidden bg-amber-500 text-slate-950 text-center text-xs font-bold py-1.5 px-3" data-i18n="offlineBanner">
+    অফলাইন মোড: সর্বশেষ সেভ করা ডেটা দেখানো হচ্ছে
+  </div>
+
+  <!-- Top Header -->
+  <header class="fintech-gradient text-white pt-4 pb-16 px-4 rounded-b-[32px] shadow-xl">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex justify-between items-center mb-5">
+        <div class="flex items-center gap-3">
+          <img id="header-avatar" src="./icon.svg" alt="Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-[#5CDDAB]" />
+          <div>
+            <p class="text-xs text-[#5CDDAB] font-semibold" id="greeting-text">স্বাগতম,</p>
+            <div class="flex items-center gap-2">
+              <h1 class="font-bold text-base md:text-lg" id="header-user-name">লোড হচ্ছে...</h1>
+              <span id="header-role-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#5CDDAB] text-[#013A20] uppercase">MEMBER</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="audit.html" class="px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold hover:bg-white/25" data-i18n="navAudit">অডিট লগ</a>
+          <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold border border-white/20">
+            <span class="lang-indicator">EN</span>
+          </button>
+          <button class="logout-btn px-3 py-1.5 rounded-xl bg-red-500/80 hover:bg-red-500 text-xs font-bold" data-i18n="logout">লগ আউট</button>
+        </div>
+      </div>
+
+      <!-- Hero Balance Card -->
+      <div id="hero-balance-section" class="hidden bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-5 md:p-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs text-emerald-100/80 font-semibold" data-i18n="availableBalance">বর্তমান ব্যালেন্স (Available)</p>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-[#5CDDAB] mt-1" id="stat-available">₹0</h2>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-400/20 text-[#5CDDAB] text-[11px] font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#5CDDAB] animate-pulse"></span>
+            <span data-i18n="onlineBadge">লাইভ সিঙ্ক</span>
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-5 pt-4 border-t border-white/15">
+          <div>
+            <p class="text-[11px] text-emerald-100/75" data-i18n="totalCollected">মোট জমা (Collected)</p>
+            <p class="text-lg font-bold text-white" id="stat-collected">₹0</p>
+          </div>
+          <div>
+            <p class="text-[11px] text-emerald-100/75" data-i18n="totalDisbursed">প্রদত্ত লোন (Disbursed)</p>
+            <p class="text-lg font-bold text-amber-300" id="stat-disbursed">₹0</p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <button id="open-upi-modal-btn" class="mint-btn py-3 px-4 rounded-2xl text-xs md:text-sm text-center" data-i18n="payUpiBtn">
+            ₹১,০০০ UPI পেমেন্ট করুন
+          </button>
+          <a href="loans.html" class="py-3 px-4 rounded-2xl bg-white text-[#0A3C2A] font-bold text-xs md:text-sm text-center shadow hover:bg-emerald-50 transition" data-i18n="requestLoanBtn">
+            ইমার্জেন্সি লোন আবেদন
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pending Admin Approval Gate (Shown ONLY if approvalStatus != 'approved') -->
+  <section id="approval-gate" class="hidden max-w-lg mx-auto px-4 -mt-8">
+    <div class="fintech-card p-8 text-center border-t-4 border-amber-500">
+      <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-3xl mx-auto mb-4">⏳</div>
+      <h2 class="text-xl font-extrabold text-[#0A3C2A] mb-2" data-i18n="pendingApprovalTitle">অ্যাডমিন অনুমোদনের অপেক্ষায়</h2>
+      <p class="text-sm text-gray-600 leading-relaxed mb-6" data-i18n="pendingApprovalDesc">
+        আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। গ্রুপের অ্যাডমিন (Admin) আপনার অ্যাকাউন্টটি Approve করলেই আপনি ড্যাশবোর্ড ও ফান্ডের হিসাব দেখতে পাবেন।
+      </p>
+      <div class="bg-emerald-50 rounded-xl p-3 text-xs text-left text-gray-700 mb-5 space-y-1">
+        <p><strong>Name:</strong> <span id="gate-name">-</span></p>
+        <p><strong>Email:</strong> <span id="gate-email">-</span></p>
+        <p><strong>Mobile:</strong> <span id="gate-phone">-</span></p>
+      </div>
+      <button class="logout-btn w-full py-3 rounded-xl bg-red-600 text-white font-bold text-sm" data-i18n="logout">লগ আউট</button>
+    </div>
+  </section>
+
+  <!-- Main Approved Dashboard Content -->
+  <main id="dashboard-main" class="hidden max-w-5xl mx-auto px-4 -mt-8 space-y-6">
+    <!-- Admin Pending Member Requests Queue -->
+    <div id="admin-approval-card" class="hidden fintech-card p-5 border-l-4 border-amber-500">
+      <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3 flex items-center gap-2">
+        🔔 নতুন সদস্য অনুমোদনের অনুরোধ (Pending Member Approvals)
+      </h3>
+      <div id="pending-users-list" class="space-y-2.5"></div>
+    </div>
+
+    <!-- Dynamic Corpus Target & Progress Bar -->
+    <div class="fintech-card p-5">
+      <div class="flex justify-between items-center mb-2">
+        <div>
+          <h3 class="text-sm font-extrabold text-[#0A3C2A]" data-i18n="corpusTarget">৬ মাসের ফান্ড টার্গেট</h3>
+          <p class="text-xs text-gray-500"><span data-i18n="approvedMembers">অনুমোদিত সদস্য</span>: <strong id="stat-member-count">0</strong> × ₹1,000 × 6</p>
+        </div>
+        <div class="text-right">
+          <p class="text-base font-extrabold text-[#0A3C2A]" id="stat-target">₹0</p>
+          <p class="text-xs font-bold text-emerald-600" id="stat-progress-pct">0%</p>
+        </div>
+      </div>
+      <div class="w-full h-3.5 bg-emerald-100 rounded-full overflow-hidden">
+        <div id="stat-progress-bar" class="h-full bg-gradient-to-r from-[#0A3C2A] to-[#39D59E] rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Grid -->
+    <div class="grid grid-cols-4 gap-2.5">
+      <a href="ledger.html" class="fintech-card p-3.5 text-center hover:border-emerald-400 transition">
+        <div class="text-2xl mb-1">📒</div>
+        <p class="text-xs font-bold text-[#0A3C2A]" data-i18n="navLedger">হিসাব</p>
+      </a>
+      <a href="loans.html" class="fintech-card p-3.5 text-center hover:border-emerald-400 transition">
+        <div class="text-2xl mb-1">🩺</div>
+        <p class="text-xs font-bold text-[#0A3C2A]" data-i18n="navLoans">লোন</p>
+      </a>
+      <a href="profile.html" class="fintech-card p-3.5 text-center hover:border-emerald-400 transition">
+        <div class="text-2xl mb-1">🪪</div>
+        <p class="text-xs font-bold text-[#0A3C2A]" data-i18n="navProfile">প্রোফাইল</p>
+      </a>
+      <a href="audit.html" class="fintech-card p-3.5 text-center hover:border-emerald-400 transition">
+        <div class="text-2xl mb-1">🔒</div>
+        <p class="text-xs font-bold text-[#0A3C2A]" data-i18n="navAudit">অডিট লগ</p>
+      </a>
+    </div>
+
+    <!-- Recent Verified Transactions & Digital PDF Receipts -->
+    <div class="fintech-card p-5">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-extrabold text-base text-[#0A3C2A]" data-i18n="recentVerified">সাম্প্রতিক ভেরিফায়েড জমা</h3>
+        <a href="ledger.html" class="text-xs font-bold text-emerald-700 underline">সব দেখুন →</a>
+      </div>
+      <div id="recent-tx-list" class="space-y-3">
+        <p class="text-xs text-gray-500 text-center py-4">লোড হচ্ছে...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- UPI Payment & UTR Submission Modal -->
+  <div id="upi-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-extrabold text-[#0A3C2A]">₹১,০০০ মাসিক চাঁদা (UPI)</h3>
+        <button id="close-upi-modal" class="text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
+      </div>
+
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4 text-center">
+        <p class="text-xs text-gray-600 mb-1">ফান্ডের অফিসিয়াল UPI ID:</p>
+        <p class="font-extrabold text-base text-[#0A3C2A] select-all" id="fund-upi-display">9832420007@ybl</p>
+        <a id="upi-deep-link" href="upi://pay?pa=9832420007@ybl&pn=PeerFund&am=1000&cu=INR"
+          class="mt-3 inline-block w-full py-2.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] font-bold text-xs shadow">
+          📲 GPay / PhonePe / Paytm খুলুন (₹1,000)
+        </a>
+      </div>
+
+      <form id="utr-submit-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">কোন মাসের চাঁদা / Month *</label>
+          <input type="month" id="utr-month" required class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">১২ সংখ্যার UTR / Reference নম্বর *</label>
+          <input type="text" id="utr-number" required minlength="6" maxlength="24" placeholder="যেমন: 432198765432"
+            class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">পেমেন্ট স্ক্রিনশট আপলোড / Payment Screenshot *</label>
+          <input type="file" id="utr-screenshot" accept="image/*" required
+            class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-[#0A3C2A] file:font-bold" />
+        </div>
+        <button type="submit" id="utr-submit-btn" class="w-full mint-btn py-3 rounded-xl text-sm">
+          ভেরিফিকেশনের জন্য জমা দিন / Submit UTR
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="hidden fixed bottom-3 left-4 right-4 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-4 py-2.5 z-40">
+    <div class="grid grid-cols-4 text-center text-xs">
+      <a href="dashboard.html" class="text-[#5CDDAB] font-extrabold flex flex-col items-center">
+        <span>🏠</span><span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="ledger.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>📒</span><span data-i18n="navLedger">হিসাব</span>
+      </a>
+      <a href="loans.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>🩺</span><span data-i18n="navLoans">লোন</span>
+      </a>
+      <a href="profile.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>👤</span><span data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+    </div>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import {
+      collection,
+      doc,
+      getDoc,
+      addDoc,
+      updateDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      requireApprovedUser,
+      setupCommonUI,
+      formatINR,
+      getCurrentMonthKey,
+      compressImageToBase64,
+      logAudit,
+      generatePaymentReceiptPDF
+    } from "./js/utils.js";
+    import "./js/i18n.js";
+
+    setupCommonUI();
+
+    requireApprovedUser((user, me) => {
+      document.getElementById("header-user-name").textContent = me.name;
+      document.getElementById("header-role-badge").textContent = me.role.toUpperCase();
+      if (me.photoBase64) {
+        document.getElementById("header-avatar").src = me.photoBase64;
+      }
+
+      // Enforce Admin Approval Gate
+      if (me.approvalStatus !== "approved") {
+        document.getElementById("approval-gate").classList.remove("hidden");
+        document.getElementById("gate-name").textContent = me.name;
+        document.getElementById("gate-email").textContent = me.email;
+        document.getElementById("gate-phone").textContent = me.phone;
+        return;
+      }
+
+      document.getElementById("hero-balance-section").classList.remove("hidden");
+      document.getElementById("dashboard-main").classList.remove("hidden");
+      document.getElementById("bottom-nav").classList.remove("hidden");
+      document.getElementById("utr-month").value = getCurrentMonthKey();
+
+      let totalCollected = 0;
+      let activeLoanDisbursed = 0;
+      let approvedCount = 0;
+
+      function refreshCorpusUI() {
+        const available = totalCollected - activeLoanDisbursed;
+        const target = approvedCount * 1000 * 6;
+        const pct = target > 0 ? Math.min(100, Math.round((totalCollected / target) * 100)) : 0;
+
+        document.getElementById("stat-collected").textContent = formatINR(totalCollected);
+        document.getElementById("stat-disbursed").textContent = formatINR(activeLoanDisbursed);
+        document.getElementById("stat-available").textContent = formatINR(available);
+        document.getElementById("stat-member-count").textContent = approvedCount;
+        document.getElementById("stat-target").textContent = formatINR(target);
+        document.getElementById("stat-progress-pct").textContent = `${pct}%`;
+        document.getElementById("stat-progress-bar").style.width = `${pct}%`;
+      }
+
+      // Load Settings (Fund UPI ID)
+      onSnapshot(doc(db, "settings", "general"), (snap) => {
+        if (snap.exists() && snap.data().fundUpi) {
+          const upi = snap.data().fundUpi;
+          document.getElementById("fund-upi-display").textContent = upi;
+          document.getElementById("upi-deep-link").href = `upi://pay?pa=${encodeURIComponent(upi)}&pn=PeerFund&am=1000&cu=INR`;
+        }
+      });
+
+      // Listen to Users (Collected + Pending Approvals)
+      onSnapshot(collection(db, "users"), (snap) => {
+        totalCollected = 0;
+        approvedCount = 0;
+        const pendingUsers = [];
+
+        snap.forEach((d) => {
+          const u = { uid: d.id, ...d.data() };
+          if (u.approvalStatus === "approved") {
+            approvedCount++;
+            totalCollected += Number(u.totalPaid || 0);
+          } else if (u.approvalStatus === "pending") {
+            pendingUsers.push(u);
+          }
+        });
+
+        refreshCorpusUI();
+
+        // Render Pending Approvals if Admin or Co-Admin
+        const approvalCard = document.getElementById("admin-approval-card");
+        const pendingList = document.getElementById("pending-users-list");
+        if ((me.role === "admin" || me.role === "co_admin") && pendingUsers.length > 0) {
+          approvalCard.classList.remove("hidden");
+          pendingList.innerHTML = pendingUsers.map((u) => `
+            <div class="flex flex-wrap justify-between items-center gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <div>
+                <p class="font-bold text-sm text-gray-900">${u.name}</p>
+                <p class="text-xs text-gray-600">${u.phone} • ${u.email}</p>
+              </div>
+              <div class="flex gap-2">
+                <button data-uid="${u.uid}" data-name="${u.name}" class="approve-user-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">Approve</button>
+                <button data-uid="${u.uid}" data-name="${u.name}" class="reject-user-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">Reject</button>
+              </div>
+            </div>
+          `).join("");
+
+          pendingList.querySelectorAll(".approve-user-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const uid = btn.dataset.uid;
+              const uname = btn.dataset.name;
+              await updateDoc(doc(db, "users", uid), { approvalStatus: "approved" });
+              await logAudit({
+                actionType: "MEMBER_APPROVED",
+                messageBn: `${me.name} নতুন সদস্য ${uname}-কে অনুমোদন (Approve) দিয়েছেন।`,
+                messageEn: `${me.name} approved new member ${uname}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            });
+          });
+
+          pendingList.querySelectorAll(".reject-user-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const uid = btn.dataset.uid;
+              const uname = btn.dataset.name;
+              await updateDoc(doc(db, "users", uid), { approvalStatus: "rejected" });
+              await logAudit({
+                actionType: "MEMBER_REJECTED",
+                messageBn: `${me.name} সদস্য ${uname}-এর আবেদন বাতিল (Reject) করেছেন।`,
+                messageEn: `${me.name} rejected signup request of ${uname}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            });
+          });
+        } else {
+          approvalCard.classList.add("hidden");
+        }
+      });
+
+      // Listen to Approved Loans
+      onSnapshot(collection(db, "loans"), (snap) => {
+        activeLoanDisbursed = 0;
+        snap.forEach((d) => {
+          const l = d.data();
+          if (l.status === "approved") {
+            const outstanding = Math.max(0, Number(l.amount || 0) - Number(l.repaidAmount || 0));
+            activeLoanDisbursed += outstanding;
+          }
+        });
+        refreshCorpusUI();
+      });
+
+      // Listen to Recent Verified Transactions
+      onSnapshot(query(collection(db, "transactions"), orderBy("createdAt", "desc")), (snap) => {
+        const list = document.getElementById("recent-tx-list");
+        const verified = [];
+        snap.forEach((d) => {
+          const item = { id: d.id, ...d.data() };
+          if (item.status === "verified") verified.push(item);
+        });
+
+        if (verified.length === 0) {
+          list.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">এখনো কোনো ভেরিফায়েড জমা নেই / No verified deposits yet.</p>`;
+          return;
+        }
+
+        list.innerHTML = verified.slice(0, 6).map((tx) => `
+          <div class="flex justify-between items-center p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100">
+            <div>
+              <p class="font-bold text-sm text-[#0A3C2A]">${tx.userName} <span class="text-xs font-normal text-gray-500">(${tx.month})</span></p>
+              <p class="text-[11px] text-gray-600">UTR: ${tx.utr || "Cash"} • Verified by ${tx.verifiedBy || "Admin"}</p>
+            </div>
+            <div class="text-right flex items-center gap-2">
+              <span class="font-extrabold text-sm text-emerald-700">+${formatINR(tx.amount)}</span>
+              <button data-tx='${JSON.stringify({
+                id: tx.id,
+                userName: tx.userName,
+                memberId: tx.memberId,
+                month: tx.month,
+                amount: tx.amount,
+                mode: tx.mode,
+                utr: tx.utr,
+                verifiedBy: tx.verifiedBy,
+                verifiedAt: tx.verifiedAt
+              }).replace(/'/g, "&apos;")}' class="pdf-receipt-btn px-2.5 py-1.5 rounded-lg bg-[#0A3C2A] text-[#5CDDAB] text-[11px] font-bold">
+                PDF
+              </button>
+            </div>
+          </div>
+        `).join("");
+
+        list.querySelectorAll(".pdf-receipt-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const txObj = JSON.parse(btn.dataset.tx);
+            generatePaymentReceiptPDF(txObj);
+          });
+        });
+      });
+
+      // UPI Modal Handlers
+      const upiModal = document.getElementById("upi-modal");
+      document.getElementById("open-upi-modal-btn").addEventListener("click", () => upiModal.classList.remove("hidden"));
+      document.getElementById("close-upi-modal").addEventListener("click", () => upiModal.classList.add("hidden"));
+
+      document.getElementById("utr-submit-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("utr-submit-btn");
+        btn.disabled = true;
+        btn.textContent = "আপলোড হচ্ছে...";
+
+        try {
+          const month = document.getElementById("utr-month").value;
+          const utr = document.getElementById("utr-number").value.trim();
+          const file = document.getElementById("utr-screenshot").files[0];
+          const screenshotBase64 = await compressImageToBase64(file, 650, 0.7);
+
+          await addDoc(collection(db, "transactions"), {
+            uid: me.uid,
+            userName: me.name,
+            memberId: me.memberId || "-",
+            amount: 1000,
+            month,
+            utr,
+            mode: "UPI",
+            screenshotBase64,
+            status: "pending",
+            createdAt: serverTimestamp()
+          });
+
+          await logAudit({
+            actionType: "UPI_UTR_SUBMITTED",
+            messageBn: `${me.name} (${month}) মাসের ₹১,০০০ UPI পেমেন্টের UTR (${utr}) জমা দিয়েছেন।`,
+            messageEn: `${me.name} submitted ₹1,000 UPI payment UTR (${utr}) for ${month}.`,
+            actorUid: me.uid,
+            actorName: me.name,
+            actorRole: me.role
+          });
+
+          document.getElementById("utr-submit-form").reset();
+          document.getElementById("utr-month").value = getCurrentMonthKey();
+          upiModal.classList.add("hidden");
+          alert("UTR ও স্ক্রিনশট জমা হয়েছে! অ্যাডমিন ভেরিফাই করলে ব্যালেন্স যুক্ত হবে।");
+        } catch (err) {
+          alert("Error: " + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "ভেরিফিকেশনের জন্য জমা দিন / Submit UTR";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

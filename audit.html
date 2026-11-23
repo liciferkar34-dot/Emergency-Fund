@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Immutable Audit Log - Peer Fund</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0A3C2A" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="pb-24">
+  <header class="fintech-gradient text-white p-4 shadow-lg sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="font-extrabold text-lg flex items-center gap-2">
+          <span>🔒</span><span data-i18n="auditLogTitle">অপরিবর্তনীয় অডিট লগ (Immutable Audit Log)</span>
+        </h1>
+        <p class="text-[11px] text-[#5CDDAB]" data-i18n="auditLogSub">
+          প্রতিটি জমা, ফাইন, রোল পরিবর্তন ও লোনের স্থায়ী রেকর্ড — অ্যাডমিনও এডিট বা ডিলিট করতে পারবেন না।
+        </p>
+      </div>
+      <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold">
+        <span class="lang-indicator">EN</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 mt-5">
+    <div id="audit-feed" class="space-y-3">
+      <p class="text-xs text-gray-500 text-center py-8">অডিট লগ লোড হচ্ছে...</p>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="fixed bottom-3 left-4 right-4 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-4 py-2.5 z-40">
+    <div class="grid grid-cols-4 text-center text-xs">
+      <a href="dashboard.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>🏠</span><span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="ledger.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>📒</span><span data-i18n="navLedger">হিসাব</span>
+      </a>
+      <a href="loans.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>🩺</span><span data-i18n="navLoans">লোন</span>
+      </a>
+      <a href="profile.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>👤</span><span data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+    </div>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { requireApprovedUser, setupCommonUI } from "./js/utils.js";
+    import { getLang } from "./js/i18n.js";
+
+    setupCommonUI();
+
+    requireApprovedUser(() => {
+      let logs = [];
+      onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAt", "desc")), (snap) => {
+        logs = [];
+        snap.forEach((d) => logs.push({ id: d.id, ...d.data() }));
+        renderLogs();
+      });
+
+      function renderLogs() {
+        const feed = document.getElementById("audit-feed");
+        const lang = getLang();
+        if (logs.length === 0) {
+          feed.innerHTML = `<div class="fintech-card p-6 text-center text-xs text-gray-500">কোনো অডিট রেকর্ড নেই।</div>`;
+          return;
+        }
+        feed.innerHTML = logs.map((l) => {
+          const msg = lang === "bn" ? (l.messageBn || l.messageEn) : (l.messageEn || l.messageBn);
+          const timeStr = l.timestampIso ? new Date(l.timestampIso).toLocaleString("en-IN") : "";
+          return `
+            <div class="fintech-card p-4 border-l-4 border-[#39D59E]">
+              <div class="flex justify-between items-center mb-1">
+                <span class="px-2 py-0.5 rounded bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold">${l.actionType || "LOG"}</span>
+                <span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>
+              </div>
+              <p class="text-xs md:text-sm font-semibold text-gray-800">${msg}</p>
+              <p class="text-[11px] text-gray-500 mt-1">Actor: ${l.actorName || "System"} (${(l.actorRole || "").toUpperCase()})</p>
+            </div>
+          `;
+        }).join("");
+      }
+
+      window.addEventListener("languageChanged", renderLogs);
+    });
+  </script>
+</body>
+</html>

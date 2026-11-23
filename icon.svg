@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A3C2A"/>
+      <stop offset="100%" stop-color="#013A20"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5CDDAB"/>
+      <stop offset="100%" stop-color="#39D59E"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#mint)" stroke-width="24" opacity="0.25"/>
+  <path d="M256 116 L366 164 V252 C366 326 319 388 256 412 C193 388 146 326 146 252 V164 Z" fill="url(#mint)"/>
+  <text x="256" y="292" font-family="Arial, sans-serif" font-weight="bold" font-size="128" fill="#013A20" text-anchor="middle">₹</text>
+</svg>

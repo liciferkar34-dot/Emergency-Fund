@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Member Ledger - Peer Fund</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0A3C2A" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="pb-24">
+  <header class="fintech-gradient text-white p-4 shadow-lg sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="font-extrabold text-lg" data-i18n="memberLedger">সদস্যদের হিসাব (Ledger)</h1>
+        <p class="text-[11px] text-[#5CDDAB]">মাসের ৫ তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="download-statement-btn" class="px-3 py-1.5 rounded-xl mint-btn text-xs" data-i18n="monthlyStatement">
+          মাসিক স্টেটমেন্ট PDF
+        </button>
+        <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold">
+          <span class="lang-indicator">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 mt-5 space-y-5">
+    <!-- Admin Settings Bar (Admin Only) -->
+    <div id="admin-settings-card" class="hidden fintech-card p-4 border-l-4 border-[#0A3C2A]">
+      <h3 class="font-extrabold text-xs text-[#0A3C2A] uppercase mb-2.5">⚙️ Admin Fund Settings (UPI ID & Late Fine)</h3>
+      <form id="settings-form" class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+        <input type="text" id="set-upi" placeholder="Fund UPI ID (e.g. 9832420007@ybl)" class="px-3 py-2 rounded-xl border text-xs" />
+        <input type="number" id="set-fine" placeholder="Late Fine Amount (₹100)" class="px-3 py-2 rounded-xl border text-xs" />
+        <button type="submit" class="mint-btn py-2 px-4 rounded-xl text-xs">সেটিংস সেভ করুন / Save</button>
+      </form>
+    </div>
+
+    <!-- Pending UTR Verification Queue (Admin & Co-Admin) -->
+    <div id="utr-verify-section" class="hidden fintech-card p-5 border-l-4 border-amber-500">
+      <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3" data-i18n="pendingUtrQueue">ভেরিফিকেশনের অপেক্ষায় থাকা UPI পেমেন্ট</h3>
+      <div id="pending-utr-list" class="space-y-3"></div>
+    </div>
+
+    <!-- Search & Status Filters -->
+    <div class="fintech-card p-4 space-y-3">
+      <input type="text" id="member-search" data-i18n-placeholder="searchMember" placeholder="নাম বা ফোন নম্বর দিয়ে খুঁজুন..."
+        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A]" />
+      <div class="flex flex-wrap gap-2">
+        <button data-filter="all" class="filter-chip px-3 py-1.5 rounded-xl bg-[#0A3C2A] text-white text-xs font-bold" data-i18n="filterAll">সবাই</button>
+        <button data-filter="paid" class="filter-chip px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold" data-i18n="filterActive">জমা হয়েছে</button>
+        <button data-filter="pending" class="filter-chip px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-xs font-bold" data-i18n="filterPending">বাকি (Pending)</button>
+        <button data-filter="overdue" class="filter-chip px-3 py-1.5 rounded-xl bg-red-100 text-red-800 text-xs font-bold" data-i18n="filterOverdue">মেয়াদোত্তীর্ণ (Overdue)</button>
+      </div>
+    </div>
+
+    <!-- Member Cards Grid -->
+    <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <p class="text-xs text-gray-500 text-center py-6 col-span-2">লোড হচ্ছে...</p>
+    </div>
+  </main>
+
+  <!-- Member Profile Detail Modal (Visible to all Approved Members) -->
+  <div id="member-profile-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-6 relative">
+      <button id="close-profile-modal" class="absolute right-4 top-4 text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
+      <div class="flex items-center gap-3.5 mb-4">
+        <img id="mp-avatar" src="./icon.svg" class="w-16 h-16 rounded-2xl object-cover border-2 border-[#39D59E]" />
+        <div>
+          <span id="mp-role" class="px-2 py-0.5 rounded-full bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold uppercase">MEMBER</span>
+          <h3 id="mp-name" class="text-lg font-extrabold text-[#0A3C2A] mt-0.5">-</h3>
+          <p id="mp-id" class="text-xs text-gray-500 font-semibold">ID: -</p>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 text-xs bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100">
+        <div class="flex justify-between">
+          <span class="text-gray-500">মোট জমা (Total Paid):</span>
+          <span id="mp-paid" class="font-extrabold text-emerald-800">₹0</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">মোবাইল নম্বর (Mobile):</span>
+          <a id="mp-phone-link" href="#" class="font-bold text-[#0A3C2A] underline">📞 <span id="mp-phone">-</span></a>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">ব্লাড গ্রুপ (Blood Group):</span>
+          <span id="mp-blood" class="font-extrabold text-red-600">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500">ফ্যামিলি SOS নম্বর:</span>
+          <a id="mp-sos-link" href="#" class="font-bold text-red-700 underline">🚑 <span id="mp-sos">-</span></a>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">UPI ID:</span>
+          <span id="mp-upi" class="font-semibold text-gray-800">-</span>
+        </div>
+        <div id="mp-bank-row" class="hidden pt-2 border-t border-emerald-200 flex justify-between">
+          <span class="text-gray-500">ব্যাঙ্ক অ্যাকাউন্ট (Private):</span>
+          <span id="mp-bank" class="font-bold text-gray-900">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screenshot Inspection Modal -->
+  <div id="screenshot-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h4 class="font-bold text-sm text-[#0A3C2A]">Payment Screenshot</h4>
+        <button id="close-ss-modal" class="font-bold text-gray-500">✕</button>
+      </div>
+      <img id="ss-preview-img" src="" class="w-full max-h-[70vh] object-contain rounded-xl border" />
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="fixed bottom-3 left-4 right-4 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-4 py-2.5 z-40">
+    <div class="grid grid-cols-4 text-center text-xs">
+      <a href="dashboard.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>🏠</span><span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="ledger.html" class="text-[#5CDDAB] font-extrabold flex flex-col items-center">
+        <span>📒</span><span data-i18n="navLedger">হিসাব</span>
+      </a>
+      <a href="loans.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>🩺</span><span data-i18n="navLoans">লোন</span>
+      </a>
+      <a href="profile.html" class="text-white/75 hover:text-white flex flex-col items-center">
+        <span>👤</span><span data-i18n="navProfile">প্রোফাইল</span>
+      </a>
+    </div>
+  </nav>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import {
+      collection,
+      doc,
+      setDoc,
+      addDoc,
+      updateDoc,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      requireApprovedUser,
+      setupCommonUI,
+      formatINR,
+      getCurrentMonthKey,
+      isAfterFifthOfMonth,
+      logAudit,
+      generateMonthlyStatementPDF
+    } from "./js/utils.js";
+    import { getLang } from "./js/i18n.js";
+
+    setupCommonUI();
+
+    requireApprovedUser((user, me) => {
+      const isStaff = me.role === "admin" || me.role === "co_admin";
+      const isAdmin = me.role === "admin";
+      let lateFineRate = 100;
+      let allMembers = [];
+      let allLoans = [];
+      let activeFilter = "all";
+
+      if (isAdmin) {
+        document.getElementById("admin-settings-card").classList.remove("hidden");
+      }
+
+      onSnapshot(doc(db, "settings", "general"), (snap) => {
+        if (snap.exists()) {
+          const d = snap.data();
+          lateFineRate = Number(d.lateFine ?? 100);
+          if (isAdmin) {
+            document.getElementById("set-upi").value = d.fundUpi || "";
+            document.getElementById("set-fine").value = lateFineRate;
+          }
+          renderMembers();
+        }
+      });
+
+      if (isAdmin) {
+        document.getElementById("settings-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const fundUpi = document.getElementById("set-upi").value.trim();
+          const lateFine = Number(document.getElementById("set-fine").value || 100);
+          await setDoc(doc(db, "settings", "general"), { fundUpi, lateFine }, { merge: true });
+          await logAudit({
+            actionType: "SETTINGS_UPDATED",
+            messageBn: `Admin ${me.name} ফান্ড সেটিংস আপডেট করেছেন (UPI: ${fundUpi}, লেট-ফাইন: ₹${lateFine})।`,
+            messageEn: `Admin ${me.name} updated fund settings (UPI: ${fundUpi}, Late Fine: ₹${lateFine}).`,
+            actorUid: me.uid,
+            actorName: me.name,
+            actorRole: me.role
+          });
+          alert("সেটিংস সেভ হয়েছে / Settings saved!");
+        });
+      }
+
+      // Listen to Pending UTR Verifications (Staff Only)
+      if (isStaff) {
+        onSnapshot(collection(db, "transactions"), (snap) => {
+          const pending = [];
+          snap.forEach((d) => {
+            const item = { id: d.id, ...d.data() };
+            if (item.status === "pending") pending.push(item);
+          });
+
+          const sec = document.getElementById("utr-verify-section");
+          const list = document.getElementById("pending-utr-list");
+          if (pending.length === 0) {
+            sec.classList.add("hidden");
+            return;
+          }
+          sec.classList.remove("hidden");
+          list.innerHTML = pending.map((tx) => `
+            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex flex-wrap justify-between items-center gap-3">
+              <div>
+                <p class="font-bold text-sm text-gray-900">${tx.userName} • <span class="text-emerald-700">${formatINR(tx.amount)}</span> (${tx.month})</p>
+                <p class="text-xs text-gray-600">UTR: <strong>${tx.utr}</strong></p>
+              </div>
+              <div class="flex items-center gap-2">
+                ${tx.screenshotBase64 ? `<button data-ss="${tx.screenshotBase64}" class="view-ss-btn px-2.5 py-1.5 rounded-lg bg-white border text-xs font-bold">🖼️ Proof</button>` : ""}
+                <button data-id="${tx.id}" data-uid="${tx.uid}" data-name="${tx.userName}" data-month="${tx.month}" data-utr="${tx.utr}"
+                  class="verify-utr-btn px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold">✓ Verify</button>
+                <button data-id="${tx.id}" data-name="${tx.userName}" data-utr="${tx.utr}"
+                  class="reject-utr-btn px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold">✕ Reject</button>
+              </div>
+            </div>
+          `).join("");
+
+          list.querySelectorAll(".view-ss-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              document.getElementById("ss-preview-img").src = btn.dataset.ss;
+              document.getElementById("screenshot-modal").classList.remove("hidden");
+            });
+          });
+
+          list.querySelectorAll(".verify-utr-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const { id, uid, name, month, utr } = btn.dataset;
+              const targetMember = allMembers.find((m) => m.uid === uid);
+              const newPaid = Number(targetMember?.totalPaid || 0) + 1000;
+
+              await updateDoc(doc(db, "transactions", id), {
+                status: "verified",
+                verifiedBy: me.name,
+                verifiedAt: new Date().toISOString()
+              });
+              await updateDoc(doc(db, "users", uid), {
+                totalPaid: newPaid,
+                lastPaidMonth: month
+              });
+              await logAudit({
+                actionType: "UPI_VERIFIED",
+                messageBn: `${me.name} সদস্য ${name}-এর ₹১,০০০ UPI পেমেন্ট (UTR: ${utr}, মাস: ${month}) ভেরিফাই করেছেন।`,
+                messageEn: `${me.name} verified ₹1,000 UPI payment (UTR: ${utr}, Month: ${month}) for ${name}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            });
+          });
+
+          list.querySelectorAll(".reject-utr-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const { id, name, utr } = btn.dataset;
+              await updateDoc(doc(db, "transactions", id), {
+                status: "rejected",
+                verifiedBy: me.name,
+                verifiedAt: new Date().toISOString()
+              });
+              await logAudit({
+                actionType: "UPI_REJECTED",
+                messageBn: `${me.name} সদস্য ${name}-এর UPI UTR (${utr}) বাতিল (Reject) করেছেন।`,
+                messageEn: `${me.name} rejected UPI UTR (${utr}) submitted by ${name}.`,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            });
+          });
+        });
+      }
+
+      document.getElementById("close-ss-modal").addEventListener("click", () => {
+        document.getElementById("screenshot-modal").classList.add("hidden");
+      });
+
+      // Listen to Approved Members
+      onSnapshot(collection(db, "users"), (snap) => {
+        allMembers = [];
+        snap.forEach((d) => {
+          const u = { uid: d.id, ...d.data() };
+          if (u.approvalStatus === "approved") {
+            allMembers.push(u);
+          }
+        });
+        renderMembers();
+      });
+
+      onSnapshot(collection(db, "loans"), (snap) => {
+        allLoans = [];
+        snap.forEach((d) => allLoans.push(d.data()));
+      });
+
+      function getMemberStatus(m) {
+        const curMonth = getCurrentMonthKey();
+        if (m.lastPaidMonth === curMonth) return "paid";
+        return isAfterFifthOfMonth() ? "overdue" : "pending";
+      }
+
+      function renderMembers() {
+        const grid = document.getElementById("members-grid");
+        const queryStr = document.getElementById("member-search").value.trim().toLowerCase();
+        const lang = getLang();
+
+        const filtered = allMembers.filter((m) => {
+          const status = getMemberStatus(m);
+          const matchesFilter = activeFilter === "all" || status === activeFilter;
+          const matchesQuery =
+            (m.name || "").toLowerCase().includes(queryStr) ||
+            (m.phone || "").includes(queryStr) ||
+            (m.memberId || "").toLowerCase().includes(queryStr);
+          return matchesFilter && matchesQuery;
+        });
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `<p class="text-xs text-gray-500 text-center py-6 col-span-2">কোনো সদস্য পাওয়া যায়নি / No members found.</p>`;
+          return;
+        }
+
+        grid.innerHTML = filtered.map((m) => {
+          const status = getMemberStatus(m);
+          const autoFine = status === "overdue" ? lateFineRate : 0;
+          const effectiveFine = Math.max(Number(m.pendingFine || 0), autoFine);
+          const paid = Number(m.totalPaid || 0);
+          const pct = Math.min(100, Math.round((paid / 6000) * 100));
+
+          const badgeHtml =
+            status === "paid"
+              ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✓ Paid</span>`
+              : status === "overdue"
+              ? `<span class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[11px] font-bold">⚠️ Overdue (+₹${effectiveFine} Fine)</span>`
+              : `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">⏳ Pending</span>`;
+
+          const waText =
+            lang === "bn"
+              ? `ভাই ${m.name}, এই মাসের ₹১,০০০ ফান্ডের চাঁদা বাকি আছে, অ্যাপ থেকে UPI করে দিও।`
+              : `Hi ${m.name}, your ₹1,000 Peer Fund contribution for this month is pending. Please pay via UPI from the app.`;
+          const waUrl = `https://wa.me/91${m.phone}?text=${encodeURIComponent(waText)}`;
+
+          return `
+            <div class="fintech-card p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start gap-2">
+                  <div class="flex items-center gap-3 cursor-pointer view-member-trigger" data-uid="${m.uid}">
+                    <img src="${m.photoBase64 || "./icon.svg"}" class="w-11 h-11 rounded-2xl object-cover border border-emerald-200" />
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h4 class="font-extrabold text-sm text-[#0A3C2A] hover:underline">${m.name}</h4>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 font-bold uppercase text-gray-600">${m.role}</span>
+                      </div>
+                      <p class="text-[11px] text-gray-500">${m.memberId || "PF"} • 📞 ${m.phone}</p>
+                    </div>
+                  </div>
+                  ${badgeHtml}
+                </div>
+
+                <!-- Paid Progress -->
+                <div class="mt-3.5">
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-gray-500">মোট জমা / Paid:</span>
+                    <span class="font-extrabold text-[#0A3C2A]">${formatINR(paid)} / ₹6,000</span>
+                  </div>
+                  <div class="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-[#39D59E] rounded-full" style="width: ${pct}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Staff Controls & One-Click WhatsApp Reminder -->
+              <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2 items-center justify-between">
+                <button data-uid="${m.uid}" class="view-member-trigger text-xs font-bold text-[#0A3C2A] hover:underline">
+                  প্রোফাইল দেখুন →
+                </button>
+
+                <div class="flex flex-wrap gap-1.5">
+                  ${isStaff && status !== "paid" ? `
+                    <a href="${waUrl}" target="_blank" rel="noopener"
+                      class="px-2.5 py-1.5 rounded-xl bg-[#25D366] text-white text-[11px] font-bold shadow-sm hover:opacity-90">
+                      💬 WhatsApp
+                    </a>
+                  ` : ""}
+
+                  ${isStaff ? `
+                    <button data-uid="${m.uid}" class="cash-deposit-btn px-2.5 py-1.5 rounded-xl mint-btn text-[11px]">
+                      + ₹1,000 Cash
+                    </button>
+                  ` : ""}
+
+                  ${isStaff && effectiveFine > 0 ? `
+                    <button data-uid="${m.uid}" class="waive-fine-btn px-2.5 py-1.5 rounded-xl bg-amber-100 text-amber-900 text-[11px] font-bold">
+                      Waive Fine
+                    </button>
+                  ` : ""}
+
+                  ${isAdmin && m.uid !== me.uid ? `
+                    <button data-uid="${m.uid}" data-role="${m.role}" class="toggle-coadmin-btn px-2.5 py-1.5 rounded-xl bg-slate-800 text-white text-[11px] font-bold">
+                      ${m.role === "co_admin" ? "Remove Co-Admin" : "Make Co-Admin"}
+                    </button>
+                  ` : ""}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // Attach Member Profile View Triggers
+        grid.querySelectorAll(".view-member-trigger").forEach((el) => {
+          el.addEventListener("click", () => {
+            const target = allMembers.find((x) => x.uid === el.dataset.uid);
+            if (!target) return;
+            document.getElementById("mp-avatar").src = target.photoBase64 || "./icon.svg";
+            document.getElementById("mp-role").textContent = (target.role || "member").toUpperCase();
+            document.getElementById("mp-name").textContent = target.name;
+            document.getElementById("mp-id").textContent = `Member ID: ${target.memberId || "-"}`;
+            document.getElementById("mp-paid").textContent = formatINR(target.totalPaid || 0);
+            document.getElementById("mp-phone").textContent = target.phone;
+            document.getElementById("mp-phone-link").href = `tel:+91${target.phone}`;
+            document.getElementById("mp-blood").textContent = target.bloodGroup || "Not set";
+            document.getElementById("mp-sos").textContent = target.sosContact || "Not set";
+            document.getElementById("mp-sos-link").href = target.sosContact ? `tel:${target.sosContact}` : "#";
+            document.getElementById("mp-upi").textContent = target.upiId || "Not set";
+
+            const bankRow = document.getElementById("mp-bank-row");
+            if (isAdmin || target.uid === me.uid) {
+              bankRow.classList.remove("hidden");
+              document.getElementById("mp-bank").textContent = target.bankAccount
+                ? `${target.bankAccount} (${target.ifsc || ""})`
+                : "Not set";
+            } else {
+              bankRow.classList.add("hidden");
+            }
+            document.getElementById("member-profile-modal").classList.remove("hidden");
+          });
+        });
+
+        // Cash Deposit Handler
+        grid.querySelectorAll(".cash-deposit-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const curMonth = getCurrentMonthKey();
+            const newPaid = Number(target.totalPaid || 0) + 1000;
+
+            await updateDoc(doc(db, "users", target.uid), {
+              totalPaid: newPaid,
+              lastPaidMonth: curMonth
+            });
+            await addDoc(collection(db, "transactions"), {
+              uid: target.uid,
+              userName: target.name,
+              memberId: target.memberId || "-",
+              amount: 1000,
+              month: curMonth,
+              utr: "CASH-ENTRY",
+              mode: "CASH",
+              status: "verified",
+              verifiedBy: me.name,
+              verifiedAt: new Date().toISOString(),
+              createdAt: serverTimestamp()
+            });
+            await logAudit({
+              actionType: "CASH_DEPOSIT",
+              messageBn: `${me.name} সদস্য ${target.name}-এর ₹১,০০০ নগদ চাঁদা (${curMonth}) এন্ট্রি করেছেন।`,
+              messageEn: `${me.name} recorded ₹1,000 cash deposit (${curMonth}) for ${target.name}.`,
+              actorUid: me.uid,
+              actorName: me.name,
+              actorRole: me.role
+            });
+          });
+        });
+
+        // Waive Fine Handler
+        grid.querySelectorAll(".waive-fine-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            await updateDoc(doc(db, "users", target.uid), {
+              pendingFine: 0,
+              lastPaidMonth: getCurrentMonthKey()
+            });
+            await logAudit({
+              actionType: "FINE_WAIVED",
+              messageBn: `${me.name} সদস্য ${target.name}-এর লেট-ফাইন মওকুফ (Waive) করেছেন।`,
+              messageEn: `${me.name} waived late fine for ${target.name}.`,
+              actorUid: me.uid,
+              actorName: me.name,
+              actorRole: me.role
+            });
+          });
+        });
+
+        // Promote/Demote Co-Admin Handler
+        grid.querySelectorAll(".toggle-coadmin-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const target = allMembers.find((x) => x.uid === btn.dataset.uid);
+            if (!target) return;
+            const nextRole = target.role === "co_admin" ? "member" : "co_admin";
+            await updateDoc(doc(db, "users", target.uid), { role: nextRole });
+            await logAudit({
+              actionType: "ROLE_CHANGED",
+              messageBn: `Admin ${me.name} সদস্য ${target.name}-এর রোল পরিবর্তন করে ${nextRole.toUpperCase()} করেছেন।`,
+              messageEn: `Admin ${me.name} changed ${target.name}'s role to ${nextRole.toUpperCase()}.`,
+              actorUid: me.uid,
+              actorName: me.name,
+              actorRole: me.role
+            });
+          });
+        });
+      }
+
+      document.getElementById("close-profile-modal").addEventListener("click", () => {
+        document.getElementById("member-profile-modal").classList.add("hidden");
+      });
+
+      document.getElementById("member-search").addEventListener("input", renderMembers);
+      window.addEventListener("languageChanged", renderMembers);
+
+      document.querySelectorAll(".filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          activeFilter = chip.dataset.filter;
+          document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("ring-2", "ring-[#0A3C2A]"));
+          chip.classList.add("ring-2", "ring-[#0A3C2A]");
+          renderMembers();
+        });
+      });
+
+      // Download Monthly Group Statement PDF
+      document.getElementById("download-statement-btn").addEventListener("click", () => {
+        const totalCollected = allMembers.reduce((s, m) => s + Number(m.totalPaid || 0), 0);
+        const totalDisbursed = allLoans
+          .filter((l) => l.status === "approved")
+          .reduce((s, l) => s + Math.max(0, Number(l.amount || 0) - Number(l.repaidAmount || 0)), 0);
+        const targetAmount = allMembers.length * 1000 * 6;
+        generateMonthlyStatementPDF({
+          members: allMembers,
+          totalCollected,
+          totalDisbursed,
+          availableBalance: totalCollected - totalDisbursed,
+          targetAmount
+        });
+      });
+    });
+  </script>
+</body>
+</html>
