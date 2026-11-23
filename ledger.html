@@ -10,18 +10,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body class="pb-24">
+<body class="pb-32">
   <header class="fintech-gradient text-white p-4 shadow-lg sticky top-0 z-30">
-    <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="font-extrabold text-lg" data-i18n="memberLedger">সদস্যদের হিসাব (Ledger)</h1>
-        <p class="text-[11px] text-[#5CDDAB]">মাসের ৫ তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়</p>
+    <div class="max-w-5xl mx-auto flex justify-between items-center gap-2">
+      <div class="min-w-0 flex-1">
+        <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="memberLedger">সদস্যদের হিসাব (Ledger)</h1>
+        <p class="text-[11px] text-[#5CDDAB] truncate">মাসের ৫ তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="download-statement-btn" class="px-3 py-1.5 rounded-xl mint-btn text-xs" data-i18n="monthlyStatement">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="download-statement-btn" class="px-2.5 py-1.5 rounded-xl mint-btn text-xs whitespace-nowrap" data-i18n="monthlyStatement">
           মাসিক স্টেটমেন্ট PDF
         </button>
-        <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold">
+        <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
           <span class="lang-indicator">EN</span>
         </button>
       </div>
@@ -29,7 +29,6 @@
   </header>
 
   <main class="max-w-5xl mx-auto px-4 mt-5 space-y-5">
-    <!-- Admin Settings Bar (Admin Only) -->
     <div id="admin-settings-card" class="hidden fintech-card p-4 border-l-4 border-[#0A3C2A]">
       <h3 class="font-extrabold text-xs text-[#0A3C2A] uppercase mb-2.5">⚙️ Admin Fund Settings (UPI ID & Late Fine)</h3>
       <form id="settings-form" class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -39,13 +38,11 @@
       </form>
     </div>
 
-    <!-- Pending UTR Verification Queue (Admin & Co-Admin) -->
     <div id="utr-verify-section" class="hidden fintech-card p-5 border-l-4 border-amber-500">
       <h3 class="font-extrabold text-sm text-[#0A3C2A] mb-3" data-i18n="pendingUtrQueue">ভেরিফিকেশনের অপেক্ষায় থাকা UPI পেমেন্ট</h3>
       <div id="pending-utr-list" class="space-y-3"></div>
     </div>
 
-    <!-- Search & Status Filters -->
     <div class="fintech-card p-4 space-y-3">
       <input type="text" id="member-search" data-i18n-placeholder="searchMember" placeholder="নাম বা ফোন নম্বর দিয়ে খুঁজুন..."
         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A]" />
@@ -57,13 +54,11 @@
       </div>
     </div>
 
-    <!-- Member Cards Grid -->
     <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <p class="text-xs text-gray-500 text-center py-6 col-span-2">লোড হচ্ছে...</p>
     </div>
   </main>
 
-  <!-- Member Profile Detail Modal (Visible to all Approved Members) -->
   <div id="member-profile-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-md p-6 relative">
       <button id="close-profile-modal" class="absolute right-4 top-4 text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
@@ -105,7 +100,6 @@
     </div>
   </div>
 
-  <!-- Screenshot Inspection Modal -->
   <div id="screenshot-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-md p-4">
       <div class="flex justify-between items-center mb-2">
@@ -116,20 +110,32 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-3 left-4 right-4 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-4 py-2.5 z-40">
-    <div class="grid grid-cols-4 text-center text-xs">
-      <a href="dashboard.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>🏠</span><span data-i18n="navHome">হোম</span>
+  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
+      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-[#5CDDAB] font-extrabold flex flex-col items-center">
-        <span>📒</span><span data-i18n="navLedger">হিসাব</span>
+      <a href="ledger.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>🩺</span><span data-i18n="navLoans">লোন</span>
+      <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>👤</span><span data-i18n="navProfile">প্রোফাইল</span>
+      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
       </a>
     </div>
   </nav>
@@ -200,7 +206,6 @@
         });
       }
 
-      // Listen to Pending UTR Verifications (Staff Only)
       if (isStaff) {
         onSnapshot(collection(db, "transactions"), (snap) => {
           const pending = [];
@@ -290,7 +295,6 @@
         document.getElementById("screenshot-modal").classList.add("hidden");
       });
 
-      // Listen to Approved Members
       onSnapshot(collection(db, "users"), (snap) => {
         allMembers = [];
         snap.forEach((d) => {
@@ -342,10 +346,10 @@
 
           const badgeHtml =
             status === "paid"
-              ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">✓ Paid</span>`
+              ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0">✓ Paid</span>`
               : status === "overdue"
-              ? `<span class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[11px] font-bold">⚠️ Overdue (+₹${effectiveFine} Fine)</span>`
-              : `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">⏳ Pending</span>`;
+              ? `<span class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 text-[11px] font-bold shrink-0">⚠️ Overdue (+₹${effectiveFine})</span>`
+              : `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0">⏳ Pending</span>`;
 
           const waText =
             lang === "bn"
@@ -357,12 +361,12 @@
             <div class="fintech-card p-4 flex flex-col justify-between">
               <div>
                 <div class="flex justify-between items-start gap-2">
-                  <div class="flex items-center gap-3 cursor-pointer view-member-trigger" data-uid="${m.uid}">
-                    <img src="${m.photoBase64 || "./icon.svg"}" class="w-11 h-11 rounded-2xl object-cover border border-emerald-200" />
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <h4 class="font-extrabold text-sm text-[#0A3C2A] hover:underline">${m.name}</h4>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 font-bold uppercase text-gray-600">${m.role}</span>
+                  <div class="flex items-center gap-3 cursor-pointer view-member-trigger min-w-0" data-uid="${m.uid}">
+                    <img src="${m.photoBase64 || "./icon.svg"}" class="w-11 h-11 rounded-2xl object-cover border border-emerald-200 shrink-0" />
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <h4 class="font-extrabold text-sm text-[#0A3C2A] hover:underline truncate">${m.name}</h4>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 font-bold uppercase text-gray-600 shrink-0">${m.role}</span>
                       </div>
                       <p class="text-[11px] text-gray-500">${m.memberId || "PF"} • 📞 ${m.phone}</p>
                     </div>
@@ -370,7 +374,6 @@
                   ${badgeHtml}
                 </div>
 
-                <!-- Paid Progress -->
                 <div class="mt-3.5">
                   <div class="flex justify-between text-xs mb-1">
                     <span class="text-gray-500">মোট জমা / Paid:</span>
@@ -382,7 +385,6 @@
                 </div>
               </div>
 
-              <!-- Staff Controls & One-Click WhatsApp Reminder -->
               <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2 items-center justify-between">
                 <button data-uid="${m.uid}" class="view-member-trigger text-xs font-bold text-[#0A3C2A] hover:underline">
                   প্রোফাইল দেখুন →
@@ -419,7 +421,6 @@
           `;
         }).join("");
 
-        // Attach Member Profile View Triggers
         grid.querySelectorAll(".view-member-trigger").forEach((el) => {
           el.addEventListener("click", () => {
             const target = allMembers.find((x) => x.uid === el.dataset.uid);
@@ -449,7 +450,6 @@
           });
         });
 
-        // Cash Deposit Handler
         grid.querySelectorAll(".cash-deposit-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const target = allMembers.find((x) => x.uid === btn.dataset.uid);
@@ -485,7 +485,6 @@
           });
         });
 
-        // Waive Fine Handler
         grid.querySelectorAll(".waive-fine-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const target = allMembers.find((x) => x.uid === btn.dataset.uid);
@@ -505,7 +504,6 @@
           });
         });
 
-        // Promote/Demote Co-Admin Handler
         grid.querySelectorAll(".toggle-coadmin-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const target = allMembers.find((x) => x.uid === btn.dataset.uid);
@@ -540,7 +538,6 @@
         });
       });
 
-      // Download Monthly Group Statement PDF
       document.getElementById("download-statement-btn").addEventListener("click", () => {
         const totalCollected = allMembers.reduce((s, m) => s + Number(m.totalPaid || 0), 0);
         const totalDisbursed = allLoans

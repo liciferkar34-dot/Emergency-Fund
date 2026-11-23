@@ -9,21 +9,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
-<body class="pb-24">
+<body class="pb-32">
   <header class="fintech-gradient text-white p-4 shadow-lg sticky top-0 z-30">
-    <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="font-extrabold text-lg" data-i18n="emergencyLoans">ইমার্জেন্সি লোন ও পিয়ার ভোটিং</h1>
-        <p class="text-[11px] text-[#5CDDAB]">০% সুদ • ₹০ প্রসেসিং ফি • সর্বোচ্চ ₹৩৫,০০০</p>
+    <div class="max-w-5xl mx-auto flex justify-between items-center gap-2">
+      <div class="min-w-0 flex-1">
+        <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="emergencyLoans">ইমার্জেন্সি লোন ও পিয়ার ভোটিং</h1>
+        <p class="text-[11px] text-[#5CDDAB] truncate">০% সুদ • ₹০ প্রসেসিং ফি • সর্বোচ্চ ₹৩৫,০০০</p>
       </div>
-      <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold">
+      <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
         <span class="lang-indicator">EN</span>
       </button>
     </div>
   </header>
 
   <main class="max-w-5xl mx-auto px-4 mt-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Left Column: Loan Application Form -->
     <div class="lg:col-span-5">
       <div class="fintech-card p-5">
         <h2 class="font-extrabold text-base text-[#0A3C2A] mb-3" data-i18n="applyLoanTitle">নতুন ইমার্জেন্সি লোনের আবেদন (০% সুদ)</h2>
@@ -75,13 +74,11 @@
       </div>
     </div>
 
-    <!-- Right Column: Loan Applications, Peer Voting & Maker-Checker Approvals -->
     <div class="lg:col-span-7 space-y-4" id="loans-feed">
       <p class="text-xs text-gray-500 text-center py-8">লোনের তালিকা লোড হচ্ছে...</p>
     </div>
   </main>
 
-  <!-- Proof Viewer Modal -->
   <div id="proof-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
     <div class="fintech-card w-full max-w-lg p-4">
       <div class="flex justify-between items-center mb-2">
@@ -92,20 +89,32 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-3 left-4 right-4 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-4 py-2.5 z-40">
-    <div class="grid grid-cols-4 text-center text-xs">
-      <a href="dashboard.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>🏠</span><span data-i18n="navHome">হোম</span>
+  <!-- High-Contrast Crisp SVG Bottom Navigation Bar -->
+  <nav id="bottom-nav" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto bottom-nav-pill text-white rounded-2xl px-2 py-2 z-40 border border-white/15">
+    <div class="grid grid-cols-4 gap-1 text-center text-[11px] leading-none">
+      <a href="dashboard.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
       </a>
-      <a href="ledger.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>📒</span><span data-i18n="navLedger">হিসাব</span>
+      <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
       </a>
-      <a href="loans.html" class="text-[#5CDDAB] font-extrabold flex flex-col items-center">
-        <span>🩺</span><span data-i18n="navLoans">লোন</span>
+      <a href="loans.html" class="text-[#5CDDAB] font-extrabold bg-[#5CDDAB]/15 rounded-xl py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
       </a>
-      <a href="profile.html" class="text-white/75 hover:text-white flex flex-col items-center">
-        <span>👤</span><span data-i18n="navProfile">প্রোফাইল</span>
+      <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-1 flex flex-col items-center justify-center gap-1 transition">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
       </a>
     </div>
   </nav>
@@ -138,7 +147,6 @@
       const isCoAdmin = me.role === "co_admin";
       const isStaff = isAdmin || isCoAdmin;
 
-      // Submit Loan Application
       document.getElementById("loan-apply-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const btn = document.getElementById("loan-submit-btn");
@@ -195,7 +203,6 @@
         }
       });
 
-      // Render Loans Feed
       onSnapshot(query(collection(db, "loans"), orderBy("createdAt", "desc")), (snap) => {
         const feed = document.getElementById("loans-feed");
         const items = [];
@@ -215,16 +222,16 @@
 
           const statusBadge =
             l.status === "approved"
-              ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">✓ Approved</span>`
+              ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold shrink-0">✓ Approved</span>`
               : l.status === "rejected"
-              ? `<span class="px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-extrabold">✕ Rejected</span>`
-              : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold">⏳ Pending</span>`;
+              ? `<span class="px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-extrabold shrink-0">✕ Rejected</span>`
+              : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold shrink-0">⏳ Pending</span>`;
 
           return `
             <div class="fintech-card p-5 space-y-3.5">
               <div class="flex justify-between items-start gap-2">
-                <div>
-                  <div class="flex items-center gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
                     <h3 class="font-extrabold text-base text-[#0A3C2A]">${l.applicantName}</h3>
                     <span class="text-xs text-gray-500">(${l.memberId || "PF"})</span>
                   </div>
@@ -235,15 +242,13 @@
 
               <p class="text-xs text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100">${l.reason}</p>
 
-              <!-- Mandatory Proof Viewer -->
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center flex-wrap gap-2">
                 <button data-proof="${l.proofBase64}" class="view-proof-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold hover:bg-emerald-200">
                   📎 প্রমাণ দেখুন / View Proof
                 </button>
                 ${l.requiresDualApproval ? `<span class="text-[11px] font-bold text-amber-700">🔐 Maker-Checker (>₹20k)</span>` : ""}
               </div>
 
-              <!-- Peer Voting Bar -->
               <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-wrap justify-between items-center gap-2">
                 <div class="text-xs font-bold text-gray-700">
                   পিয়ার ভোট (Peer Vote): <span class="text-emerald-700">👍 ${agreeCount}</span> | <span class="text-red-600">👎 ${disagreeCount}</span>
@@ -262,7 +267,6 @@
                 ` : ""}
               </div>
 
-              <!-- Maker-Checker Status & Admin/Co-Admin Approval Buttons -->
               ${l.status === "pending" ? `
                 <div class="pt-2 border-t border-gray-100 flex flex-wrap justify-between items-center gap-2">
                   <div class="text-[11px] text-gray-600">
@@ -283,7 +287,6 @@
                 </div>
               ` : ""}
 
-              <!-- Repayment Tracking for Approved Loans -->
               ${l.status === "approved" ? `
                 <div class="pt-2 border-t border-gray-100 flex flex-wrap justify-between items-center gap-2 text-xs">
                   <span>বকেয়া লোন (Due): <strong class="text-red-700">${formatINR(outstanding)}</strong> (Paid: ${formatINR(l.repaidAmount || 0)})</span>
@@ -298,7 +301,6 @@
           `;
         }).join("");
 
-        // Proof Modal Trigger
         feed.querySelectorAll(".view-proof-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
             const src = btn.dataset.proof;
@@ -312,7 +314,6 @@
           });
         });
 
-        // Peer Voting Handler
         feed.querySelectorAll(".vote-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = items.find((x) => x.id === btn.dataset.id);
@@ -330,7 +331,6 @@
           });
         });
 
-        // Maker-Checker Loan Approval Handler
         feed.querySelectorAll(".approve-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = items.find((x) => x.id === btn.dataset.id);
@@ -366,7 +366,6 @@
           });
         });
 
-        // Reject Loan Handler
         feed.querySelectorAll(".reject-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = items.find((x) => x.id === btn.dataset.id);
@@ -383,7 +382,6 @@
           });
         });
 
-        // Record Loan Repayment Handler
         feed.querySelectorAll(".repay-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = items.find((x) => x.id === btn.dataset.id);
