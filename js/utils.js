@@ -4,7 +4,12 @@ import {
   doc,
   getDoc,
   addDoc,
+  deleteDoc,
   collection,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { t, getLang } from "./i18n.js";
@@ -25,7 +30,238 @@ export function isAfterDueDay(dueDay = 5) {
   return new Date().getDate() > Number(dueDay || 5);
 }
 
-// Write Immutable Audit Log Entry
+// Role Badge Styling: Admin = Red Highlight, Co-Admin = Yellow Highlight, Member = Mint Green
+export function getRoleBadgeClasses(role) {
+  const r = (role || "member").toLowerCase();
+  if (r === "admin") {
+    return "bg-red-600 text-white border border-red-300 shadow-sm";
+  }
+  if (r === "co_admin") {
+    return "bg-amber-400 text-slate-950 border border-amber-200 shadow-sm";
+  }
+  return "bg-[#5CDDAB] text-[#013A20]";
+}
+
+export function applyRoleBadge(el, role) {
+  if (!el) return;
+  const r = (role || "member").toLowerCase();
+  el.textContent = r === "co_admin" ? "CO-ADMIN" : r.toUpperCase();
+  el.className = `px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider shrink-0 ${getRoleBadgeClasses(r)}`;
+}
+
+// High-End Animated Banking Popup Modal
+export function showFintechPopup({ titleBn, titleEn, msgBn, msgEn, type = "success", actionUrl = "", actionLabelBn = "", actionLabelEn = "" }) {
+  let modal = document.getElementById("fintech-fancy-popup");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "fintech-fancy-popup";
+    modal.className = "fixed inset-0 bg-black/70 backdrop-blur-md z-[95] flex items-center justify-center p-4";
+    modal.innerHTML = `
+      <div class="bg-white rounded-[28px] w-full max-w-sm shadow-2xl overflow-hidden animate-pop-in border border-emerald-200/60">
+        <div id="ffp-banner" class="fintech-gradient pt-6 pb-8 px-6 text-center text-white relative">
+          <div id="ffp-icon-wrap" class="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl shadow-xl border-2 border-white/25"></div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-[#5CDDAB] text-[10px] font-extrabold tracking-widest uppercase">
+            PEER FUND VERIFIED
+          </span>
+        </div>
+        <div class="p-6 text-center -mt-3 bg-white rounded-t-3xl relative">
+          <h3 id="ffp-title" class="text-xl font-extrabold text-[#0A3C2A] mb-2"></h3>
+          <p id="ffp-msg" class="text-xs sm:text-sm text-gray-600 leading-relaxed mb-6"></p>
+          <div class="flex gap-2.5">
+            <button id="ffp-close-btn" class="flex-1 py-3 rounded-2xl mint-btn text-sm font-extrabold">OK / ঠিক আছে</button>
+            <a id="ffp-action-btn" href="#" class="hidden flex-1 py-3 rounded-2xl bg-[#0A3C2A] text-[#5CDDAB] font-extrabold text-sm flex items-center justify-center shadow"></a>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  const lang = getLang();
+  const banner = document.getElementById("ffp-banner");
+  const iconWrap = document.getElementById("ffp-icon-wrap");
+  if (type === "error") {
+    banner.className = "bg-gradient-to-br from-red-800 to-red-950 pt-6 pb-8 px-6 text-center text-white relative";
+    iconWrap.className = "w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl shadow-xl bg-red-500 text-white border-2 border-white/30";
+    iconWrap.textContent = "⚠️";
+  } else if (type === "info") {
+    banner.className = "bg-gradient-to-br from-amber-700 to-amber-950 pt-6 pb-8 px-6 text-center text-white relative";
+    iconWrap.className = "w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl shadow-xl bg-amber-400 text-slate-950 border-2 border-white/30";
+    iconWrap.textContent = "🔔";
+  } else {
+    banner.className = "fintech-gradient pt-6 pb-8 px-6 text-center text-white relative";
+    iconWrap.className = "w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl shadow-xl bg-[#5CDDAB] text-[#013A20] border-2 border-white/40 font-extrabold";
+    iconWrap.textContent = "✓";
+  }
+
+  document.getElementById("ffp-title").textContent = lang === "bn" ? titleBn : titleEn;
+  document.getElementById("ffp-msg").textContent = lang === "bn" ? msgBn : msgEn;
+
+  const actionBtn = document.getElementById("ffp-action-btn");
+  if (actionUrl) {
+    actionBtn.href = actionUrl;
+    actionBtn.textContent = lang === "bn" ? (actionLabelBn || "দেখুন →") : (actionLabelEn || "Open →");
+    actionBtn.classList.remove("hidden");
+  } else {
+    actionBtn.classList.add("hidden");
+  }
+
+  modal.classList.remove("hidden");
+  document.getElementById("ffp-close-btn").onclick = () => {
+    modal.classList.add("hidden");
+  };
+}
+
+// Send Real-Time Group Notification
+export async function sendGroupNotification({ titleBn, titleEn, bodyBn, bodyEn, targetPage = "dashboard.html", actorUid = "" }) {
+  try {
+    await addDoc(collection(db, "notifications"), {
+      titleBn,
+      titleEn,
+      bodyBn,
+      bodyEn,
+      targetPage,
+      actorUid,
+      createdAt: serverTimestamp(),
+      timestampIso: new Date().toISOString()
+    });
+  } catch (e) {
+    console.error("Notification write error:", e);
+  }
+}
+
+// Initialize Notification Bell & Live Listener across all authenticated pages
+export function initNotificationCenter(currentUid, isAdmin = false) {
+  const bellBtns = document.querySelectorAll(".notif-bell-btn");
+  if (bellBtns.length === 0) return;
+
+  let modal = document.getElementById("global-notif-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "global-notif-modal";
+    modal.className = "hidden fixed inset-0 bg-black/65 backdrop-blur-sm z-[85] flex items-center justify-center p-4";
+    modal.innerHTML = `
+      <div class="fintech-card w-full max-w-md p-5 max-h-[85vh] flex flex-col animate-pop-in">
+        <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-100">
+          <h3 class="font-extrabold text-base text-[#0A3C2A] flex items-center gap-2">
+            <span>🔔</span><span data-i18n="notifTitle">${t("notifTitle")}</span>
+          </h3>
+          <button id="close-notif-modal" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold">✕</button>
+        </div>
+        <button id="enable-push-btn" class="mb-3 w-full py-2 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[#0A3C2A] font-bold text-xs hover:bg-emerald-100 transition">
+          📲 <span data-i18n="enableBrowserNotif">${t("enableBrowserNotif")}</span>
+        </button>
+        <div id="notif-items-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById("close-notif-modal").addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+    document.getElementById("enable-push-btn").addEventListener("click", async () => {
+      if ("Notification" in window) {
+        const perm = await Notification.requestPermission();
+        if (perm === "granted") {
+          showFintechPopup({
+            titleBn: "নোটিফিকেশন চালু হয়েছে!",
+            titleEn: "Notifications Enabled!",
+            msgBn: "এখন থেকে লোন বা মাসিক চাঁদা জমা হলেই আপনার ফোনে নোটিফিকেশন চলে আসবে।",
+            msgEn: "You will now receive instant alerts for loans and monthly deposits."
+          });
+        }
+      }
+    });
+  }
+
+  let notifList = [];
+  let initialLoad = true;
+  const pageLoadIso = new Date().toISOString();
+
+  function updateBellBadges() {
+    const lastSeen = localStorage.getItem("peerfund_last_seen_notif") || "1970-01-01T00:00:00.000Z";
+    const unread = notifList.filter((n) => (n.timestampIso || "") > lastSeen).length;
+    document.querySelectorAll(".notif-badge").forEach((badge) => {
+      if (unread > 0) {
+        badge.textContent = unread > 9 ? "9+" : String(unread);
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+    });
+  }
+
+  function renderNotifList() {
+    const container = document.getElementById("notif-items-list");
+    if (!container) return;
+    const lang = getLang();
+    if (notifList.length === 0) {
+      container.innerHTML = `<p class="text-xs text-gray-500 text-center py-8">${t("notifEmpty")}</p>`;
+      return;
+    }
+    container.innerHTML = notifList.map((n) => {
+      const title = lang === "bn" ? (n.titleBn || n.titleEn) : (n.titleEn || n.titleBn);
+      const body = lang === "bn" ? (n.bodyBn || n.bodyEn) : (n.bodyEn || n.bodyBn);
+      const timeStr = n.timestampIso ? new Date(n.timestampIso).toLocaleString("en-IN") : "";
+      return `
+        <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/70 flex items-start justify-between gap-2">
+          <a href="${n.targetPage || "dashboard.html"}" class="block flex-1 min-w-0">
+            <div class="flex justify-between items-start gap-2">
+              <p class="font-extrabold text-xs sm:text-sm text-[#0A3C2A]">${title}</p>
+              <span class="text-[10px] text-gray-400 shrink-0">${timeStr}</span>
+            </div>
+            <p class="text-xs text-gray-700 mt-1 leading-relaxed">${body}</p>
+            <p class="text-[11px] font-bold text-emerald-700 mt-1.5">${t("tapToOpenPage")}</p>
+          </a>
+          ${isAdmin ? `<button data-nid="${n.id}" class="del-notif-btn p-1.5 rounded-lg bg-red-100 text-red-700 text-xs font-bold shrink-0" title="Delete">🗑️</button>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".del-notif-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        await deleteDoc(doc(db, "notifications", btn.dataset.nid));
+      });
+    });
+  }
+
+  onSnapshot(query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(30)), (snap) => {
+    notifList = [];
+    snap.forEach((d) => notifList.push({ id: d.id, ...d.data() }));
+    updateBellBadges();
+    renderNotifList();
+
+    if (!initialLoad && notifList.length > 0) {
+      const newest = notifList[0];
+      if ((newest.timestampIso || "") > pageLoadIso && newest.actorUid !== currentUid) {
+        const lang = getLang();
+        const title = lang === "bn" ? newest.titleBn : newest.titleEn;
+        const body = lang === "bn" ? newest.bodyBn : newest.bodyEn;
+        if ("Notification" in window && Notification.permission === "granted") {
+          const push = new Notification(title, { body, icon: "./icon.svg" });
+          push.onclick = () => {
+            window.focus();
+            window.location.href = newest.targetPage || "dashboard.html";
+          };
+        }
+      }
+    }
+    initialLoad = false;
+  });
+
+  bellBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      localStorage.setItem("peerfund_last_seen_notif", new Date().toISOString());
+      updateBellBadges();
+      renderNotifList();
+      modal.classList.remove("hidden");
+    });
+  });
+
+  window.addEventListener("languageChanged", renderNotifList);
+}
+
+// Write Audit Log Entry
 export async function logAudit({ actionType, messageBn, messageEn, remark = "", actorUid, actorName, actorRole, meta = {} }) {
   try {
     await addDoc(collection(db, "audit_logs"), {
@@ -45,12 +281,11 @@ export async function logAudit({ actionType, messageBn, messageEn, remark = "", 
   }
 }
 
-// Universal Undo / Redo Manager (Persisted in sessionStorage so Undo/Redo works across actions)
+// Universal Undo / Redo Manager
 const undoStack = [];
 const redoStack = [];
 
 export function pushUndoAction(action) {
-  // action = { labelBn, labelEn, undoFn: async () => {}, redoFn: async () => {} }
   undoStack.push(action);
   redoStack.length = 0;
   renderUndoRedoBar();
@@ -96,7 +331,7 @@ export function initUndoRedoControls() {
         await act.undoFn();
         redoStack.push(act);
       } catch (e) {
-        alert("Undo error: " + e.message);
+        showFintechPopup({ type: "error", titleBn: "Undo ত্রুটি", titleEn: "Undo Error", msgBn: e.message, msgEn: e.message });
       }
       renderUndoRedoBar();
     });
@@ -110,7 +345,7 @@ export function initUndoRedoControls() {
         await act.redoFn();
         undoStack.push(act);
       } catch (e) {
-        alert("Redo error: " + e.message);
+        showFintechPopup({ type: "error", titleBn: "Redo ত্রুটি", titleEn: "Redo Error", msgBn: e.message, msgEn: e.message });
       }
       renderUndoRedoBar();
     });
@@ -127,7 +362,7 @@ export function askForRemarks({ titleBn, titleEn, required = true } = {}) {
       modal.id = "global-remarks-modal";
       modal.className = "fixed inset-0 bg-black/65 z-50 flex items-center justify-center p-4";
       modal.innerHTML = `
-        <div class="fintech-card w-full max-w-md p-6">
+        <div class="fintech-card w-full max-w-md p-6 animate-pop-in">
           <h3 id="grm-title" class="text-lg font-extrabold text-[#0A3C2A] mb-1"></h3>
           <p class="text-xs text-gray-500 mb-3" data-i18n="remarksModalSub">${t("remarksModalSub")}</p>
           <textarea id="grm-input" rows="3" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#0A3C2A] mb-3" placeholder="${t("remarksInputPh")}"></textarea>
@@ -173,12 +408,12 @@ export function askForRemarks({ titleBn, titleEn, required = true } = {}) {
 export function enforcePinLock() {
   const savedPin = localStorage.getItem("peerfund_app_pin");
   const unlocked = sessionStorage.getItem("peerfund_pin_unlocked");
-  if (!savedPin || unlocked === "1") return;
+  if (!savedPin || !/^[0-9]{4}$/.test(savedPin) || unlocked === "1") return;
 
   const overlay = document.createElement("div");
   overlay.className = "fixed inset-0 fintech-gradient z-[100] flex items-center justify-center p-4 text-white";
   overlay.innerHTML = `
-    <div class="fintech-card w-full max-w-xs p-6 text-center text-gray-900">
+    <div class="fintech-card w-full max-w-xs p-6 text-center text-gray-900 animate-pop-in">
       <div class="w-12 h-12 rounded-2xl fintech-gradient text-[#5CDDAB] flex items-center justify-center font-extrabold text-xl mx-auto mb-3">🔒</div>
       <h2 class="font-extrabold text-lg text-[#0A3C2A]">App PIN Lock</h2>
       <p class="text-xs text-gray-500 mb-4">৪ সংখ্যার সিকিউরিটি PIN দিন / Enter 4-digit PIN</p>
@@ -191,6 +426,7 @@ export function enforcePinLock() {
   document.body.appendChild(overlay);
 
   const inp = overlay.querySelector("#pin-unlock-input");
+  setTimeout(() => inp.focus(), 100);
   const check = () => {
     if (inp.value === savedPin) {
       sessionStorage.setItem("peerfund_pin_unlocked", "1");
@@ -265,6 +501,8 @@ export function requireApprovedUser(onReady) {
           window.location.href = "dashboard.html";
           return;
         }
+      } else {
+        initNotificationCenter(user.uid, userData.role === "admin");
       }
       onReady(user, userData);
     } catch (err) {

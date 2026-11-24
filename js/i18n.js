@@ -25,8 +25,8 @@ export const translations = {
     rule3Desc: "মাসের নির্ধারিত তারিখ পেরিয়ে গেলে চাঁদা স্বয়ংক্রিয়ভাবে Overdue হবে এবং নির্ধারিত লেট-ফাইন যুক্ত হবে।",
     rule4Title: "৪. ০% সুদে ইমার্জেন্সি লোন ও ভোটিং",
     rule4Desc: "প্রমাণসহ (হাসপাতালের বিল/প্রেসক্রিপশন) ০% সুদে ও ₹০ ফিতে আবেদন করা যাবে। বড় লোনে Admin ও Co-Admin উভয়ের অনুমোদন লাগবে।",
-    rule5Title: "৫. অপরিবর্তনীয় অডিট লগ ও এক্সিট পলিসি",
-    rule5Desc: "প্রতিটি লেনদেন স্থায়ীভাবে রেকর্ড থাকে যা অ্যাডমিনও ডিলিট করতে পারবেন না। ফান্ড ছাড়লে মোট জমা থেকে বকেয়া লোন ও ফাইন বাদ দিয়ে বাকি টাকা ফেরত পাবেন।",
+    rule5Title: "৫. স্বচ্ছ অডিট লগ ও এক্সিট পলিসি",
+    rule5Desc: "প্রতিটি লেনদেনের স্বচ্ছ রেকর্ড থাকে। ফান্ড ছাড়লে মোট জমা থেকে বকেয়া লোন ও ফাইন বাদ দিয়ে বাকি টাকা ফেরত পাবেন।",
     installApp: "মোবাইল অ্যাপ ইনস্টল করুন (PWA)",
     footerNote: "পিয়ার ফান্ড ডিজিটাল মিউচুয়াল ব্যাঙ্কিং সিস্টেম • ফায়ারবেস দ্বারা সুরক্ষিত",
 
@@ -58,7 +58,7 @@ export const translations = {
     cancelBtn: "বাতিল",
     sendLinkBtn: "লিংক পাঠান",
 
-    // Dashboard & Notice Banner
+    // Dashboard & Notifications & Member List
     pinnedNoticeTitle: "অ্যাডমিন জরুরি ঘোষণা",
     editNoticeBtn: "নোটিশ লিখুন / এডিট",
     noNoticeYet: "কোনো জরুরি ঘোষণা পিন করা নেই।",
@@ -69,6 +69,9 @@ export const translations = {
     approvedMembers: "অনুমোদিত সদস্য",
     payUpiBtn: "UPI পেমেন্ট করুন",
     requestLoanBtn: "ইমার্জেন্সি লোন আবেদন",
+    memberListBtn: "মেম্বার লিস্ট",
+    memberListTitle: "সকল অনুমোদিত মেম্বার লিস্ট",
+    thisMonthStatusTitle: "এই মাসের চাঁদা জমার স্ট্যাটাস (লাইভ)",
     upiPausedNotice: "অ্যাডমিন সাময়িকভাবে UPI পেমেন্ট বন্ধ রেখেছেন",
     offlineBanner: "অফলাইন মোড: সর্বশেষ সেভ করা ডেটা দেখানো হচ্ছে",
     onlineBadge: "লাইভ সিঙ্ক",
@@ -85,13 +88,17 @@ export const translations = {
     utrNumberPh: "যেমন: 432198765432",
     screenshotLabel: "পেমেন্ট স্ক্রিনশট আপলোড *",
     submitUtrBtn: "ভেরিফিকেশনের জন্য জমা দিন",
+    notifTitle: "নোটিফিকেশন সেন্টার",
+    notifEmpty: "এখনো কোনো নোটিফিকেশন নেই।",
+    enableBrowserNotif: "ফোন নোটিফিকেশন চালু করুন",
+    tapToOpenPage: "পেজে যেতে ট্যাপ করুন →",
 
     // Undo / Redo & Remarks
     undoBtn: "পূর্বাবস্থায় ফিরুন (Undo)",
     redoBtn: "পুনরায় করুন (Redo)",
     remarksModalTitle: "কারণ বা মন্তব্য লিখুন (Remarks)",
-    remarksModalSub: "এই সিদ্ধান্ত বা পরিবর্তনের কারণ নিচে লিখুন—এটি স্থায়ীভাবে রেকর্ড থাকবে:",
-    remarksInputPh: "যেমন: স্ক্রিনশট অস্পষ্ট, ভুল UTR নম্বর, বা ভুল এন্ট্রি সংশোধন...",
+    remarksModalSub: "এই সিদ্ধান্ত বা পরিবর্তনের কারণ নিচে লিখুন—এটি রেকর্ড থাকবে:",
+    remarksInputPh: "যেমন: স্ক্রিনশট অস্পষ্ট, ভুল UTR নম্বর, বা অপ্রয়োজনীয় রেকর্ড ডিলিট...",
     confirmActionBtn: "নিশ্চিত করুন",
 
     // Ledger & Member Management
@@ -99,7 +106,7 @@ export const translations = {
     ledgerSub: "নির্ধারিত তারিখের পর বাকি থাকলে অটো লেট-ফাইন যুক্ত হয়",
     monthlyStatement: "মাসিক স্টেটমেন্ট PDF",
     pendingUtrQueue: "ভেরিফিকেশনের অপেক্ষায় থাকা UPI পেমেন্ট",
-    recentTxStaffTitle: "সাম্প্রতিক লেনদেন (Undo / রিভার্ট করার সুবিধা)",
+    recentTxStaffTitle: "সাম্প্রতিক লেনদেন (Undo / Delete কন্ট্রোল)",
     searchMember: "নাম, আইডি বা ফোন নম্বর দিয়ে খুঁজুন...",
     filterAll: "সবাই",
     filterActive: "জমা হয়েছে",
@@ -109,8 +116,6 @@ export const translations = {
     totalPaidLabel: "মোট জমা:",
     viewProfileBtn: "প্রোফাইল দেখুন →",
     whatsappNudge: "WhatsApp",
-    addDepositBtn: "+ জমা",
-    deductDepositBtn: "− বিয়োগ",
     customAdjustBtn: "± এডিট",
     waiveFineBtn: "ফাইন মওকুফ",
     makeCoAdminBtn: "Co-Admin বানান",
@@ -118,16 +123,15 @@ export const translations = {
     unapproveBtn: "Unapprove",
     reapproveBtn: "Approve",
     deleteMemberBtn: "ডিলিট",
-    memberProfileModalTitle: "সদস্যের প্রোফাইল",
     mobileCol: "মোবাইল নম্বর:",
     bloodCol: "ব্লাড গ্রুপ:",
     sosCol: "ফ্যামিলি SOS নম্বর:",
     upiCol: "UPI ID:",
     bankCol: "ব্যাঙ্ক অ্যাকাউন্ট (গোপন):",
 
-    // Loans
+    // Loans & Disbursement Proof
     emergencyLoans: "ইমার্জেন্সি লোন ও পিয়ার ভোটিং",
-    loansSub: "০% সুদ • ₹০ প্রসেসিং ফি • প্রমাণসহ আবেদন",
+    loansSub: "০% সুদ • ₹০ প্রসেসিং ফি • আগে আবেদন করলে প্রথম অগ্রাধিকার",
     applyLoanTitle: "নতুন ইমার্জেন্সি লোনের আবেদন (০% সুদ)",
     interestBadge: "০% সুদ",
     feeBadge: "₹০ ফি",
@@ -147,6 +151,10 @@ export const translations = {
     undoDecisionBtn: "সিদ্ধান্ত ফিরিয়ে নিন (Undo)",
     recordRepayBtn: "+ কিস্তি জমা",
     loanDueLabel: "বকেয়া লোন:",
+    payApplicantUpiBtn: "আবেদনকারীর UPI-তে টাকা পাঠান",
+    uploadDisburseProofBtn: "📤 টাকা পাঠানোর স্ক্রিনশট আপলোড",
+    viewDisburseProofBtn: "✅ টাকা পাঠানো হয়েছে — প্রমাণ দেখুন",
+    noApplicantPayoutNote: "আবেদনকারী এখনো প্রোফাইলে UPI ID বা ব্যাঙ্ক অ্যাকাউন্ট সেট করেননি।",
 
     // Profile
     myProfile: "আমার প্রোফাইল ও SOS",
@@ -154,9 +162,9 @@ export const translations = {
     profilePicLabel: "প্রোফাইল পিকচার আপলোড",
     bloodGroupLabel: "ব্লাড গ্রুপ",
     selectOption: "নির্বাচন করুন",
-    yourUpiLabel: "আপনার UPI ID (টাকা পাওয়ার জন্য)",
+    yourUpiLabel: "আপনার UPI ID (লোন বা টাকা পাওয়ার জন্য)",
     sosNumberLabel: "ফ্যামিলি ইমার্জেন্সি SOS নম্বর",
-    bankAccLabel: "ব্যাঙ্ক অ্যাকাউন্ট নম্বর (সুরক্ষিত ও ব্যক্তিগত)",
+    bankAccLabel: "ব্যাঙ্ক অ্যাকাউন্ট নম্বর (লোন ও সেটেলমেন্টের জন্য)",
     ifscLabel: "IFSC কোড",
     nomineeLabel: "নমিনি নাম ও সম্পর্ক",
     saveProfileBtn: "প্রোফাইল সেভ করুন",
@@ -179,7 +187,7 @@ export const translations = {
     disablePinBtn: "PIN বন্ধ করুন",
     hideBalDefaultLabel: "ড্যাশবোর্ডে ব্যালেন্স লুকিয়ে রাখুন",
     hideBalDefaultDesc: "পাবলিক জায়গায় ব্যালেন্স ₹••••• দেখাবে",
-    viewAuditBtn: "অপরিবর্তনীয় অডিট লগ দেখুন",
+    viewAuditBtn: "অডিট লগ দেখুন",
     viewRulesBtn: "ফান্ডের নিয়মাবলী দেখুন",
     adminBankingTitle: "অ্যাডমিন ব্যাঙ্কিং কন্ট্রোল (শুধুমাত্র Admin)",
     adminBankingDesc: "এখান থেকে পুরো গ্রুপের পেমেন্ট UPI, চাঁদা, ফাইন, লোন সীমা ও নোটিশ নিয়ন্ত্রণ করুন",
@@ -199,8 +207,8 @@ export const translations = {
     saveBankingSettingsBtn: "সব ব্যাঙ্কিং সেটিংস সেভ করুন",
 
     // Audit Log
-    auditLogTitle: "অপরিবর্তনীয় অডিট লগ",
-    auditLogSub: "প্রতিটি জমা, বিয়োগ, রিমার্কস, Undo ও রোল পরিবর্তনের স্থায়ী রেকর্ড — কেউ ডিলিট করতে পারবেন না।"
+    auditLogTitle: "অডিট লগ (রেকর্ড ও হিস্ট্রি)",
+    auditLogSub: "প্রতিটি জমা, বিয়োগ, রিমার্কস, Undo ও রোল পরিবর্তনের রেকর্ড (শুধুমাত্র Admin ডিলিট করতে পারবেন)।"
   },
   en: {
     appName: "Peer Fund",
@@ -228,8 +236,8 @@ export const translations = {
     rule3Desc: "Unpaid monthly contributions after the due date are automatically marked Overdue with the configured late fine.",
     rule4Title: "4. 0% Interest Emergency Loans & Voting",
     rule4Desc: "Apply at 0% interest & ₹0 processing fee with mandatory proof (hospital bill/prescription). Large loans require both Admin & Co-Admin approval.",
-    rule5Title: "5. Immutable Audit Log & Exit Policy",
-    rule5Desc: "Every action is permanently logged and cannot be edited or deleted even by Admins. Exiting members receive Total Paid minus unpaid loans & fines.",
+    rule5Title: "5. Transparent Audit Log & Exit Policy",
+    rule5Desc: "Every action is recorded transparently. Exiting members receive Total Paid minus unpaid loans & fines.",
     installApp: "Install Mobile App (PWA)",
     footerNote: "Peer Fund Digital Mutual Banking System • Secured by Firebase",
 
@@ -261,7 +269,7 @@ export const translations = {
     cancelBtn: "Cancel",
     sendLinkBtn: "Send Link",
 
-    // Dashboard & Notice Banner
+    // Dashboard & Notifications & Member List
     pinnedNoticeTitle: "Admin Urgent Announcement",
     editNoticeBtn: "Post / Edit Notice",
     noNoticeYet: "No urgent announcement pinned right now.",
@@ -272,6 +280,9 @@ export const translations = {
     approvedMembers: "Approved Members",
     payUpiBtn: "Pay via UPI",
     requestLoanBtn: "Apply Emergency Loan",
+    memberListBtn: "Member List",
+    memberListTitle: "All Approved Members List",
+    thisMonthStatusTitle: "This Month's Deposit Status (Live)",
     upiPausedNotice: "Admin has temporarily paused UPI payments",
     offlineBanner: "Offline Mode: Showing cached balance & records",
     onlineBadge: "Live Sync",
@@ -288,13 +299,17 @@ export const translations = {
     utrNumberPh: "e.g., 432198765432",
     screenshotLabel: "Upload Payment Screenshot *",
     submitUtrBtn: "Submit for Verification",
+    notifTitle: "Notification Center",
+    notifEmpty: "No notifications yet.",
+    enableBrowserNotif: "Enable Phone Notifications",
+    tapToOpenPage: "Tap to open page →",
 
     // Undo / Redo & Remarks
     undoBtn: "Undo",
     redoBtn: "Redo",
     remarksModalTitle: "Enter Remarks / Reason",
-    remarksModalSub: "Please state the reason for this rejection or adjustment — it will be permanently logged:",
-    remarksInputPh: "e.g., Blurry screenshot, invalid UTR, or correcting mistaken entry...",
+    remarksModalSub: "Please state the reason for this rejection or deletion — it will be recorded:",
+    remarksInputPh: "e.g., Blurry screenshot, invalid UTR, or deleting unnecessary record...",
     confirmActionBtn: "Confirm",
 
     // Ledger & Member Management
@@ -302,7 +317,7 @@ export const translations = {
     ledgerSub: "Unpaid dues after the monthly deadline automatically accrue a late fine",
     monthlyStatement: "Monthly Statement PDF",
     pendingUtrQueue: "Pending UPI / UTR Verifications",
-    recentTxStaffTitle: "Recent Transactions (Undo / Revert Controls)",
+    recentTxStaffTitle: "Recent Transactions (Undo / Delete Controls)",
     searchMember: "Search by name, ID, or phone...",
     filterAll: "All",
     filterActive: "Paid",
@@ -312,8 +327,6 @@ export const translations = {
     totalPaidLabel: "Total Paid:",
     viewProfileBtn: "View Profile →",
     whatsappNudge: "WhatsApp",
-    addDepositBtn: "+ Add",
-    deductDepositBtn: "− Deduct",
     customAdjustBtn: "± Adjust",
     waiveFineBtn: "Waive Fine",
     makeCoAdminBtn: "Make Co-Admin",
@@ -321,16 +334,15 @@ export const translations = {
     unapproveBtn: "Unapprove",
     reapproveBtn: "Approve",
     deleteMemberBtn: "Delete",
-    memberProfileModalTitle: "Member Profile",
     mobileCol: "Mobile Number:",
     bloodCol: "Blood Group:",
     sosCol: "Family SOS Number:",
     upiCol: "UPI ID:",
     bankCol: "Bank Account (Private):",
 
-    // Loans
+    // Loans & Disbursement Proof
     emergencyLoans: "Emergency Loans & Peer Voting",
-    loansSub: "0% Interest • ₹0 Processing Fee • Proof Required",
+    loansSub: "0% Interest • ₹0 Processing Fee • First-Come First-Served Priority",
     applyLoanTitle: "Apply for Emergency Loan (0% Interest)",
     interestBadge: "0% Interest",
     feeBadge: "₹0 Fee",
@@ -350,6 +362,10 @@ export const translations = {
     undoDecisionBtn: "Undo Decision",
     recordRepayBtn: "+ Record Repayment",
     loanDueLabel: "Loan Due:",
+    payApplicantUpiBtn: "Pay to Applicant's UPI ID",
+    uploadDisburseProofBtn: "📤 Upload Transfer Screenshot Proof",
+    viewDisburseProofBtn: "✅ Money Sent — View Transfer Proof",
+    noApplicantPayoutNote: "Applicant has not added UPI ID or Bank Account in Profile yet.",
 
     // Profile
     myProfile: "My Profile & SOS",
@@ -357,9 +373,9 @@ export const translations = {
     profilePicLabel: "Upload Profile Picture",
     bloodGroupLabel: "Blood Group",
     selectOption: "Select",
-    yourUpiLabel: "Your UPI ID (For Receiving Payouts)",
+    yourUpiLabel: "Your UPI ID (For Receiving Loan Payouts)",
     sosNumberLabel: "Family Emergency SOS Number",
-    bankAccLabel: "Bank Account Number (Private & Protected)",
+    bankAccLabel: "Bank Account Number (For Loan & Settlement)",
     ifscLabel: "IFSC Code",
     nomineeLabel: "Nominee Name & Relation",
     saveProfileBtn: "Save Profile",
@@ -382,7 +398,7 @@ export const translations = {
     disablePinBtn: "Disable PIN",
     hideBalDefaultLabel: "Hide Balance on Dashboard",
     hideBalDefaultDesc: "Mask available balance as ₹••••• in public places",
-    viewAuditBtn: "View Immutable Audit Log",
+    viewAuditBtn: "View Audit Log",
     viewRulesBtn: "View Fund Rules & Regulations",
     adminBankingTitle: "Admin Banking Controls (Admin Only)",
     adminBankingDesc: "Control the group's official payment UPI ID, contribution rules, loan limits, and pinned notice",
@@ -402,8 +418,8 @@ export const translations = {
     saveBankingSettingsBtn: "Save All Banking Settings",
 
     // Audit Log
-    auditLogTitle: "Immutable Audit Log",
-    auditLogSub: "Permanent tamper-proof record of every deposit, deduction, remark, Undo & role change — cannot be deleted by anyone."
+    auditLogTitle: "Audit Log & History",
+    auditLogSub: "Complete record of every deposit, deduction, remark, Undo & role change (Admin can delete unnecessary records)."
   }
 };
 
