@@ -20,9 +20,16 @@
           প্রতিটি জমা, বিয়োগ, রিমার্কস, Undo ও রোল পরিবর্তনের স্থায়ী রেকর্ড — কেউ ডিলিট করতে পারবেন না।
         </p>
       </div>
+      <div class="flex items-center gap-1.5 shrink-0"><button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
       <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
         <span class="lang-indicator">English</span>
       </button>
+      </div>
     </div>
   </header>
 
@@ -84,13 +91,14 @@
 
   <script type="module">
     import { db } from "./js/firebase-config.js";
-    import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { requireApprovedUser, setupCommonUI } from "./js/utils.js";
+    import { collection, doc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { requireApprovedUser, setupCommonUI, getRoleBadgeClasses, askForRemarks, showFintechPopup } from "./js/utils.js";
     import { getLang } from "./js/i18n.js";
 
     setupCommonUI();
 
-    requireApprovedUser(() => {
+    requireApprovedUser((user, me) => {
+      const isAdmin = me.role === "admin";
       let logs = [];
       onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAt", "desc")), (snap) => {
         logs = [];
@@ -112,14 +120,34 @@
             <div class="fintech-card p-4 border-l-4 border-[#39D59E]">
               <div class="flex justify-between items-center mb-1">
                 <span class="px-2 py-0.5 rounded bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold">${l.actionType || "LOG"}</span>
-                <span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>
+                <div class="flex items-center gap-2"><span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>${isAdmin ? `<button data-lid="${l.id}" class="del-audit-btn px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold">🗑️</button>` : ""}</div>
               </div>
               <p class="text-xs md:text-sm font-semibold text-gray-800">${msg}</p>
               ${l.remark ? `<p class="text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg mt-1.5 font-medium">Remark: ${l.remark}</p>` : ""}
-              <p class="text-[11px] text-gray-500 mt-1">Actor: ${l.actorName || "System"} (${(l.actorRole || "").toUpperCase()})</p>
+              <p class="text-[11px] text-gray-500 mt-1">Actor: <strong>${l.actorName || "System"}</strong> <span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(l.actorRole)}">${(l.actorRole || "system").toUpperCase()}</span></p>
             </div>
           `;
         }).join("");
+      }
+
+        feed.querySelectorAll(".del-audit-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const ok = await askForRemarks({
+              titleBn: "এই রেকর্ডটি ডিলিট করার কারণ লিখুন",
+              titleEn: "Reason for deleting this record",
+              required: false
+            });
+            if (ok === null) return;
+            await deleteDoc(doc(db, "audit_logs", btn.dataset.lid));
+            showFintechPopup({
+              type: "info",
+              titleBn: "রেকর্ড ডিলিট হয়েছে",
+              titleEn: "Record Deleted",
+              msgBn: "নির্বাচিত রেকর্ডটি মুছে ফেলা হয়েছে।",
+              msgEn: "The selected record has been deleted."
+            });
+          });
+        });
       }
 
       window.addEventListener("languageChanged", renderLogs);

@@ -14,11 +14,19 @@
     <div class="max-w-5xl mx-auto flex justify-between items-center gap-2">
       <div class="min-w-0 flex-1">
         <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="emergencyLoans">ইমার্জেন্সি লোন ও পিয়ার ভোটিং</h1>
-        <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="loansSub">০% সুদ • ₹০ প্রসেসিং ফি • প্রমাণসহ আবেদন</p>
+        <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="loansSub">০% সুদ • ₹০ প্রসেসিং ফি • আগে আবেদন করলে প্রথম অগ্রাধিকার</p>
       </div>
-      <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
-        <span class="lang-indicator">English</span>
-      </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
+        <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
+          <span class="lang-indicator">English</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -79,13 +87,40 @@
     </div>
   </main>
 
+  <!-- Proof / Transfer Screenshot Viewer Modal -->
   <div id="proof-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
-    <div class="fintech-card w-full max-w-lg p-4">
+    <div class="fintech-card w-full max-w-lg p-4 animate-pop-in">
       <div class="flex justify-between items-center mb-2">
-        <h4 class="font-bold text-sm text-[#0A3C2A]">Emergency Proof Document</h4>
+        <h4 id="proof-modal-title" class="font-bold text-sm text-[#0A3C2A]">Document Proof</h4>
         <button id="close-proof-modal" class="font-bold text-gray-500 text-lg">✕</button>
       </div>
       <div id="proof-container" class="max-h-[75vh] overflow-auto"></div>
+    </div>
+  </div>
+
+  <!-- Upload Money Transfer Proof Modal (Staff) -->
+  <div id="disburse-proof-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-6 animate-pop-in">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-base font-extrabold text-[#0A3C2A]" data-i18n="uploadDisburseProofBtn">📤 টাকা পাঠানোর স্ক্রিনশট আপলোড</h3>
+        <button id="close-disburse-modal" class="text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
+      </div>
+      <form id="disburse-proof-form" class="space-y-3">
+        <input type="hidden" id="disburse-loan-id" />
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">UTR / Transaction Reference (Optional)</label>
+          <input type="text" id="disburse-utr" placeholder="e.g. 432198765432"
+            class="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" data-i18n="screenshotLabel">পেমেন্ট স্ক্রিনশট আপলোড *</label>
+          <input type="file" id="disburse-file" accept="image/*" required
+            class="w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-100 file:text-[#0A3C2A] file:font-bold" />
+        </div>
+        <button type="submit" id="disburse-submit-btn" class="w-full mint-btn py-3 rounded-xl text-sm">
+          সেভ ও সবাইকে জানান / Save Transfer Proof
+        </button>
+      </form>
     </div>
   </div>
 
@@ -146,6 +181,7 @@
       doc,
       addDoc,
       updateDoc,
+      deleteDoc,
       onSnapshot,
       query,
       orderBy,
@@ -158,7 +194,9 @@
       compressImageToBase64,
       logAudit,
       pushUndoAction,
-      askForRemarks
+      askForRemarks,
+      showFintechPopup,
+      sendGroupNotification
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
 
@@ -171,6 +209,15 @@
       let maxLoanLimit = 35000;
       let dualThreshold = 20000;
       let loansEnabled = true;
+      let usersByUid = {};
+
+      onSnapshot(collection(db, "users"), (snap) => {
+        usersByUid = {};
+        snap.forEach((d) => {
+          usersByUid[d.id] = { uid: d.id, ...d.data() };
+        });
+        renderLoans();
+      });
 
       onSnapshot(doc(db, "settings", "general"), (snap) => {
         const d = snap.exists() ? snap.data() : {};
@@ -212,6 +259,9 @@
           await addDoc(collection(db, "loans"), {
             uid: me.uid,
             applicantName: me.name,
+            applicantUpi: me.upiId || "",
+            applicantBank: me.bankAccount || "",
+            applicantIfsc: me.ifsc || "",
             memberId: me.memberId || "-",
             amount,
             repaidAmount: 0,
@@ -222,8 +272,13 @@
             coAdminApproved: false,
             status: "pending",
             rejectReason: "",
+            disbursementProofBase64: "",
+            disbursementUtr: "",
+            disbursedBy: "",
+            disbursedAt: "",
             votes: {},
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            submittedAtIso: new Date().toISOString()
           });
 
           await logAudit({
@@ -235,17 +290,38 @@
             actorRole: me.role
           });
 
+          await sendGroupNotification({
+            titleBn: `🩺 নতুন ইমার্জেন্সি লোন আবেদন (${me.name})`,
+            titleEn: `🩺 New Emergency Loan Request (${me.name})`,
+            bodyBn: `${me.name} জরুরি প্রয়োজনে ${formatINR(amount)} লোনের আবেদন করেছেন। ভোট দিতে ট্যাপ করুন।`,
+            bodyEn: `${me.name} applied for a ${formatINR(amount)} emergency loan. Tap to review & vote.`,
+            targetPage: "loans.html",
+            actorUid: me.uid
+          });
+
           document.getElementById("loan-apply-form").reset();
-          alert(lang === "bn" ? "লোনের আবেদন জমা হয়েছে!" : "Loan application submitted!");
+
+          showFintechPopup({
+            titleBn: "লোনের আবেদন সফলভাবে জমা হয়েছে!",
+            titleEn: "Emergency Loan Request Submitted!",
+            msgBn: `আপনার ${formatINR(amount)} (০% সুদ) লোনের আবেদন সিরিয়াল অনুযায়ী নথিভুক্ত হয়েছে এবং বাকি সব সদস্যের ফোনে নোটিফিকেশন পাঠানো হয়েছে।`,
+            msgEn: `Your ${formatINR(amount)} (0% Interest) loan request is queued by priority and all members have been notified.`
+          });
         } catch (err) {
-          alert(err.message);
+          showFintechPopup({
+            type: "error",
+            titleBn: "আবেদন জমা হয়নি",
+            titleEn: "Application Error",
+            msgBn: err.message,
+            msgEn: err.message
+          });
         } finally {
           btn.disabled = false;
         }
       });
 
       let loanItems = [];
-      onSnapshot(query(collection(db, "loans"), orderBy("createdAt", "desc")), (snap) => {
+      onSnapshot(query(collection(db, "loans"), orderBy("createdAt", "asc")), (snap) => {
         loanItems = [];
         snap.forEach((d) => loanItems.push({ id: d.id, ...d.data() }));
         renderLoans();
@@ -259,12 +335,35 @@
           return;
         }
 
-        feed.innerHTML = loanItems.map((l) => {
+        const pendingOrdered = loanItems.filter((x) => x.status === "pending");
+        const priorityMap = {};
+        pendingOrdered.forEach((item, index) => {
+          priorityMap[item.id] = index + 1;
+        });
+
+        const displayOrder = [...pendingOrdered, ...loanItems.filter((x) => x.status !== "pending").reverse()];
+
+        feed.innerHTML = displayOrder.map((l) => {
           const votes = l.votes || {};
           const agreeCount = Object.values(votes).filter((v) => v === "agree").length;
           const disagreeCount = Object.values(votes).filter((v) => v === "disagree").length;
           const myVote = votes[me.uid];
           const outstanding = Math.max(0, Number(l.amount) - Number(l.repaidAmount || 0));
+          const priorityNum = priorityMap[l.id];
+
+          const applicantProfile = usersByUid[l.uid] || {};
+          const targetUpi = (applicantProfile.upiId || l.applicantUpi || "").trim();
+          const targetBank = (applicantProfile.bankAccount || l.applicantBank || "").trim();
+          const targetIfsc = (applicantProfile.ifsc || l.applicantIfsc || "").trim();
+          const upiPayUrl = targetUpi
+            ? `upi://pay?pa=${encodeURIComponent(targetUpi)}&pn=${encodeURIComponent(l.applicantName || "Member")}&am=${l.amount}&cu=INR`
+            : "";
+
+          const priorityBadge = priorityNum
+            ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${priorityNum === 1 ? "bg-[#0A3C2A] text-[#5CDDAB] shadow-sm" : "bg-slate-200 text-slate-800"}">
+                #${priorityNum} ${priorityNum === 1 ? (lang === "bn" ? "প্রথম অগ্রাধিকার" : "1st Priority") : (lang === "bn" ? "অগ্রাধিকার" : "Priority")}
+              </span>`
+            : "";
 
           const statusBadge =
             l.status === "approved"
@@ -274,27 +373,72 @@
               : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold shrink-0">⏳ Pending</span>`;
 
           return `
-            <div class="fintech-card p-5 space-y-3.5">
+            <div class="fintech-card p-5 space-y-3.5 ${priorityNum === 1 ? "border-2 border-[#39D59E]" : ""}">
               <div class="flex justify-between items-start gap-2">
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
+                    ${priorityBadge}
                     <h3 class="font-extrabold text-base text-[#0A3C2A]">${l.applicantName}</h3>
                     <span class="text-xs text-gray-500">(${l.memberId || "PF"})</span>
                   </div>
-                  <p class="text-xl font-extrabold text-emerald-700 mt-0.5">${formatINR(l.amount)} <span class="text-xs font-normal text-gray-500">(0% Interest)</span></p>
+                  <p class="text-xl font-extrabold text-emerald-700 mt-1">${formatINR(l.amount)} <span class="text-xs font-normal text-gray-500">(0% Interest)</span></p>
                 </div>
-                ${statusBadge}
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${statusBadge}
+                  ${isAdmin ? `<button data-id="${l.id}" class="del-loan-btn p-1.5 rounded-lg bg-red-100 text-red-700 text-xs font-bold" title="Delete Record">🗑️</button>` : ""}
+                </div>
               </div>
 
               <p class="text-xs text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100">${l.reason}</p>
               ${l.rejectReason ? `<p class="text-xs text-red-700 bg-red-50 p-2.5 rounded-xl border border-red-200 font-semibold">Remark: ${l.rejectReason}</p>` : ""}
 
               <div class="flex justify-between items-center flex-wrap gap-2">
-                <button data-proof="${l.proofBase64}" class="view-proof-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold hover:bg-emerald-200">
+                <button data-proof="${l.proofBase64}" data-title="Emergency Proof - ${l.applicantName}" class="view-proof-btn px-3 py-1.5 rounded-xl bg-emerald-100 text-[#0A3C2A] text-xs font-bold hover:bg-emerald-200">
                   📎 ${t("viewProofBtn")}
                 </button>
                 ${l.requiresDualApproval ? `<span class="text-[11px] font-bold text-amber-700">🔐 Maker-Checker</span>` : ""}
               </div>
+
+              <!-- Approved Loan Payout Details (UPI + Bank Account/IFSC) & Money Transfer Screenshot Proof -->
+              ${l.status === "approved" ? `
+                <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2.5">
+                  <div class="text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                      <span class="text-gray-600 font-semibold">UPI ID:</span>
+                      <span class="font-extrabold text-[#0A3C2A] select-all">${targetUpi || "Not Set"}</span>
+                    </div>
+                    ${targetBank ? `
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-600 font-semibold">Bank A/C:</span>
+                        <span class="font-extrabold text-[#0A3C2A] select-all">${targetBank} ${targetIfsc ? `(${targetIfsc})` : ""}</span>
+                      </div>
+                    ` : ""}
+                  </div>
+
+                  ${targetUpi ? `
+                    <a href="${upiPayUrl}" class="block w-full py-2.5 px-3 rounded-xl mint-btn text-xs text-center">
+                      📲 ${t("payApplicantUpiBtn")} (${formatINR(l.amount)} → ${targetUpi})
+                    </a>
+                  ` : (!targetBank ? `<p class="text-[11px] text-amber-800 font-semibold">${t("noApplicantPayoutNote")}</p>` : "")}
+
+                  <!-- Public Money Transfer Proof Viewer (Visible to ALL Members) -->
+                  ${l.disbursementProofBase64 ? `
+                    <div class="pt-2 border-t border-emerald-200 flex flex-wrap items-center justify-between gap-2">
+                      <span class="text-[11px] font-extrabold text-emerald-800">
+                        ✅ Sent by ${l.disbursedBy || "Admin"} ${l.disbursementUtr ? `(UTR: ${l.disbursementUtr})` : ""}
+                      </span>
+                      <button data-proof="${l.disbursementProofBase64}" data-title="Money Transfer Proof - ${l.applicantName}"
+                        class="view-proof-btn px-3 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] text-xs font-bold shadow">
+                        🖼️ ${t("viewDisburseProofBtn")}
+                      </button>
+                    </div>
+                  ` : (isStaff ? `
+                    <button data-id="${l.id}" class="open-disburse-proof-btn w-full py-2 px-3 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] font-bold text-xs shadow">
+                      ${t("uploadDisburseProofBtn")}
+                    </button>
+                  ` : "")}
+                </div>
+              ` : ""}
 
               <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex flex-wrap justify-between items-center gap-2">
                 <div class="text-xs font-bold text-gray-700">
@@ -355,9 +499,11 @@
           `;
         }).join("");
 
+        // Proof Modal Trigger (for both Emergency Proof & Money Transfer Proof)
         feed.querySelectorAll(".view-proof-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
             const src = btn.dataset.proof;
+            document.getElementById("proof-modal-title").textContent = btn.dataset.title || "Document Proof";
             const container = document.getElementById("proof-container");
             if (src && src.startsWith("data:application/pdf")) {
               container.innerHTML = `<iframe src="${src}" class="w-full h-[65vh] rounded-xl"></iframe>`;
@@ -368,6 +514,46 @@
           });
         });
 
+        // Open Disbursement Screenshot Upload Modal (Staff)
+        feed.querySelectorAll(".open-disburse-proof-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document.getElementById("disburse-loan-id").value = btn.dataset.id;
+            document.getElementById("disburse-proof-modal").classList.remove("hidden");
+          });
+        });
+
+        // Admin Delete Loan Record
+        feed.querySelectorAll(".del-loan-btn").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const loan = loanItems.find((x) => x.id === btn.dataset.id);
+            if (!loan) return;
+            const remark = await askForRemarks({
+              titleBn: `${loan.applicantName}-এর লোনের রেকর্ড ডিলিট করার কারণ`,
+              titleEn: `Reason for deleting ${loan.applicantName}'s loan record`
+            });
+            if (!remark) return;
+
+            await deleteDoc(doc(db, "loans", loan.id));
+            await logAudit({
+              actionType: "LOAN_RECORD_DELETED",
+              messageBn: `Admin ${me.name} সদস্য ${loan.applicantName}-এর ${formatINR(loan.amount)} লোনের রেকর্ড ডিলিট করেছেন। কারণ: ${remark}`,
+              messageEn: `Admin ${me.name} deleted ${loan.applicantName}'s ${formatINR(loan.amount)} loan record. Reason: ${remark}`,
+              remark,
+              actorUid: me.uid,
+              actorName: me.name,
+              actorRole: me.role
+            });
+            showFintechPopup({
+              type: "info",
+              titleBn: "লোনের রেকর্ড ডিলিট হয়েছে",
+              titleEn: "Loan Record Deleted",
+              msgBn: `${loan.applicantName}-এর লোনের রেকর্ডটি স্থায়ীভাবে মুছে ফেলা হয়েছে।`,
+              msgEn: `${loan.applicantName}'s loan record has been removed.`
+            });
+          });
+        });
+
+        // Peer Voting
         feed.querySelectorAll(".vote-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = loanItems.find((x) => x.id === btn.dataset.id);
@@ -385,6 +571,7 @@
           });
         });
 
+        // Maker-Checker Approve Loan
         feed.querySelectorAll(".approve-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = loanItems.find((x) => x.id === btn.dataset.id);
@@ -422,18 +609,20 @@
                 actorName: me.name,
                 actorRole: me.role
               });
+              if (finalApproved) {
+                await sendGroupNotification({
+                  titleBn: `✅ লোন অনুমোদিত (${loan.applicantName})`,
+                  titleEn: `✅ Loan Approved (${loan.applicantName})`,
+                  bodyBn: `${me.name} সদস্য ${loan.applicantName}-এর ${formatINR(loan.amount)} ইমার্জেন্সি লোন অনুমোদন দিয়েছেন।`,
+                  bodyEn: `${me.name} approved ${loan.applicantName}'s ${formatINR(loan.amount)} emergency loan.`,
+                  targetPage: "loans.html",
+                  actorUid: me.uid
+                });
+              }
             };
 
             const doUndo = async () => {
               await updateDoc(doc(db, "loans", loan.id), prevState);
-              await logAudit({
-                actionType: "UNDO_LOAN_DECISION",
-                messageBn: `${me.name} সদস্য ${loan.applicantName}-এর লোনের সিদ্ধান্ত Undo করেছেন।`,
-                messageEn: `${me.name} undid loan decision for ${loan.applicantName}.`,
-                actorUid: me.uid,
-                actorName: me.name,
-                actorRole: me.role
-              });
             };
 
             await doApprove();
@@ -446,6 +635,7 @@
           });
         });
 
+        // Reject Loan
         feed.querySelectorAll(".reject-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = loanItems.find((x) => x.id === btn.dataset.id);
@@ -467,6 +657,14 @@
                 actorName: me.name,
                 actorRole: me.role
               });
+              await sendGroupNotification({
+                titleBn: `❌ লোন আবেদন বাতিল (${loan.applicantName})`,
+                titleEn: `❌ Loan Request Rejected (${loan.applicantName})`,
+                bodyBn: `${loan.applicantName}-এর ${formatINR(loan.amount)} লোনের আবেদন বাতিল হয়েছে। কারণ: ${remark}`,
+                bodyEn: `${loan.applicantName}'s ${formatINR(loan.amount)} loan was rejected. Reason: ${remark}`,
+                targetPage: "loans.html",
+                actorUid: me.uid
+              });
             };
             const doUndo = async () => {
               await updateDoc(doc(db, "loans", loan.id), { status: "pending", rejectReason: "" });
@@ -482,6 +680,7 @@
           });
         });
 
+        // Undo Loan Decision
         feed.querySelectorAll(".undo-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = loanItems.find((x) => x.id === btn.dataset.id);
@@ -503,6 +702,7 @@
           });
         });
 
+        // Record Loan Repayment
         feed.querySelectorAll(".repay-loan-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
             const loan = loanItems.find((x) => x.id === btn.dataset.id);
@@ -540,6 +740,62 @@
         });
       }
 
+      // Submit Money Transfer Proof Screenshot
+      document.getElementById("disburse-proof-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("disburse-submit-btn");
+        btn.disabled = true;
+        try {
+          const loanId = document.getElementById("disburse-loan-id").value;
+          const utr = document.getElementById("disburse-utr").value.trim();
+          const file = document.getElementById("disburse-file").files[0];
+          const loan = loanItems.find((x) => x.id === loanId);
+          if (!loan || !file) return;
+
+          const base64 = await compressImageToBase64(file, 700, 0.72);
+          await updateDoc(doc(db, "loans", loanId), {
+            disbursementProofBase64: base64,
+            disbursementUtr: utr,
+            disbursedBy: me.name,
+            disbursedAt: new Date().toISOString()
+          });
+
+          await logAudit({
+            actionType: "LOAN_MONEY_TRANSFERRED",
+            messageBn: `${me.name} সদস্য ${loan.applicantName}-কে ${formatINR(loan.amount)} লোনের টাকা ট্রান্সফার করে স্ক্রিনশট আপলোড করেছেন।`,
+            messageEn: `${me.name} transferred ${formatINR(loan.amount)} loan to ${loan.applicantName} and uploaded payment proof.`,
+            actorUid: me.uid,
+            actorName: me.name,
+            actorRole: me.role
+          });
+
+          await sendGroupNotification({
+            titleBn: `💰 লোনের টাকা ট্রান্সফার সম্পন্ন (${loan.applicantName})`,
+            titleEn: `💰 Loan Money Transferred (${loan.applicantName})`,
+            bodyBn: `${me.name} সদস্য ${loan.applicantName}-কে ${formatINR(loan.amount)} পাঠিয়ে প্রমাণ আপলোড করেছেন।`,
+            bodyEn: `${me.name} sent ${formatINR(loan.amount)} to ${loan.applicantName} and uploaded transfer proof.`,
+            targetPage: "loans.html",
+            actorUid: me.uid
+          });
+
+          document.getElementById("disburse-proof-form").reset();
+          document.getElementById("disburse-proof-modal").classList.add("hidden");
+          showFintechPopup({
+            titleBn: "টাকা পাঠানোর প্রমাণ সেভ হয়েছে!",
+            titleEn: "Transfer Proof Uploaded!",
+            msgBn: "পেমেন্ট স্ক্রিনশটটি সেভ হয়েছে—এখন গ্রুপের সব সদস্য এটি দেখতে পাবেন।",
+            msgEn: "The transfer screenshot is now saved and visible to all members."
+          });
+        } catch (err) {
+          showFintechPopup({ type: "error", titleBn: "ত্রুটি", titleEn: "Error", msgBn: err.message, msgEn: err.message });
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById("close-disburse-modal").addEventListener("click", () => {
+        document.getElementById("disburse-proof-modal").classList.add("hidden");
+      });
       window.addEventListener("languageChanged", renderLoans);
       document.getElementById("close-proof-modal").addEventListener("click", () => {
         document.getElementById("proof-modal").classList.add("hidden");

@@ -16,9 +16,16 @@
         <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="settingsTitle">অ্যাপ ও ব্যাঙ্কিং সেটিংস</h1>
         <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="settingsSub">ভাষা, সিকিউরিটি PIN এবং অ্যাডমিন ব্যাঙ্কিং কন্ট্রোল</p>
       </div>
+      <div class="flex items-center gap-1.5 shrink-0"><button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
       <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
         <span class="lang-indicator">English</span>
       </button>
+      </div>
     </div>
   </header>
 
@@ -221,7 +228,8 @@
       requireApprovedUser,
       setupCommonUI,
       logAudit,
-      pushUndoAction
+      pushUndoAction,
+      showFintechPopup
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
 
@@ -243,19 +251,19 @@
 
       document.getElementById("set-pin-btn").addEventListener("click", () => {
         const pin = prompt(getLang() === "bn" ? "নতুন ৪ সংখ্যার PIN লিখুন:" : "Enter a new 4-digit PIN:");
-        if (!pin || !/^[0-9]4$/.test(pin)) {
-          return alert(getLang() === "bn" ? "সঠিক ৪ সংখ্যার নম্বর দিন।" : "Please enter exactly 4 digits.");
+        if (!pin || !/^[0-9]{4}$/.test(pin)) {
+          return showFintechPopup({ type: "error", titleBn: "ভুল ফরম্যাট", titleEn: "Invalid PIN", msgBn: "সঠিক ৪ সংখ্যার নম্বর দিন।", msgEn: "Please enter exactly 4 digits." });
         }
         localStorage.setItem("peerfund_app_pin", pin);
         sessionStorage.setItem("peerfund_pin_unlocked", "1");
         refreshPinUI();
-        alert(getLang() === "bn" ? "৪-ডিজিট PIN সেট হয়েছে!" : "4-Digit PIN enabled!");
+        showFintechPopup({ titleBn: "৪-ডিজিট PIN চালু হয়েছে!", titleEn: "4-Digit PIN Enabled!", msgBn: "এখন থেকে অ্যাপ খোলার সময় এই গোপন ৪ সংখ্যার PIN চাইবে।", msgEn: "Your 4-digit security PIN lock is now active." });
       });
 
       disablePinBtn.addEventListener("click", () => {
         localStorage.removeItem("peerfund_app_pin");
         refreshPinUI();
-        alert(getLang() === "bn" ? "PIN লক বন্ধ করা হয়েছে।" : "PIN lock disabled.");
+        showFintechPopup({ type: "info", titleBn: "PIN লক বন্ধ হয়েছে", titleEn: "PIN Lock Disabled", msgBn: "৪-ডিজিট PIN লক বন্ধ করা হয়েছে।", msgEn: "4-digit PIN lock has been disabled." });
       });
 
       // Hide Balance Preference
@@ -316,7 +324,7 @@
             undoFn: doUndo,
             redoFn: doPin
           });
-          alert(getLang() === "bn" ? "নোটিশ ড্যাশবোর্ডে পিন করা হয়েছে!" : "Notice pinned to Home Dashboard!");
+          showFintechPopup({ titleBn: "নোটিশ পিন করা হয়েছে!", titleEn: "Notice Pinned!", msgBn: "জরুরি নোটিশটি হোম ড্যাশবোর্ডে পিন করা হয়েছে।", msgEn: "Urgent notice is now pinned on the Home Dashboard." });
         });
 
         document.getElementById("pin-notice-clear-btn").addEventListener("click", async () => {
@@ -380,7 +388,7 @@
             undoFn: doUndo,
             redoFn: doSave
           });
-          alert(getLang() === "bn" ? "সব ব্যাঙ্কিং সেটিংস সেভ হয়েছে!" : "All banking settings saved!");
+          showFintechPopup({ titleBn: "ব্যাঙ্কিং সেটিংস সেভ হয়েছে!", titleEn: "Banking Settings Saved!", msgBn: "নতুন UPI ID ও ব্যাঙ্কিং নিয়মাবলী পুরো গ্রুপের জন্য কার্যকর হয়েছে।", msgEn: "Updated UPI ID & banking rules are now live for all members." });
         });
       }
     });

@@ -21,6 +21,12 @@
         <button id="download-statement-btn" class="px-2.5 py-1.5 rounded-xl mint-btn text-xs whitespace-nowrap" data-i18n="monthlyStatement">
           মাসিক স্টেটমেন্ট PDF
         </button>
+        <button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
         <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
           <span class="lang-indicator">English</span>
         </button>
@@ -185,7 +191,9 @@
       logAudit,
       generateMonthlyStatementPDF,
       pushUndoAction,
-      askForRemarks
+      askForRemarks,
+      getRoleBadgeClasses,
+      sendGroupNotification
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
 
@@ -283,6 +291,14 @@
                     actorName: me.name,
                     actorRole: me.role
                   });
+                  await sendGroupNotification({
+                    titleBn: `✅ চাঁদা ভেরিফায়েড (${tx.userName})`,
+                    titleEn: `✅ Deposit Verified (${tx.userName})`,
+                    bodyBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(amt)} (${tx.month}) চাঁদা ভেরিফাই করেছেন।`,
+                    bodyEn: `${me.name} verified ${tx.userName}'s ${formatINR(amt)} (${tx.month}) contribution.`,
+                    targetPage: "ledger.html",
+                    actorUid: me.uid
+                  });
                 };
 
                 const doUndo = async () => {
@@ -304,6 +320,14 @@
                     actorUid: me.uid,
                     actorName: me.name,
                     actorRole: me.role
+                  });
+                  await sendGroupNotification({
+                    titleBn: `✅ চাঁদা ভেরিফায়েড (${tx.userName})`,
+                    titleEn: `✅ Deposit Verified (${tx.userName})`,
+                    bodyBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(amt)} (${tx.month}) চাঁদা ভেরিফাই করেছেন।`,
+                    bodyEn: `${me.name} verified ${tx.userName}'s ${formatINR(amt)} (${tx.month}) contribution.`,
+                    targetPage: "ledger.html",
+                    actorUid: me.uid
                   });
                 };
 
@@ -343,6 +367,14 @@
                     actorName: me.name,
                     actorRole: me.role
                   });
+                  await sendGroupNotification({
+                    titleBn: `✅ চাঁদা ভেরিফায়েড (${tx.userName})`,
+                    titleEn: `✅ Deposit Verified (${tx.userName})`,
+                    bodyBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(amt)} (${tx.month}) চাঁদা ভেরিফাই করেছেন।`,
+                    bodyEn: `${me.name} verified ${tx.userName}'s ${formatINR(amt)} (${tx.month}) contribution.`,
+                    targetPage: "ledger.html",
+                    actorUid: me.uid
+                  });
                 };
 
                 const doUndo = async () => {
@@ -359,6 +391,14 @@
                     actorUid: me.uid,
                     actorName: me.name,
                     actorRole: me.role
+                  });
+                  await sendGroupNotification({
+                    titleBn: `✅ চাঁদা ভেরিফায়েড (${tx.userName})`,
+                    titleEn: `✅ Deposit Verified (${tx.userName})`,
+                    bodyBn: `${me.name} সদস্য ${tx.userName}-এর ${formatINR(amt)} (${tx.month}) চাঁদা ভেরিফাই করেছেন।`,
+                    bodyEn: `${me.name} verified ${tx.userName}'s ${formatINR(amt)} (${tx.month}) contribution.`,
+                    targetPage: "ledger.html",
+                    actorUid: me.uid
                   });
                 };
 
@@ -383,11 +423,41 @@
                 </p>
                 ${tx.rejectReason ? `<p class="text-[11px] text-red-600 mt-0.5">Remark: ${tx.rejectReason}</p>` : ""}
               </div>
-              <button data-id="${tx.id}" class="revert-tx-btn px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold text-[11px]">
-                ↩️ ${t("undoBtn")}
-              </button>
+              <div class="flex items-center gap-1.5">
+                <button data-id="${tx.id}" class="revert-tx-btn px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold text-[11px]">
+                  ↩️ ${t("undoBtn")}
+                </button>
+                ${isAdmin ? `<button data-id="${tx.id}" class="del-tx-btn px-2.5 py-1 rounded-lg bg-red-600 text-white font-bold text-[11px]">🗑️</button>` : ""}
+              </div>
             </div>
           `).join("");
+
+          staffList.querySelectorAll(".del-tx-btn").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const tx = processed.find((x) => x.id === btn.dataset.id);
+              if (!tx) return;
+              const remark = await askForRemarks({
+                titleBn: `${tx.userName}-এর লেনদেন রেকর্ড ডিলিট করার কারণ`,
+                titleEn: `Reason for deleting ${tx.userName}'s transaction record`
+              });
+              if (!remark) return;
+              const targetMember = allUsers.find((m) => m.uid === tx.uid);
+              if (tx.status === "verified" && targetMember) {
+                const newPaid = Number(targetMember.totalPaid || 0) - Number(tx.amount || 0);
+                await updateDoc(doc(db, "users", tx.uid), { totalPaid: newPaid });
+              }
+              await deleteDoc(doc(db, "transactions", tx.id));
+              await logAudit({
+                actionType: "TX_RECORD_DELETED",
+                messageBn: `Admin ${me.name} সদস্য ${tx.userName}-এর ${formatINR(tx.amount)} লেনদেনের রেকর্ড ডিলিট করেছেন। কারণ: ${remark}`,
+                messageEn: `Admin ${me.name} deleted ${tx.userName}'s ${formatINR(tx.amount)} transaction record. Reason: ${remark}`,
+                remark,
+                actorUid: me.uid,
+                actorName: me.name,
+                actorRole: me.role
+              });
+            });
+          });
 
           staffList.querySelectorAll(".revert-tx-btn").forEach((btn) => {
             btn.addEventListener("click", async () => {
@@ -496,7 +566,7 @@
                     <div class="min-w-0">
                       <div class="flex items-center gap-1.5 flex-wrap">
                         <h4 class="font-extrabold text-sm text-[#0A3C2A] hover:underline truncate">${m.name}</h4>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 font-bold uppercase text-gray-600 shrink-0">${m.role}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0 ${getRoleBadgeClasses(m.role)}">${m.role === "co_admin" ? "CO-ADMIN" : m.role}</span>
                       </div>
                       <p class="text-[11px] text-gray-500">${m.memberId || "PF"} • 📞 ${m.phone}</p>
                     </div>
@@ -583,7 +653,7 @@
             const target = allUsers.find((x) => x.uid === el.dataset.uid);
             if (!target) return;
             document.getElementById("mp-avatar").src = target.photoBase64 || "./icon.svg";
-            document.getElementById("mp-role").textContent = (target.role || "member").toUpperCase();
+            const mpRoleEl = document.getElementById("mp-role"); mpRoleEl.textContent = target.role === "co_admin" ? "CO-ADMIN" : (target.role || "member").toUpperCase(); mpRoleEl.className = `px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${getRoleBadgeClasses(target.role)}`;
             document.getElementById("mp-name").textContent = target.name;
             document.getElementById("mp-id").textContent = `Member ID: ${target.memberId || "-"}`;
             document.getElementById("mp-paid").textContent = formatINR(target.totalPaid || 0);

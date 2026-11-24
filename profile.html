@@ -14,6 +14,12 @@
     <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
       <h1 class="font-extrabold text-base sm:text-lg truncate" data-i18n="myProfile">আমার প্রোফাইল ও SOS</h1>
       <div class="flex items-center gap-2 shrink-0">
+        <button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
         <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold whitespace-nowrap">
           <span class="lang-indicator">English</span>
         </button>
@@ -188,7 +194,9 @@
       getCurrentMonthKey,
       isAfterDueDay,
       compressImageToBase64,
-      logAudit
+      logAudit,
+      applyRoleBadge,
+      showFintechPopup
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
 
@@ -196,7 +204,7 @@
 
     requireApprovedUser((user, me) => {
       document.getElementById("prof-name-display").textContent = me.name;
-      document.getElementById("prof-role-display").textContent = me.role.toUpperCase();
+      applyRoleBadge(document.getElementById("prof-role-display"), me.role);
       document.getElementById("prof-id-display").textContent = `ID: ${me.memberId || "-"}`;
       document.getElementById("prof-phone-display").textContent = me.phone;
       document.getElementById("prof-email-display").textContent = me.email;
@@ -265,7 +273,7 @@
             actorRole: me.role
           });
 
-          alert(getLang() === "bn" ? "প্রোফাইল সফলভাবে আপডেট হয়েছে!" : "Profile updated successfully!");
+          showFintechPopup({ titleBn: "প্রোফাইল সেভ হয়েছে!", titleEn: "Profile Saved!", msgBn: "আপনার প্রোফাইল ও UPI তথ্য সফলভাবে আপডেট হয়েছে।", msgEn: "Your profile & UPI details have been updated." });
         } catch (err) {
           alert("Error: " + err.message);
         } finally {

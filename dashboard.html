@@ -18,38 +18,51 @@
   <!-- Top Header -->
   <header class="fintech-gradient text-white pt-3.5 pb-16 px-4 rounded-b-[32px] shadow-xl">
     <div class="max-w-5xl mx-auto">
-      <div class="flex justify-between items-center gap-2 pb-3.5 mb-3.5 border-b border-white/10">
+      <div class="flex justify-between items-center gap-1.5 pb-3.5 mb-3.5 border-b border-white/10">
         <div class="flex items-center gap-2 min-w-0">
           <span class="w-7 h-7 rounded-lg bg-[#5CDDAB] text-[#013A20] flex items-center justify-center font-extrabold text-sm shrink-0">₹</span>
           <span class="font-extrabold text-sm tracking-wide text-white truncate" data-i18n="appName">পিয়ার ফান্ড</span>
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0">
-          <a href="audit.html" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold flex items-center gap-1 whitespace-nowrap">
+          <button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+          </button>
+          <a href="audit.html" class="px-2 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold flex items-center gap-1 whitespace-nowrap">
             <svg class="w-3.5 h-3.5 text-[#5CDDAB] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
             </svg>
             <span data-i18n="navAudit">অডিট লগ</span>
           </a>
-          <button class="lang-toggle-btn px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold border border-white/20 whitespace-nowrap">
+          <button class="lang-toggle-btn px-2 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-xs font-bold border border-white/20 whitespace-nowrap">
             <span class="lang-indicator">English</span>
           </button>
-          <button class="logout-btn px-2.5 py-1.5 rounded-xl bg-red-500/85 hover:bg-red-500 text-xs font-bold whitespace-nowrap" data-i18n="logout">লগ আউট</button>
+          <button class="logout-btn px-2 py-1.5 rounded-xl bg-red-500/85 hover:bg-red-500 text-xs font-bold whitespace-nowrap" data-i18n="logout">লগ আউট</button>
         </div>
       </div>
 
-      <div class="flex items-center gap-3 mb-4">
-        <img id="header-avatar" src="./icon.svg" alt="Avatar" class="w-12 h-12 rounded-2xl object-cover border-2 border-[#5CDDAB] shrink-0 bg-emerald-950" />
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2 mb-0.5">
-            <p class="text-xs text-[#5CDDAB] font-semibold" data-i18n="welcomePrefix">স্বাগতম,</p>
-            <span id="header-role-badge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#5CDDAB] text-[#013A20] uppercase tracking-wider shrink-0">MEMBER</span>
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <img id="header-avatar" src="./icon.svg" alt="Avatar" class="w-12 h-12 rounded-2xl object-cover border-2 border-[#5CDDAB] shrink-0 bg-emerald-950" />
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <p class="text-xs text-[#5CDDAB] font-semibold" data-i18n="welcomePrefix">স্বাগতম,</p>
+              <span id="header-role-badge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#5CDDAB] text-[#013A20] uppercase tracking-wider shrink-0">MEMBER</span>
+            </div>
+            <h1 class="font-extrabold text-base sm:text-lg leading-snug text-white break-words" id="header-user-name">...</h1>
           </div>
-          <h1 class="font-extrabold text-base sm:text-lg leading-snug text-white break-words" id="header-user-name">...</h1>
         </div>
+
+        <!-- Quick Member List Button -->
+        <button id="open-member-list-btn" class="hidden px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 shrink-0">
+          <span>👥</span><span data-i18n="memberListBtn">মেম্বার লিস্ট</span>
+        </button>
       </div>
 
-      <!-- Admin Pinned Urgent Notice Banner (Right at the top of Home Dashboard) -->
+      <!-- Admin Pinned Urgent Notice Banner -->
       <div id="pinned-notice-box" class="hidden mb-4 p-3.5 rounded-2xl bg-amber-400/20 border border-amber-300/40 backdrop-blur-sm">
         <div class="flex items-start justify-between gap-2">
           <div class="flex items-start gap-2.5 min-w-0">
@@ -147,6 +160,15 @@
       </div>
     </div>
 
+    <!-- Live This Month's Contribution Status Strip (Everyone can see who deposited ₹1,000 this month) -->
+    <div class="fintech-card p-5">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-extrabold text-sm text-[#0A3C2A]" data-i18n="thisMonthStatusTitle">এই মাসের চাঁদা জমার স্ট্যাটাস (লাইভ)</h3>
+        <button id="open-member-list-btn-2" class="text-xs font-bold text-emerald-700 underline" data-i18n="memberListBtn">মেম্বার লিস্ট</button>
+      </div>
+      <div id="monthly-status-chips" class="flex flex-wrap gap-2"></div>
+    </div>
+
     <!-- Recent Verified Transactions -->
     <div class="fintech-card p-5">
       <div class="flex justify-between items-center mb-4">
@@ -159,9 +181,20 @@
     </div>
   </main>
 
+  <!-- Member List Modal (Accessible to All Approved Members) -->
+  <div id="member-list-modal" class="hidden fixed inset-0 bg-black/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-lg p-5 max-h-[85vh] flex flex-col animate-pop-in">
+      <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-100">
+        <h3 class="font-extrabold text-base text-[#0A3C2A]" data-i18n="memberListTitle">সকল অনুমোদিত মেম্বার লিস্ট</h3>
+        <button id="close-member-list-modal" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold">✕</button>
+      </div>
+      <div id="member-list-modal-body" class="space-y-2.5 overflow-y-auto flex-1 pr-1"></div>
+    </div>
+  </div>
+
   <!-- UPI Payment Modal -->
-  <div id="upi-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="fintech-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+  <div id="upi-modal" class="hidden fixed inset-0 bg-black/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-6 max-h-[90vh] overflow-y-auto animate-pop-in">
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-lg font-extrabold text-[#0A3C2A]" data-i18n="upiModalTitle">মাসিক চাঁদা পেমেন্ট (UPI)</h3>
         <button id="close-upi-modal" class="text-gray-400 hover:text-gray-700 font-bold text-lg">✕</button>
@@ -270,7 +303,11 @@
       logAudit,
       generatePaymentReceiptPDF,
       pushUndoAction,
-      askForRemarks
+      askForRemarks,
+      applyRoleBadge,
+      getRoleBadgeClasses,
+      showFintechPopup,
+      sendGroupNotification
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
 
@@ -279,7 +316,7 @@
     requireApprovedUser((user, me) => {
       const isAdmin = me.role === "admin";
       document.getElementById("header-user-name").textContent = me.name;
-      document.getElementById("header-role-badge").textContent = me.role.toUpperCase();
+      applyRoleBadge(document.getElementById("header-role-badge"), me.role);
       if (me.photoBase64) document.getElementById("header-avatar").src = me.photoBase64;
 
       if (me.approvalStatus !== "approved") {
@@ -290,6 +327,7 @@
         return;
       }
 
+      document.getElementById("open-member-list-btn").classList.remove("hidden");
       document.getElementById("hero-balance-section").classList.remove("hidden");
       document.getElementById("dashboard-main").classList.remove("hidden");
       document.getElementById("bottom-nav").classList.remove("hidden");
@@ -297,7 +335,7 @@
 
       let totalCollected = 0;
       let activeLoanDisbursed = 0;
-      let approvedCount = 0;
+      let approvedMembersList = [];
       let monthlyContribution = 1000;
       let upiEnabled = true;
       let hideBalance = localStorage.getItem("peerfund_hide_bal") === "1";
@@ -310,6 +348,7 @@
 
       function refreshCorpusUI() {
         const available = totalCollected - activeLoanDisbursed;
+        const approvedCount = approvedMembersList.length;
         const target = approvedCount * monthlyContribution * 6;
         const pct = target > 0 ? Math.min(100, Math.round((totalCollected / target) * 100)) : 0;
 
@@ -323,7 +362,6 @@
         document.getElementById("stat-progress-bar").style.width = `${pct}%`;
       }
 
-      // Listen to Settings + Pinned Admin Notice
       onSnapshot(doc(db, "settings", "general"), (snap) => {
         const d = snap.exists() ? snap.data() : {};
         const upi = d.fundUpi || "9832420007@ybl";
@@ -336,15 +374,9 @@
         document.getElementById("upi-deep-link").href = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payee)}&am=${monthlyContribution}&cu=INR`;
 
         const payBtn = document.getElementById("open-upi-modal-btn");
-        if (!upiEnabled) {
-          payBtn.disabled = true;
-          payBtn.classList.add("opacity-50");
-        } else {
-          payBtn.disabled = false;
-          payBtn.classList.remove("opacity-50");
-        }
+        payBtn.disabled = !upiEnabled;
+        payBtn.classList.toggle("opacity-50", !upiEnabled);
 
-        // Pinned Notice Banner
         const noticeBox = document.getElementById("pinned-notice-box");
         const noticeText = document.getElementById("pinned-notice-text");
         const noticeMeta = document.getElementById("pinned-notice-meta");
@@ -367,7 +399,6 @@
         refreshCorpusUI();
       });
 
-      // Admin-Only Quick Notice Editor
       if (isAdmin) {
         document.getElementById("admin-quick-notice-btn").addEventListener("click", async () => {
           const current = document.getElementById("pinned-notice-text").textContent;
@@ -393,16 +424,15 @@
         });
       }
 
-      // Listen to Users (Collected + Pending Approvals with Undo/Redo & Remarks)
       onSnapshot(collection(db, "users"), (snap) => {
         totalCollected = 0;
-        approvedCount = 0;
+        approvedMembersList = [];
         const pendingUsers = [];
 
         snap.forEach((d) => {
           const u = { uid: d.id, ...d.data() };
           if (u.approvalStatus === "approved") {
-            approvedCount++;
+            approvedMembersList.push(u);
             totalCollected += Number(u.totalPaid || 0);
           } else if (u.approvalStatus === "pending") {
             pendingUsers.push(u);
@@ -411,6 +441,42 @@
 
         refreshCorpusUI();
 
+        // Render Live Monthly Deposit Status Chips (So everyone sees who paid this month)
+        const curMonth = getCurrentMonthKey();
+        const statusChips = document.getElementById("monthly-status-chips");
+        statusChips.innerHTML = approvedMembersList.map((m) => {
+          const isPaid = m.lastPaidMonth === curMonth;
+          return `
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 ${isPaid ? "bg-emerald-100 text-emerald-900 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200"}">
+              <span>${isPaid ? "✓" : "⏳"}</span>
+              <span>${m.name.split(" ")[0]}</span>
+            </span>
+          `;
+        }).join("");
+
+        // Render Member List Modal Body
+        const modalBody = document.getElementById("member-list-modal-body");
+        modalBody.innerHTML = approvedMembersList.map((m, idx) => {
+          const roleLabel = m.role === "co_admin" ? "CO-ADMIN" : (m.role || "member").toUpperCase();
+          return `
+            <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="text-xs font-extrabold text-gray-400 w-4">${idx + 1}.</span>
+                <img src="${m.photoBase64 || "./icon.svg"}" class="w-10 h-10 rounded-xl object-cover border border-emerald-200 shrink-0" />
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <p class="font-extrabold text-sm text-[#0A3C2A] truncate">${m.name}</p>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(m.role)}">${roleLabel}</span>
+                  </div>
+                  <p class="text-[11px] text-gray-500">${m.memberId || "PF"} • 🩸 ${m.bloodGroup || "-"} • Paid: <strong>${formatINR(m.totalPaid || 0)}</strong></p>
+                </div>
+              </div>
+              <a href="tel:+91${m.phone}" class="px-2.5 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] text-xs font-bold shrink-0">📞 Call</a>
+            </div>
+          `;
+        }).join("");
+
+        // Render Pending Approvals if Staff
         const approvalCard = document.getElementById("admin-approval-card");
         const pendingList = document.getElementById("pending-users-list");
         if ((me.role === "admin" || me.role === "co_admin") && pendingUsers.length > 0) {
@@ -444,22 +510,9 @@
               };
               const doUndo = async () => {
                 await updateDoc(doc(db, "users", uid), { approvalStatus: "pending" });
-                await logAudit({
-                  actionType: "UNDO_MEMBER_APPROVAL",
-                  messageBn: `${me.name} সদস্য ${name}-এর অনুমোদন ফিরিয়ে (Undo/Unapprove) নিয়েছেন।`,
-                  messageEn: `${me.name} undid approval (unapproved) for ${name}.`,
-                  actorUid: me.uid,
-                  actorName: me.name,
-                  actorRole: me.role
-                });
               };
               await doApprove();
-              pushUndoAction({
-                labelBn: `Approve: ${name}`,
-                labelEn: `Approved: ${name}`,
-                undoFn: doUndo,
-                redoFn: doApprove
-              });
+              pushUndoAction({ labelBn: `Approve: ${name}`, labelEn: `Approved: ${name}`, undoFn: doUndo, redoFn: doApprove });
             });
           });
 
@@ -486,22 +539,9 @@
               };
               const doUndo = async () => {
                 await updateDoc(doc(db, "users", uid), { approvalStatus: "pending", rejectReason: "" });
-                await logAudit({
-                  actionType: "UNDO_MEMBER_REJECT",
-                  messageBn: `${me.name} সদস্য ${name}-এর আবেদন বাতিল ফিরিয়ে (Undo) নিয়েছেন।`,
-                  messageEn: `${me.name} undid rejection for ${name}.`,
-                  actorUid: me.uid,
-                  actorName: me.name,
-                  actorRole: me.role
-                });
               };
               await doReject();
-              pushUndoAction({
-                labelBn: `Reject: ${name}`,
-                labelEn: `Rejected: ${name}`,
-                undoFn: doUndo,
-                redoFn: doReject
-              });
+              pushUndoAction({ labelBn: `Reject: ${name}`, labelEn: `Rejected: ${name}`, undoFn: doUndo, redoFn: doReject });
             });
           });
         } else {
@@ -566,9 +606,24 @@
         });
       });
 
+      // Member List Modal Open/Close
+      const memberListModal = document.getElementById("member-list-modal");
+      document.getElementById("open-member-list-btn").addEventListener("click", () => memberListModal.classList.remove("hidden"));
+      document.getElementById("open-member-list-btn-2").addEventListener("click", () => memberListModal.classList.remove("hidden"));
+      document.getElementById("close-member-list-modal").addEventListener("click", () => memberListModal.classList.add("hidden"));
+
+      // UPI Modal Open/Close & Submit with Group Notification + High-End Popup
       const upiModal = document.getElementById("upi-modal");
       document.getElementById("open-upi-modal-btn").addEventListener("click", () => {
-        if (!upiEnabled) return alert(t("upiPausedNotice"));
+        if (!upiEnabled) {
+          return showFintechPopup({
+            type: "info",
+            titleBn: "UPI পেমেন্ট বন্ধ আছে",
+            titleEn: "UPI Payments Paused",
+            msgBn: t("upiPausedNotice"),
+            msgEn: t("upiPausedNotice")
+          });
+        }
         upiModal.classList.remove("hidden");
       });
       document.getElementById("close-upi-modal").addEventListener("click", () => upiModal.classList.add("hidden"));
@@ -606,12 +661,33 @@
             actorRole: me.role
           });
 
+          await sendGroupNotification({
+            titleBn: `💸 নতুন চাঁদা জমা (${me.name})`,
+            titleEn: `💸 New Contribution Submitted (${me.name})`,
+            bodyBn: `${me.name} (${month}) মাসের ${formatINR(monthlyContribution)} UPI পেমেন্ট জমা দিয়েছেন (UTR: ${utr})।`,
+            bodyEn: `${me.name} submitted ${formatINR(monthlyContribution)} UPI deposit for ${month} (UTR: ${utr}).`,
+            targetPage: "ledger.html",
+            actorUid: me.uid
+          });
+
           document.getElementById("utr-submit-form").reset();
           document.getElementById("utr-month").value = getCurrentMonthKey();
           upiModal.classList.add("hidden");
-          alert(getLang() === "bn" ? "UTR ও স্ক্রিনশট জমা হয়েছে! অ্যাডমিন ভেরিফাই করলে ব্যালেন্স যুক্ত হবে।" : "UTR & screenshot submitted for verification!");
+
+          showFintechPopup({
+            titleBn: "পেমেন্ট সফলভাবে জমা হয়েছে!",
+            titleEn: "Payment Submitted Successfully!",
+            msgBn: `আপনার ${formatINR(monthlyContribution)} পেমেন্টের UTR (${utr}) ও স্ক্রিনশট জমা হয়েছে এবং গ্রুপের সবাইকে নোটিফিকেশন পাঠানো হয়েছে।`,
+            msgEn: `Your ${formatINR(monthlyContribution)} UPI UTR (${utr}) has been submitted and all members have been notified.`
+          });
         } catch (err) {
-          alert("Error: " + err.message);
+          showFintechPopup({
+            type: "error",
+            titleBn: "সমস্যা হয়েছে",
+            titleEn: "Submission Error",
+            msgBn: err.message,
+            msgEn: err.message
+          });
         } finally {
           btn.disabled = false;
         }
