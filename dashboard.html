@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -307,6 +307,7 @@
       applyRoleBadge,
       getRoleBadgeClasses,
       showFintechPopup,
+      showFintechInputPopup,
       sendGroupNotification
     } from "./js/utils.js";
     import { getLang, t } from "./js/i18n.js";
@@ -402,10 +403,21 @@
       if (isAdmin) {
         document.getElementById("admin-quick-notice-btn").addEventListener("click", async () => {
           const current = document.getElementById("pinned-notice-text").textContent;
-          const nextText = prompt(
-            getLang() === "bn" ? "জরুরি নোটিশ লিখুন (ফাঁকা রাখলে মুছে যাবে):" : "Enter urgent notice (leave blank to clear):",
-            current === t("noNoticeYet") ? "" : current
-          );
+          const initial = current === t("noNoticeYet") ? "" : current;
+          const nextText = await showFintechInputPopup({
+            icon: "📌",
+            badgeText: "ADMIN NOTICE BOARD",
+            titleBn: "জরুরি নোটিশ পোস্ট / এডিট",
+            titleEn: "Post / Edit Urgent Notice",
+            subBn: "হোম ড্যাশবোর্ডের একদম ওপরে সবার জন্য নোটিশ পিন করুন (মুছতে চাইলে ফাঁকা রেখে সেভ করুন)।",
+            subEn: "Pin an urgent announcement on top of the Home Dashboard (leave blank and save to clear).",
+            placeholderBn: "যেমন: রবিবার সন্ধ্যায় ফান্ডের মিটিং হবে...",
+            placeholderEn: "e.g., Sunday evening fund meeting at 7 PM...",
+            initialValue: initial,
+            inputType: "textarea",
+            confirmBn: "নোটিশ সেভ করুন",
+            confirmEn: "Save Notice"
+          });
           if (nextText === null) return;
           const trimmed = nextText.trim();
           await setDoc(doc(db, "settings", "general"), {
@@ -420,6 +432,13 @@
             actorUid: me.uid,
             actorName: me.name,
             actorRole: me.role
+          });
+
+          showFintechPopup({
+            titleBn: trimmed ? "নোটিশ পিন করা হয়েছে!" : "নোটিশ মুছে ফেলা হয়েছে",
+            titleEn: trimmed ? "Urgent Notice Pinned!" : "Pinned Notice Cleared",
+            msgBn: trimmed ? "আপনার ঘোষণাটি এখন হোম ড্যাশবোর্ডে সবার জন্য দেখা যাচ্ছে।" : "হোম ড্যাশবোর্ড থেকে পিন করা নোটিশ সরানো হয়েছে।",
+            msgEn: trimmed ? "Your announcement is now pinned live on the Home Dashboard." : "The pinned announcement has been removed from Home."
           });
         });
       }
