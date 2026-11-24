@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Immutable Audit Log - Peer Fund</title>
+  <title>Audit Log - Peer Fund</title>
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#0A3C2A" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,28 +14,29 @@
     <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
       <div class="min-w-0 flex-1">
         <h1 class="font-extrabold text-base sm:text-lg flex items-center gap-2 truncate">
-          <span>🔒</span><span class="truncate" data-i18n="auditLogTitle">অপরিবর্তনীয় অডিট লগ</span>
+          <span>🔒</span><span class="truncate" data-i18n="auditLogTitle">Audit Log & History</span>
         </h1>
         <p class="text-[11px] text-[#5CDDAB] truncate" data-i18n="auditLogSub">
-          প্রতিটি জমা, বিয়োগ, রিমার্কস, Undo ও রোল পরিবর্তনের স্থায়ী রেকর্ড — কেউ ডিলিট করতে পারবেন না।
+          Complete record of every deposit, deduction, remark, Undo & role change (Admin can delete unnecessary records).
         </p>
       </div>
-      <div class="flex items-center gap-1.5 shrink-0"><button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
-            <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
-          </button>
-      <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
-        <span class="lang-indicator">English</span>
-      </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button class="notif-bell-btn relative p-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition shrink-0" title="Notifications">
+          <svg class="w-4 h-4 text-[#5CDDAB]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <span class="notif-badge hidden absolute -top-1 -right-1 px-1 min-w-[16px] h-4 rounded-full bg-red-600 text-white text-[9px] font-extrabold flex items-center justify-center">0</span>
+        </button>
+        <button class="lang-toggle-btn px-3 py-1.5 rounded-xl bg-white/15 text-xs font-bold shrink-0 whitespace-nowrap">
+          <span class="lang-indicator">বাংলা</span>
+        </button>
       </div>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto px-4 mt-5">
     <div id="audit-feed" class="space-y-3">
-      <p class="text-xs text-gray-500 text-center py-8">...</p>
+      <p class="text-xs text-gray-500 text-center py-8">Loading audit logs...</p>
     </div>
   </main>
 
@@ -59,39 +60,39 @@
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/>
         </svg>
-        <span class="whitespace-nowrap" data-i18n="navHome">হোম</span>
+        <span class="whitespace-nowrap" data-i18n="navHome">Home</span>
       </a>
       <a href="ledger.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h4"/>
         </svg>
-        <span class="whitespace-nowrap" data-i18n="navLedger">হিসাব</span>
+        <span class="whitespace-nowrap" data-i18n="navLedger">Ledger</span>
       </a>
       <a href="loans.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <span class="whitespace-nowrap" data-i18n="navLoans">লোন</span>
+        <span class="whitespace-nowrap" data-i18n="navLoans">Loans</span>
       </a>
       <a href="profile.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
-        <span class="whitespace-nowrap" data-i18n="navProfile">প্রোফাইল</span>
+        <span class="whitespace-nowrap" data-i18n="navProfile">Profile</span>
       </a>
       <a href="settings.html" class="text-white hover:text-[#5CDDAB] font-medium py-1.5 px-0.5 flex flex-col items-center justify-center gap-1 transition">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        <span class="whitespace-nowrap" data-i18n="navSettings">সেটিংস</span>
+        <span class="whitespace-nowrap" data-i18n="navSettings">Settings</span>
       </a>
     </div>
   </nav>
 
   <script type="module">
     import { db } from "./js/firebase-config.js";
-    import { collection, doc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { requireApprovedUser, setupCommonUI, getRoleBadgeClasses, askForRemarks, showFintechPopup } from "./js/utils.js";
     import { getLang } from "./js/i18n.js";
 
@@ -100,11 +101,24 @@
     requireApprovedUser((user, me) => {
       const isAdmin = me.role === "admin";
       let logs = [];
-      onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAt", "desc")), (snap) => {
-        logs = [];
-        snap.forEach((d) => logs.push({ id: d.id, ...d.data() }));
-        renderLogs();
-      });
+
+      onSnapshot(
+        collection(db, "audit_logs"),
+        (snap) => {
+          logs = [];
+          snap.forEach((d) => logs.push({ id: d.id, ...d.data() }));
+          logs.sort((a, b) => {
+            const ta = a.timestampIso || (a.createdAt?.toDate ? a.createdAt.toDate().toISOString() : "");
+            const tb = b.timestampIso || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString() : "");
+            return tb.localeCompare(ta);
+          });
+          renderLogs();
+        },
+        (err) => {
+          const feed = document.getElementById("audit-feed");
+          feed.innerHTML = `<div class="fintech-card p-6 text-center text-xs text-red-600 font-bold">Error loading audit logs: ${err.message}</div>`;
+        }
+      );
 
       function renderLogs() {
         const feed = document.getElementById("audit-feed");
@@ -115,20 +129,25 @@
         }
         feed.innerHTML = logs.map((l) => {
           const msg = lang === "bn" ? (l.messageBn || l.messageEn) : (l.messageEn || l.messageBn);
-          const timeStr = l.timestampIso ? new Date(l.timestampIso).toLocaleString("en-IN") : "";
+          const timeStr = l.timestampIso
+            ? new Date(l.timestampIso).toLocaleString("en-IN")
+            : (l.createdAt?.toDate ? l.createdAt.toDate().toLocaleString("en-IN") : "");
+          const roleText = (l.actorRole || "system") === "co_admin" ? "CO-ADMIN" : (l.actorRole || "system").toUpperCase();
           return `
             <div class="fintech-card p-4 border-l-4 border-[#39D59E]">
-              <div class="flex justify-between items-center mb-1">
+              <div class="flex justify-between items-center gap-2 mb-1">
                 <span class="px-2 py-0.5 rounded bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold">${l.actionType || "LOG"}</span>
-                <div class="flex items-center gap-2"><span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>${isAdmin ? `<button data-lid="${l.id}" class="del-audit-btn px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold">🗑️</button>` : ""}</div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>
+                  ${isAdmin ? `<button data-lid="${l.id}" class="del-audit-btn px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold" title="Delete">🗑️</button>` : ""}
+                </div>
               </div>
-              <p class="text-xs md:text-sm font-semibold text-gray-800">${msg}</p>
+              <p class="text-xs md:text-sm font-semibold text-gray-800">${msg || "-"}</p>
               ${l.remark ? `<p class="text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg mt-1.5 font-medium">Remark: ${l.remark}</p>` : ""}
-              <p class="text-[11px] text-gray-500 mt-1">Actor: <strong>${l.actorName || "System"}</strong> <span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(l.actorRole)}">${(l.actorRole || "system").toUpperCase()}</span></p>
+              <p class="text-[11px] text-gray-500 mt-1">Actor: <strong>${l.actorName || "System"}</strong> <span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(l.actorRole)}">${roleText}</span></p>
             </div>
           `;
         }).join("");
-      }
 
         feed.querySelectorAll(".del-audit-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
