@@ -49,6 +49,15 @@ body {
   box-shadow: 0 12px 32px rgba(1, 42, 24, 0.45);
 }
 
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.86) translateY(14px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-pop-in {
+  animation: popIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
