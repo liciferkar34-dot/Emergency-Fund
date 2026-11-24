@@ -424,7 +424,7 @@ export const translations = {
 };
 
 export function getLang() {
-  return localStorage.getItem("peerfund_lang") || "bn";
+  return localStorage.getItem("peerfund_lang") || "en";
 }
 
 export function setLang(lang) {
@@ -464,11 +464,20 @@ export function applyTranslations() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initI18n() {
   applyTranslations();
   document.querySelectorAll(".lang-toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      toggleLang();
-    });
+    if (!btn.dataset.i18nBound) {
+      btn.dataset.i18nBound = "1";
+      btn.addEventListener("click", () => {
+        toggleLang();
+      });
+    }
   });
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initI18n);
+} else {
+  initI18n();
+}
