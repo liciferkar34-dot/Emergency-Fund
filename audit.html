@@ -34,7 +34,23 @@
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto px-4 mt-5">
+  <main class="max-w-4xl mx-auto px-4 mt-5 space-y-3">
+    <!-- Admin Multi-Select & Select All Toolbar -->
+    <div id="audit-bulk-bar" class="hidden fintech-card p-3.5 flex flex-wrap items-center justify-between gap-2 border-l-4 border-red-600 sticky top-20 z-20">
+      <label class="flex items-center gap-2.5 cursor-pointer select-none">
+        <input type="checkbox" id="audit-select-all-chk" class="w-4 h-4 accent-red-600 rounded cursor-pointer" />
+        <span class="text-xs sm:text-sm font-extrabold text-[#0A3C2A]" data-i18n="selectAllLabel">Select All</span>
+        <span id="audit-selected-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-[#0A3C2A] text-[11px] font-extrabold">0</span>
+      </label>
+
+      <button id="audit-delete-selected-btn" disabled
+        class="px-3.5 py-2 rounded-xl bg-red-600 disabled:opacity-40 text-white text-xs font-extrabold flex items-center gap-1.5 shadow transition">
+        <span>🗑️</span>
+        <span data-i18n="deleteSelectedBtn">Delete Selected</span>
+        <span id="audit-del-count">(0)</span>
+      </button>
+    </div>
+
     <div id="audit-feed" class="space-y-3">
       <p class="text-xs text-gray-500 text-center py-8">Loading audit logs...</p>
     </div>
@@ -92,7 +108,7 @@
 
   <script type="module">
     import { db } from "./js/firebase-config.js";
-    import { collection, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, doc, deleteDoc, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { requireApprovedUser, setupCommonUI, getRoleBadgeClasses, askForRemarks, showFintechPopup } from "./js/utils.js";
     import { getLang } from "./js/i18n.js";
 
@@ -101,6 +117,83 @@
     requireApprovedUser((user, me) => {
       const isAdmin = me.role === "admin";
       let logs = [];
+      const selectedIds = new Set();
+
+      const bulkBar = document.getElementById("audit-bulk-bar");
+      const selectAllChk = document.getElementById("audit-select-all-chk");
+      const selectedBadge = document.getElementById("audit-selected-badge");
+      const delSelectedBtn = document.getElementById("audit-delete-selected-btn");
+      const delCountSpan = document.getElementById("audit-del-count");
+
+      function updateSelectionUI() {
+        if (!isAdmin) return;
+        // Prune IDs that no longer exist
+        const validIds = new Set(logs.map((x) => x.id));
+        for (const id of Array.from(selectedIds)) {
+          if (!validIds.has(id)) selectedIds.delete(id);
+        }
+
+        const count = selectedIds.size;
+        selectedBadge.textContent = String(count);
+        delCountSpan.textContent = `(${count})`;
+        delSelectedBtn.disabled = count === 0;
+        selectAllChk.checked = logs.length > 0 && count === logs.length;
+        selectAllChk.indeterminate = count > 0 && count < logs.length;
+      }
+
+      if (isAdmin) {
+        selectAllChk.addEventListener("change", () => {
+          if (selectAllChk.checked) {
+            logs.forEach((l) => selectedIds.add(l.id));
+          } else {
+            selectedIds.clear();
+          }
+          document.querySelectorAll(".audit-row-chk").forEach((cb) => {
+            cb.checked = selectedIds.has(cb.dataset.lid);
+          });
+          updateSelectionUI();
+        });
+
+        delSelectedBtn.addEventListener("click", async () => {
+          const idsToDelete = Array.from(selectedIds);
+          if (idsToDelete.length === 0) return;
+
+          const remark = await askForRemarks({
+            titleBn: `নির্বাচিত ${idsToDelete.length}টি রেকর্ড ডিলিট করার কারণ`,
+            titleEn: `Delete ${idsToDelete.length} Selected Records`,
+            required: false
+          });
+          if (remark === null) return;
+
+          delSelectedBtn.disabled = true;
+          try {
+            // Firestore writeBatch supports up to 500 ops per batch
+            for (let i = 0; i < idsToDelete.length; i += 450) {
+              const chunk = idsToDelete.slice(i, i + 450);
+              const batch = writeBatch(db);
+              chunk.forEach((id) => batch.delete(doc(db, "audit_logs", id)));
+              await batch.commit();
+            }
+            selectedIds.clear();
+            updateSelectionUI();
+            showFintechPopup({
+              type: "info",
+              titleBn: `${idsToDelete.length}টি রেকর্ড ডিলিট হয়েছে!`,
+              titleEn: `${idsToDelete.length} Records Deleted!`,
+              msgBn: "নির্বাচিত অডিট লগ রেকর্ডগুলো সফলভাবে মুছে ফেলা হয়েছে।",
+              msgEn: "All selected audit log records have been permanently deleted."
+            });
+          } catch (err) {
+            showFintechPopup({
+              type: "error",
+              titleBn: "ডিলিট ত্রুটি",
+              titleEn: "Delete Error",
+              msgBn: err.message,
+              msgEn: err.message
+            });
+          }
+        });
+      }
 
       onSnapshot(
         collection(db, "audit_logs"),
@@ -112,7 +205,11 @@
             const tb = b.timestampIso || (b.createdAt?.toDate ? b.createdAt.toDate().toISOString() : "");
             return tb.localeCompare(ta);
           });
+          if (isAdmin) {
+            bulkBar.classList.toggle("hidden", logs.length === 0);
+          }
           renderLogs();
+          updateSelectionUI();
         },
         (err) => {
           const feed = document.getElementById("audit-feed");
@@ -133,21 +230,36 @@
             ? new Date(l.timestampIso).toLocaleString("en-IN")
             : (l.createdAt?.toDate ? l.createdAt.toDate().toLocaleString("en-IN") : "");
           const roleText = (l.actorRole || "system") === "co_admin" ? "CO-ADMIN" : (l.actorRole || "system").toUpperCase();
+          const isChecked = selectedIds.has(l.id);
           return `
-            <div class="fintech-card p-4 border-l-4 border-[#39D59E]">
-              <div class="flex justify-between items-center gap-2 mb-1">
-                <span class="px-2 py-0.5 rounded bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold">${l.actionType || "LOG"}</span>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>
-                  ${isAdmin ? `<button data-lid="${l.id}" class="del-audit-btn px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold" title="Delete">🗑️</button>` : ""}
+            <div class="fintech-card p-4 border-l-4 border-[#39D59E] flex items-start gap-3">
+              ${isAdmin ? `
+                <input type="checkbox" data-lid="${l.id}" ${isChecked ? "checked" : ""}
+                  class="audit-row-chk mt-1 w-4 h-4 accent-red-600 rounded shrink-0 cursor-pointer" />
+              ` : ""}
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center gap-2 mb-1">
+                  <span class="px-2 py-0.5 rounded bg-emerald-100 text-[#0A3C2A] text-[10px] font-extrabold">${l.actionType || "LOG"}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-gray-400">🔒 ${timeStr}</span>
+                    ${isAdmin ? `<button data-lid="${l.id}" class="del-audit-btn px-2 py-0.5 rounded bg-red-100 text-red-700 text-[10px] font-bold" title="Delete">🗑️</button>` : ""}
+                  </div>
                 </div>
+                <p class="text-xs md:text-sm font-semibold text-gray-800 break-words">${msg || "-"}</p>
+                ${l.remark ? `<p class="text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg mt-1.5 font-medium">Remark: ${l.remark}</p>` : ""}
+                <p class="text-[11px] text-gray-500 mt-1">Actor: <strong>${l.actorName || "System"}</strong> <span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(l.actorRole)}">${roleText}</span></p>
               </div>
-              <p class="text-xs md:text-sm font-semibold text-gray-800">${msg || "-"}</p>
-              ${l.remark ? `<p class="text-xs text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg mt-1.5 font-medium">Remark: ${l.remark}</p>` : ""}
-              <p class="text-[11px] text-gray-500 mt-1">Actor: <strong>${l.actorName || "System"}</strong> <span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase ${getRoleBadgeClasses(l.actorRole)}">${roleText}</span></p>
             </div>
           `;
         }).join("");
+
+        feed.querySelectorAll(".audit-row-chk").forEach((cb) => {
+          cb.addEventListener("change", () => {
+            if (cb.checked) selectedIds.add(cb.dataset.lid);
+            else selectedIds.delete(cb.dataset.lid);
+            updateSelectionUI();
+          });
+        });
 
         feed.querySelectorAll(".del-audit-btn").forEach((btn) => {
           btn.addEventListener("click", async () => {
@@ -157,6 +269,7 @@
               required: false
             });
             if (ok === null) return;
+            selectedIds.delete(btn.dataset.lid);
             await deleteDoc(doc(db, "audit_logs", btn.dataset.lid));
             showFintechPopup({
               type: "info",

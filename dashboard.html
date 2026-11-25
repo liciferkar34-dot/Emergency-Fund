@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -189,6 +189,61 @@
         <button id="close-member-list-modal" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-bold">✕</button>
       </div>
       <div id="member-list-modal-body" class="space-y-2.5 overflow-y-auto flex-1 pr-1"></div>
+    </div>
+  </div>
+
+  <!-- Member Profile Details Popup (Opens when tapping any member in Member List) -->
+  <div id="dash-member-detail-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+    <div class="fintech-card w-full max-w-md p-6 relative animate-pop-in">
+      <button id="close-dash-member-detail" class="absolute right-4 top-4 w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:text-gray-900 font-bold">✕</button>
+      <div class="flex items-center gap-3.5 mb-4">
+        <img id="dmd-avatar" src="./icon.svg" class="w-16 h-16 rounded-2xl object-cover border-2 border-[#39D59E] shrink-0" />
+        <div class="min-w-0">
+          <span id="dmd-role" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase">MEMBER</span>
+          <h3 id="dmd-name" class="text-lg font-extrabold text-[#0A3C2A] mt-1 truncate">-</h3>
+          <p id="dmd-id" class="text-xs text-gray-500 font-semibold">ID: -</p>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 text-xs bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100">
+        <div class="flex justify-between">
+          <span class="text-gray-500" data-i18n="totalPaidLabel">Total Paid:</span>
+          <span id="dmd-paid" class="font-extrabold text-emerald-800">₹0</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500" data-i18n="statusCol">This Month Status:</span>
+          <span id="dmd-status" class="font-extrabold">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500" data-i18n="mobileCol">Mobile Number:</span>
+          <a id="dmd-phone-link" href="#" class="font-bold text-[#0A3C2A] underline">📞 <span id="dmd-phone">-</span></a>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500" data-i18n="bloodCol">Blood Group:</span>
+          <span id="dmd-blood" class="font-extrabold text-red-600">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-500" data-i18n="sosCol">Family SOS Number:</span>
+          <a id="dmd-sos-link" href="#" class="font-bold text-red-700 underline">🚑 <span id="dmd-sos">-</span></a>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500" data-i18n="upiCol">UPI ID:</span>
+          <span id="dmd-upi" class="font-semibold text-gray-800 select-all">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500" data-i18n="nomineeCol">Nominee:</span>
+          <span id="dmd-nominee" class="font-semibold text-gray-800">-</span>
+        </div>
+        <div id="dmd-bank-row" class="hidden pt-2 border-t border-emerald-200 flex justify-between">
+          <span class="text-gray-500" data-i18n="bankCol">Bank Account (Private):</span>
+          <span id="dmd-bank" class="font-bold text-gray-900 select-all">-</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 mt-4">
+        <a id="dmd-call-btn" href="#" class="py-2.5 px-3 rounded-xl mint-btn text-xs text-center font-extrabold">📞 Call Member</a>
+        <a id="dmd-wa-btn" href="#" target="_blank" rel="noopener" class="py-2.5 px-3 rounded-xl bg-[#25D366] text-white text-xs text-center font-extrabold">💬 WhatsApp</a>
+      </div>
     </div>
   </div>
 
@@ -441,25 +496,58 @@
 
         refreshCorpusUI();
 
-        // Render Live Monthly Deposit Status Chips (So everyone sees who paid this month)
+        function openMemberProfileDetail(target) {
+          if (!target) return;
+          const curM = getCurrentMonthKey();
+          const paidThisMonth = target.lastPaidMonth === curM;
+          document.getElementById("dmd-avatar").src = target.photoBase64 || "./icon.svg";
+          applyRoleBadge(document.getElementById("dmd-role"), target.role);
+          document.getElementById("dmd-name").textContent = target.name || "-";
+          document.getElementById("dmd-id").textContent = `Member ID: ${target.memberId || "-"}`;
+          document.getElementById("dmd-paid").textContent = formatINR(target.totalPaid || 0);
+          document.getElementById("dmd-status").textContent = paidThisMonth ? "✓ Paid" : "⏳ Pending";
+          document.getElementById("dmd-status").className = paidThisMonth ? "font-extrabold text-emerald-700" : "font-extrabold text-amber-600";
+          document.getElementById("dmd-phone").textContent = target.phone || "-";
+          document.getElementById("dmd-phone-link").href = `tel:+91${target.phone}`;
+          document.getElementById("dmd-blood").textContent = target.bloodGroup || "-";
+          document.getElementById("dmd-sos").textContent = target.sosContact || "-";
+          document.getElementById("dmd-sos-link").href = target.sosContact ? `tel:${target.sosContact}` : "#";
+          document.getElementById("dmd-upi").textContent = target.upiId || "-";
+          document.getElementById("dmd-nominee").textContent = target.nominee || "-";
+          document.getElementById("dmd-call-btn").href = `tel:+91${target.phone}`;
+          document.getElementById("dmd-wa-btn").href = `https://wa.me/91${target.phone}`;
+
+          const bankRow = document.getElementById("dmd-bank-row");
+          if (isAdmin || target.uid === me.uid) {
+            bankRow.classList.remove("hidden");
+            document.getElementById("dmd-bank").textContent = target.bankAccount
+              ? `${target.bankAccount} (${target.ifsc || ""})`
+              : "-";
+          } else {
+            bankRow.classList.add("hidden");
+          }
+          document.getElementById("dash-member-detail-modal").classList.remove("hidden");
+        }
+
+        // Render Live Monthly Deposit Status Chips (Tapping any member opens their Profile Details Popup)
         const curMonth = getCurrentMonthKey();
         const statusChips = document.getElementById("monthly-status-chips");
         statusChips.innerHTML = approvedMembersList.map((m) => {
           const isPaid = m.lastPaidMonth === curMonth;
           return `
-            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 ${isPaid ? "bg-emerald-100 text-emerald-900 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200"}">
+            <button type="button" data-uid="${m.uid}" class="dash-member-tap px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 cursor-pointer hover:opacity-85 transition ${isPaid ? "bg-emerald-100 text-emerald-900 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200"}">
               <span>${isPaid ? "✓" : "⏳"}</span>
               <span>${m.name.split(" ")[0]}</span>
-            </span>
+            </button>
           `;
         }).join("");
 
-        // Render Member List Modal Body
+        // Render Member List Modal Body (Tapping any member row opens their full Profile Details Popup)
         const modalBody = document.getElementById("member-list-modal-body");
         modalBody.innerHTML = approvedMembersList.map((m, idx) => {
           const roleLabel = m.role === "co_admin" ? "CO-ADMIN" : (m.role || "member").toUpperCase();
           return `
-            <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between gap-3">
+            <div data-uid="${m.uid}" class="dash-member-tap cursor-pointer p-3 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-100 flex items-center justify-between gap-3 transition">
               <div class="flex items-center gap-3 min-w-0">
                 <span class="text-xs font-extrabold text-gray-400 w-4">${idx + 1}.</span>
                 <img src="${m.photoBase64 || "./icon.svg"}" class="w-10 h-10 rounded-xl object-cover border border-emerald-200 shrink-0" />
@@ -471,10 +559,17 @@
                   <p class="text-[11px] text-gray-500">${m.memberId || "PF"} • 🩸 ${m.bloodGroup || "-"} • Paid: <strong>${formatINR(m.totalPaid || 0)}</strong></p>
                 </div>
               </div>
-              <a href="tel:+91${m.phone}" class="px-2.5 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] text-xs font-bold shrink-0">📞 Call</a>
+              <a href="tel:+91${m.phone}" onclick="event.stopPropagation()" class="px-2.5 py-1.5 rounded-xl bg-[#0A3C2A] text-[#5CDDAB] text-xs font-bold shrink-0">📞 Call</a>
             </div>
           `;
         }).join("");
+
+        document.querySelectorAll(".dash-member-tap").forEach((el) => {
+          el.addEventListener("click", () => {
+            const target = approvedMembersList.find((x) => x.uid === el.dataset.uid);
+            openMemberProfileDetail(target);
+          });
+        });
 
         // Render Pending Approvals if Staff
         const approvalCard = document.getElementById("admin-approval-card");
@@ -611,6 +706,7 @@
       document.getElementById("open-member-list-btn").addEventListener("click", () => memberListModal.classList.remove("hidden"));
       document.getElementById("open-member-list-btn-2").addEventListener("click", () => memberListModal.classList.remove("hidden"));
       document.getElementById("close-member-list-modal").addEventListener("click", () => memberListModal.classList.add("hidden"));
+      document.getElementById("close-dash-member-detail").addEventListener("click", () => document.getElementById("dash-member-detail-modal").classList.add("hidden"));
 
       // UPI Modal Open/Close & Submit with Group Notification + High-End Popup
       const upiModal = document.getElementById("upi-modal");

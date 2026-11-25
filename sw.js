@@ -1,4 +1,4 @@
-const CACHE_NAME = 'peer-fund-v8';
+const CACHE_NAME = 'peer-fund-v9';
 const ASSETS = [
   './',
   './index.html',

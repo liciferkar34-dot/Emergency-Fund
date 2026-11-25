@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,6 +33,25 @@
     <!-- General & Security Settings (All Members) -->
     <div class="fintech-card p-6 space-y-4">
       <h2 class="font-extrabold text-base text-[#0A3C2A]" data-i18n="generalPrefsTitle">সাধারণ ও সিকিউরিটি সেটিংস (সবার জন্য)</h2>
+
+      <!-- App Theme Row (Dark Mode / Light Mode / System Default) -->
+      <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-2.5">
+        <div>
+          <p class="font-bold text-sm text-[#0A3C2A]" data-i18n="themeSettingLabel">App Theme (Dark / Light Mode)</p>
+          <p class="text-xs text-gray-500" data-i18n="themeSettingDesc">Choose Dark Mode, Light Mode, or follow your phone's System Default</p>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" data-theme-choice="light" class="theme-choice-btn py-2.5 px-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold text-center">
+            ☀️ <span data-i18n="themeLight">Light Mode</span>
+          </button>
+          <button type="button" data-theme-choice="dark" class="theme-choice-btn py-2.5 px-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold text-center">
+            🌙 <span data-i18n="themeDark">Dark Mode</span>
+          </button>
+          <button type="button" data-theme-choice="system" class="theme-choice-btn py-2.5 px-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold text-center">
+            📱 <span data-i18n="themeSystem">System Default</span>
+          </button>
+        </div>
+      </div>
 
       <!-- Language Switch Row -->
       <div class="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100">
@@ -229,11 +248,18 @@
       setupCommonUI,
       logAudit,
       pushUndoAction,
-      showFintechPopup
+      showFintechPopup,
+      showFintechInputPopup
     } from "./js/utils.js";
-    import { getLang, t } from "./js/i18n.js";
+    import { getLang, t, setTheme, applyTheme } from "./js/i18n.js";
 
     setupCommonUI();
+    applyTheme();
+    document.querySelectorAll("[data-theme-choice]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setTheme(btn.getAttribute("data-theme-choice"));
+      });
+    });
 
     requireApprovedUser((user, me) => {
       const isAdmin = me.role === "admin";
@@ -249,15 +275,35 @@
       }
       refreshPinUI();
 
-      document.getElementById("set-pin-btn").addEventListener("click", () => {
-        const pin = prompt(getLang() === "bn" ? "নতুন ৪ সংখ্যার PIN লিখুন:" : "Enter a new 4-digit PIN:");
-        if (!pin || !/^[0-9]{4}$/.test(pin)) {
-          return showFintechPopup({ type: "error", titleBn: "ভুল ফরম্যাট", titleEn: "Invalid PIN", msgBn: "সঠিক ৪ সংখ্যার নম্বর দিন।", msgEn: "Please enter exactly 4 digits." });
-        }
-        localStorage.setItem("peerfund_app_pin", pin);
+      document.getElementById("set-pin-btn").addEventListener("click", async () => {
+        const pin = await showFintechInputPopup({
+          icon: "🔐",
+          badgeText: "APP SECURITY LOCK",
+          titleBn: "নতুন ৪-ডিজিট PIN সেট করুন",
+          titleEn: "Set New 4-Digit Security PIN",
+          subBn: "অ্যাপ খোলার সময় নিরাপত্তার জন্য ৪ সংখ্যার একটি গোপন PIN লিখুন।",
+          subEn: "Enter a secret 4-digit numeric PIN to lock your Peer Fund app.",
+          inputType: "pin",
+          confirmBn: "PIN সেভ করুন",
+          confirmEn: "Set PIN",
+          validateFn: (val, lang) => {
+            if (!val || !/^[0-9]{4}$/.test(val.trim())) {
+              return lang === "bn" ? "সঠিক ৪ সংখ্যার নম্বর দিন (যেমন: 1234)।" : "Please enter exactly 4 digits (e.g., 1234).";
+            }
+            return null;
+          }
+        });
+        if (!pin) return;
+        const cleanPin = pin.trim();
+        localStorage.setItem("peerfund_app_pin", cleanPin);
         sessionStorage.setItem("peerfund_pin_unlocked", "1");
         refreshPinUI();
-        showFintechPopup({ titleBn: "৪-ডিজিট PIN চালু হয়েছে!", titleEn: "4-Digit PIN Enabled!", msgBn: "এখন থেকে অ্যাপ খোলার সময় এই গোপন ৪ সংখ্যার PIN চাইবে।", msgEn: "Your 4-digit security PIN lock is now active." });
+        showFintechPopup({
+          titleBn: "৪-ডিজিট PIN চালু হয়েছে!",
+          titleEn: "4-Digit PIN Enabled!",
+          msgBn: "এখন থেকে অ্যাপ খোলার সময় এই গোপন ৪ সংখ্যার PIN চাইবে।",
+          msgEn: "Your 4-digit security PIN lock is now active."
+        });
       });
 
       disablePinBtn.addEventListener("click", () => {

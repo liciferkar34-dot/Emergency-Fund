@@ -137,6 +137,7 @@
         }
 
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        localStorage.setItem("peerfund_last_activity_ts", String(Date.now()));
         const uid = cred.user.uid;
 
         const isAutoAdmin = (email === ADMIN_EMAIL.toLowerCase() && phone === ADMIN_PHONE);
