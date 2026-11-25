@@ -481,3 +481,80 @@ if (document.readyState === "loading") {
 } else {
   initI18n();
 }
+
+// Global Mobile Keyboard Auto-Scroll & Modal Lift Handler
+// Ensures password fields and inputs always rise clearly above the on-screen keyboard
+function initKeyboardAutoScroll() {
+  if (window.__peerfundKbInit) return;
+  window.__peerfundKbInit = true;
+
+  let activeField = null;
+
+  function adjustForKeyboard() {
+    if (!activeField) return;
+    const vv = window.visualViewport;
+    const kbHeight = vv ? Math.max(0, window.innerHeight - vv.height) : 260;
+    const effectiveKb = kbHeight > 80 ? kbHeight : 260;
+
+    // Give body extra bottom scroll room so fields near bottom can scroll up freely
+    document.body.style.paddingBottom = `${effectiveKb + 140}px`;
+
+    // If inside a fixed modal (Login Forgot Modal, PIN Modal, Remarks Modal, UPI Modal), lift modal above keyboard
+    const fixedModal = activeField.closest(".fixed");
+    if (fixedModal) {
+      fixedModal.style.paddingBottom = `${effectiveKb + 16}px`;
+      fixedModal.style.alignItems = "flex-start";
+      fixedModal.style.paddingTop = "20px";
+      fixedModal.style.overflowY = "auto";
+    }
+
+    try {
+      activeField.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (_) {
+      activeField.scrollIntoView(true);
+    }
+  }
+
+  document.addEventListener("focusin", (e) => {
+    const el = e.target;
+    if (!el || !el.tagName) return;
+    const tag = el.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+      const type = (el.type || "").toLowerCase();
+      if (["checkbox", "radio", "file", "button", "submit", "hidden"].includes(type)) return;
+      activeField = el;
+      setTimeout(adjustForKeyboard, 100);
+      setTimeout(adjustForKeyboard, 350);
+    }
+  });
+
+  document.addEventListener("focusout", (e) => {
+    const prevField = e.target;
+    const prevModal = prevField && prevField.closest ? prevField.closest(".fixed") : null;
+    setTimeout(() => {
+      const cur = document.activeElement;
+      const curTag = cur && cur.tagName;
+      if (curTag !== "INPUT" && curTag !== "TEXTAREA" && curTag !== "SELECT") {
+        activeField = null;
+        document.body.style.paddingBottom = "";
+        if (prevModal) {
+          prevModal.style.paddingBottom = "";
+          prevModal.style.alignItems = "";
+          prevModal.style.paddingTop = "";
+        }
+      }
+    }, 160);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", () => {
+      if (activeField) adjustForKeyboard();
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initKeyboardAutoScroll);
+} else {
+  initKeyboardAutoScroll();
+}
