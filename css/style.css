@@ -75,3 +75,106 @@ input, textarea, select {
   scroll-margin-top: 90px;
   scroll-margin-bottom: 220px;
 }
+
+/* Theme System: Light Mode, Dark Mode & System Default */
+html.dark-theme,
+body.dark-theme {
+  background-color: #071510;
+  color: #E6F4EE;
+}
+
+body.dark-theme .fintech-card,
+body.dark-theme .bg-white {
+  background-color: #0F241C !important;
+  color: #E6F4EE;
+  border-color: rgba(92, 221, 171, 0.16) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-theme .bg-gray-50,
+body.dark-theme .bg-gray-100 {
+  background-color: #142E24 !important;
+  color: #D5EBE2;
+}
+
+body.dark-theme .bg-emerald-50,
+body.dark-theme .bg-emerald-50\/70,
+body.dark-theme .bg-emerald-50\/80,
+body.dark-theme .bg-emerald-100 {
+  background-color: rgba(18, 58, 43, 0.78) !important;
+  border-color: rgba(92, 221, 171, 0.22) !important;
+}
+
+body.dark-theme .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.34) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+
+body.dark-theme .bg-red-50,
+body.dark-theme .bg-red-100 {
+  background-color: rgba(127, 29, 29, 0.36) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+body.dark-theme .bg-slate-100,
+body.dark-theme .bg-slate-200 {
+  background-color: #1B382D !important;
+  color: #E2F1EB !important;
+}
+
+body.dark-theme .text-\[\#0A3C2A\] {
+  color: #5CDDAB !important;
+}
+
+body.dark-theme .text-gray-900,
+body.dark-theme .text-gray-800 {
+  color: #F0FAF5 !important;
+}
+
+body.dark-theme .text-gray-700,
+body.dark-theme .text-gray-600 {
+  color: #B8D4C8 !important;
+}
+
+body.dark-theme .text-gray-500,
+body.dark-theme .text-gray-400 {
+  color: #8EB3A4 !important;
+}
+
+body.dark-theme .text-emerald-900,
+body.dark-theme .text-emerald-800,
+body.dark-theme .text-emerald-700 {
+  color: #5CDDAB !important;
+}
+
+body.dark-theme .text-amber-950,
+body.dark-theme .text-amber-900,
+body.dark-theme .text-amber-800 {
+  color: #FCD34D !important;
+}
+
+body.dark-theme .text-red-800,
+body.dark-theme .text-red-700,
+body.dark-theme .text-red-600 {
+  color: #FCA5A5 !important;
+}
+
+body.dark-theme .border-gray-100,
+body.dark-theme .border-gray-200,
+body.dark-theme .border-emerald-100,
+body.dark-theme .border-emerald-200 {
+  border-color: rgba(92, 221, 171, 0.16) !important;
+}
+
+body.dark-theme input:not([type="checkbox"]):not([type="file"]),
+body.dark-theme textarea,
+body.dark-theme select {
+  background-color: #091B14 !important;
+  color: #F0FAF5 !important;
+  border-color: rgba(92, 221, 171, 0.28) !important;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #6F9687 !important;
+}
