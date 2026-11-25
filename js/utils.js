@@ -112,6 +112,121 @@ export function showFintechPopup({ titleBn, titleEn, msgBn, msgEn, type = "succe
   };
 }
 
+// High-End Animated Fintech Input Popup Modal (Replaces plain browser prompt)
+export function showFintechInputPopup({
+  titleBn,
+  titleEn,
+  subBn = "",
+  subEn = "",
+  placeholderBn = "",
+  placeholderEn = "",
+  initialValue = "",
+  inputType = "text", // "pin" | "textarea" | "text"
+  icon = "✨",
+  badgeText = "PEER FUND",
+  confirmBn = "সেভ করুন",
+  confirmEn = "Save",
+  validateFn = null // (val, lang) => errorStringOrNull
+}) {
+  return new Promise((resolve) => {
+    let modal = document.getElementById("fintech-input-popup");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "fintech-input-popup";
+      modal.className = "fixed inset-0 bg-black/70 backdrop-blur-md z-[96] flex items-center justify-center p-4";
+      modal.innerHTML = `
+        <div class="bg-white rounded-[28px] w-full max-w-sm shadow-2xl overflow-hidden animate-pop-in border border-emerald-200/60">
+          <div class="fintech-gradient pt-5 pb-7 px-6 text-center text-white relative">
+            <div id="fip-icon" class="w-14 h-14 rounded-2xl mx-auto mb-2.5 flex items-center justify-center text-2xl shadow-xl bg-[#5CDDAB] text-[#013A20] border-2 border-white/40 font-extrabold"></div>
+            <span id="fip-badge" class="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-[#5CDDAB] text-[10px] font-extrabold tracking-widest uppercase"></span>
+          </div>
+          <div class="p-6 -mt-3 bg-white rounded-t-3xl relative">
+            <h3 id="fip-title" class="text-lg font-extrabold text-[#0A3C2A] text-center mb-1"></h3>
+            <p id="fip-sub" class="text-xs text-gray-500 text-center mb-4 leading-relaxed"></p>
+            <div id="fip-field-wrap" class="mb-2"></div>
+            <p id="fip-err" class="hidden text-xs text-red-600 font-bold text-center mb-3"></p>
+            <div class="flex gap-2.5 mt-4">
+              <button type="button" id="fip-cancel-btn" class="flex-1 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm font-extrabold transition">Cancel / বাতিল</button>
+              <button type="button" id="fip-confirm-btn" class="flex-1 py-3 rounded-2xl mint-btn text-xs sm:text-sm font-extrabold"></button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    const lang = getLang();
+    document.getElementById("fip-icon").textContent = icon;
+    document.getElementById("fip-badge").textContent = badgeText;
+    document.getElementById("fip-title").textContent = lang === "bn" ? titleBn : titleEn;
+
+    const subEl = document.getElementById("fip-sub");
+    const subText = lang === "bn" ? subBn : subEn;
+    subEl.textContent = subText;
+    subEl.classList.toggle("hidden", !subText);
+
+    const errEl = document.getElementById("fip-err");
+    errEl.classList.add("hidden");
+    errEl.textContent = "";
+
+    const wrap = document.getElementById("fip-field-wrap");
+    const ph = lang === "bn" ? placeholderBn : placeholderEn;
+
+    if (inputType === "pin") {
+      wrap.innerHTML = `<input type="password" id="fip-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••"
+        class="w-full text-center tracking-[0.6em] font-extrabold text-2xl py-3 rounded-2xl border-2 border-emerald-200 focus:outline-none focus:border-[#0A3C2A] bg-emerald-50/40 text-[#0A3C2A]" />`;
+    } else if (inputType === "textarea") {
+      wrap.innerHTML = `<textarea id="fip-input" rows="3" placeholder="${ph}"
+        class="w-full px-3.5 py-2.5 rounded-2xl border-2 border-emerald-200 focus:outline-none focus:border-[#0A3C2A] text-sm bg-emerald-50/30 text-gray-900"></textarea>`;
+    } else {
+      wrap.innerHTML = `<input type="text" id="fip-input" placeholder="${ph}"
+        class="w-full px-3.5 py-2.5 rounded-2xl border-2 border-emerald-200 focus:outline-none focus:border-[#0A3C2A] text-sm bg-emerald-50/30 text-gray-900" />`;
+    }
+
+    const inputEl = document.getElementById("fip-input");
+    inputEl.value = initialValue || "";
+
+    const confirmBtn = document.getElementById("fip-confirm-btn");
+    confirmBtn.textContent = lang === "bn" ? confirmBn : confirmEn;
+
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+      inputEl.focus();
+      if (inputType !== "pin" && inputEl.value) {
+        inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+      }
+    }, 80);
+
+    const cleanup = (val) => {
+      modal.classList.add("hidden");
+      resolve(val);
+    };
+
+    const submitHandler = () => {
+      const val = inputEl.value;
+      if (validateFn) {
+        const errMsg = validateFn(val, lang);
+        if (errMsg) {
+          errEl.textContent = errMsg;
+          errEl.classList.remove("hidden");
+          inputEl.focus();
+          return;
+        }
+      }
+      cleanup(val);
+    };
+
+    document.getElementById("fip-cancel-btn").onclick = () => cleanup(null);
+    confirmBtn.onclick = submitHandler;
+    inputEl.onkeydown = (e) => {
+      if (e.key === "Enter" && inputType !== "textarea") {
+        e.preventDefault();
+        submitHandler();
+      }
+    };
+  });
+}
+
 // Send Real-Time Group Notification
 export async function sendGroupNotification({ titleBn, titleEn, bodyBn, bodyEn, targetPage = "dashboard.html", actorUid = "" }) {
   try {
@@ -511,8 +626,73 @@ export function requireApprovedUser(onReady) {
   });
 }
 
+
+// Automatic Logout after 30 Minutes of Inactivity
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+let inactivityWatcherStarted = false;
+
+export function startInactivityAutoLogout() {
+  if (inactivityWatcherStarted) return;
+  inactivityWatcherStarted = true;
+
+  const KEY = "peerfund_last_activity_ts";
+  const now = Date.now();
+  const existing = Number(localStorage.getItem(KEY) || 0);
+
+  // If already expired before page opened, log out immediately
+  if (existing > 0 && now - existing >= INACTIVITY_TIMEOUT_MS) {
+    performAutoLogout();
+    return;
+  }
+
+  localStorage.setItem(KEY, String(now));
+
+  let lastWrite = now;
+  const recordActivity = () => {
+    const tNow = Date.now();
+    // Check if already timed out before updating timestamp
+    const prev = Number(localStorage.getItem(KEY) || tNow);
+    if (tNow - prev >= INACTIVITY_TIMEOUT_MS) {
+      performAutoLogout();
+      return;
+    }
+    if (tNow - lastWrite > 5000) {
+      lastWrite = tNow;
+      localStorage.setItem(KEY, String(tNow));
+    }
+  };
+
+  ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"].forEach((evt) => {
+    window.addEventListener(evt, recordActivity, { passive: true });
+  });
+
+  const checkTimeout = () => {
+    const last = Number(localStorage.getItem(KEY) || Date.now());
+    if (Date.now() - last >= INACTIVITY_TIMEOUT_MS) {
+      performAutoLogout();
+    }
+  };
+
+  setInterval(checkTimeout, 15000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      checkTimeout();
+    }
+  });
+}
+
+async function performAutoLogout() {
+  try {
+    localStorage.removeItem("peerfund_last_activity_ts");
+    sessionStorage.removeItem("peerfund_pin_unlocked");
+    await signOut(auth);
+  } catch (_) {}
+  window.location.href = "login.html?timeout=1";
+}
+
 export function setupCommonUI() {
   initUndoRedoControls();
+  startInactivityAutoLogout();
   document.querySelectorAll(".logout-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       sessionStorage.removeItem("peerfund_pin_unlocked");

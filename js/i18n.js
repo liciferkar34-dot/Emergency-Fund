@@ -179,6 +179,18 @@ export const translations = {
     settingsTitle: "অ্যাপ ও ব্যাঙ্কিং সেটিংস",
     settingsSub: "ভাষা, সিকিউরিটি PIN এবং অ্যাডমিন ব্যাঙ্কিং কন্ট্রোল",
     generalPrefsTitle: "সাধারণ ও সিকিউরিটি সেটিংস (সবার জন্য)",
+    themeSettingLabel: "অ্যাপ থিম (ডার্ক / লাইট মোড)",
+    themeSettingDesc: "ডার্ক মোড, লাইট মোড অথবা ফোনের সিস্টেম ডিফল্ট বেছে নিন",
+    themeLight: "লাইট মোড",
+    themeDark: "ডার্ক মোড",
+    themeSystem: "সিস্টেম ডিফল্ট",
+    selectAllLabel: "সব সিলেক্ট করুন (Select All)",
+    deleteSelectedBtn: "নির্বাচিত ডিলিট করুন",
+    selectedCountLabel: "সিলেক্টেড:",
+    memberDetailsTitle: "সদস্যের সম্পূর্ণ প্রোফাইল",
+    nomineeCol: "নমিনি:",
+    statusCol: "এই মাসের স্ট্যাটাস:",
+    sessionTimeoutMsg: "৩০ মিনিট নিষ্ক্রিয় থাকার কারণে নিরাপত্তার জন্য অটো লগ-আউট হয়ে গেছে। আবার লগ ইন করুন।",
     languageSettingLabel: "অ্যাপের ভাষা নির্বাচন করুন",
     languageSettingDesc: "পুরো অ্যাপ মুহূর্তেই বাংলা বা ইংরেজিতে পরিবর্তন করুন",
     pinLockLabel: "৪-ডিজিট অ্যাপ PIN লক",
@@ -390,6 +402,18 @@ export const translations = {
     settingsTitle: "App & Banking Settings",
     settingsSub: "Language, Security PIN, and Admin Banking Controls",
     generalPrefsTitle: "General & Security Preferences (All Members)",
+    themeSettingLabel: "App Theme (Dark / Light Mode)",
+    themeSettingDesc: "Choose Dark Mode, Light Mode, or follow your phone's System Default",
+    themeLight: "Light Mode",
+    themeDark: "Dark Mode",
+    themeSystem: "System Default",
+    selectAllLabel: "Select All",
+    deleteSelectedBtn: "Delete Selected",
+    selectedCountLabel: "Selected:",
+    memberDetailsTitle: "Member Full Profile",
+    nomineeCol: "Nominee:",
+    statusCol: "This Month Status:",
+    sessionTimeoutMsg: "You were automatically logged out after 30 minutes of inactivity. Please sign in again.",
     languageSettingLabel: "Select App Language",
     languageSettingDesc: "Switch the entire application between Bengali and English",
     pinLockLabel: "4-Digit App PIN Lock",
@@ -557,4 +581,54 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initKeyboardAutoScroll);
 } else {
   initKeyboardAutoScroll();
+}
+
+// Global Theme Engine: Light Mode, Dark Mode & System Default
+export function getTheme() {
+  return localStorage.getItem("peerfund_theme") || "system";
+}
+
+export function applyTheme(mode = getTheme()) {
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const isDark = mode === "dark" || (mode === "system" && prefersDark);
+
+  document.documentElement.classList.toggle("dark-theme", isDark);
+  if (document.body) {
+    document.body.classList.toggle("dark-theme", isDark);
+  }
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute("content", isDark ? "#071510" : "#0A3C2A");
+  }
+
+  document.querySelectorAll("[data-theme-choice]").forEach((btn) => {
+    const active = btn.getAttribute("data-theme-choice") === mode;
+    if (active) {
+      btn.className = "theme-choice-btn flex-1 py-2.5 px-2 rounded-xl mint-btn text-xs font-extrabold text-center transition";
+    } else {
+      btn.className = "theme-choice-btn flex-1 py-2.5 px-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold text-center transition";
+    }
+  });
+}
+
+export function setTheme(mode) {
+  localStorage.setItem("peerfund_theme", mode);
+  applyTheme(mode);
+  window.dispatchEvent(new Event("themeChanged"));
+}
+
+// Apply theme immediately and listen for OS system theme changes
+applyTheme();
+if (window.matchMedia) {
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (getTheme() === "system") {
+      applyTheme("system");
+    }
+  });
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => applyTheme());
+} else {
+  applyTheme();
 }
