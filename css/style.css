@@ -66,3 +66,12 @@ body {
   background: #A7D7C5;
   border-radius: 999px;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+input, textarea, select {
+  scroll-margin-top: 90px;
+  scroll-margin-bottom: 220px;
+}
